@@ -45,7 +45,7 @@ class Haversine:
         :type LON_init: float
         :type LAT_final: float
         :type LON_final: float
-        :returns: distance [NM]
+        :returns: distance [m]
         :rtype: float.
         """
 
@@ -62,7 +62,7 @@ class Haversine:
         c = 2 * atan2(sqrt(a), sqrt(1 - a))
         d = const.AVG_EARTH_RADIUS_KM * 1000 * c
 
-        return conv.m2nm(d)
+        return d
 
     @staticmethod
     def destinationPoint(LAT_init, LON_init, distance, bearing):
@@ -73,7 +73,7 @@ class Haversine:
 
         :param LAT_init: initial Latitude [deg]
         :param LON_init: initial Longitude [deg]
-        :param distance: distance travelled from initial point at defined bearing [NM]
+        :param distance: distance travelled from initial point at defined bearing [m]
         :param bearing:  [deg]
         :type LAT_init: float
         :type LON_init: float
@@ -83,7 +83,7 @@ class Haversine:
         :rtype: (float, float).
         """
 
-        delta = conv.nm2m(distance) / (const.AVG_EARTH_RADIUS_KM * 1000)
+        delta = distance / (const.AVG_EARTH_RADIUS_KM * 1000)
         theta = radians(bearing)
 
         phi_init = radians(LAT_init)
