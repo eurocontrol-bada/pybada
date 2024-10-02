@@ -18,6 +18,7 @@ __docformat__ = "reStructuredText"
 
 import json
 import bisect
+from pyBADA import configuration
 
 
 class Grid:
@@ -27,7 +28,11 @@ class Grid:
 
     """
 
-    def __init__(self, inputJSON):
+    def __init__(self, inputJSON=None):
+        if inputJSON is None:
+            inputJSON = (
+                configuration.getDataPath() + "/magneticDeclinationGridData.json"
+            )
 
         f = open(inputJSON)
         grid = json.load(f)
@@ -47,7 +52,6 @@ class Grid:
         self.gridData["declination"] = magneticDeclinationList
 
     def getClosestLatitude(self, LAT_target):
-
         latitudeList = sorted(self.gridData["LAT"])
 
         if LAT_target < latitudeList[0] or LAT_target > latitudeList[-1]:
@@ -66,7 +70,6 @@ class Grid:
         return closest
 
     def getClosestLongitude(self, LON_target):
-
         longitudeList = sorted(self.gridData["LON"])
 
         if LON_target < longitudeList[0] or LON_target > longitudeList[-1]:
@@ -85,7 +88,6 @@ class Grid:
         return closest
 
     def getClosestIdx(self, LAT_target, LON_target):
-
         closestLAT = self.getClosestLatitude(LAT_target=LAT_target)
         closestLON = self.getClosestLongitude(LON_target=LON_target)
 
@@ -107,7 +109,6 @@ class Grid:
         return None
 
     def getMagneticDeclination(self, LAT_target, LON_target):
-
         idx = self.getClosestIdx(LAT_target=LAT_target, LON_target=LON_target)
 
         if idx is None:

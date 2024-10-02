@@ -38,3 +38,4 @@ packages = ["src/pyBADA"]
 "src/aircraft/BADA3/DUMMY" = "pyBADA/aircraft/BADA3/DUMMY"
 "src/aircraft/BADA4/DUMMY" = "pyBADA/aircraft/BADA4/DUMMY"
 "src/aircraft/BADAH/DUMMY" = "pyBADA/aircraft/BADAH/DUMMY"
+"src/data" = "pyBADA/data"

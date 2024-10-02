@@ -3,6 +3,7 @@ Example of BADA3 and BADA4 trajectory including geodesic calculations using TCL
 """
 
 from dataclasses import dataclass
+import os, pyBADA
 
 from pyBADA import atmosphere as atm
 from pyBADA import conversions as conv
@@ -34,9 +35,7 @@ print(allData)
 AC = Bada4Aircraft(badaVersion=badaVersion, acName="Dummy-TWIN", allData=allData)
 
 # get magnetic declination data
-magneticDeclinationGrid = Grid(
-    str(parentDir) + "/data/magneticDeclinationGridData.json"
-)
+magneticDeclinationGrid = Grid()
 
 # create a Flight Trajectory object to store the output from TCL segment calculations
 ft = FT()

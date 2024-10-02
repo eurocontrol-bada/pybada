@@ -90,3 +90,9 @@ def getAircraftPath():
     package_dir = os.path.dirname(__file__)
     path = os.path.join(package_dir, "aircraft")
     return path
+
+
+def getDataPath():
+    package_dir = os.path.dirname(__file__)
+    path = os.path.join(package_dir, "data")
+    return path

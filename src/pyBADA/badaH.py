@@ -191,28 +191,28 @@ class Parser:
 
         filename = os.path.join(filePath, "BADAH", badaVersion, "SYNONYM.xml")
 
-        try:
-            tree = ET.parse(filename)
-            root = tree.getroot()
-        except:
-            raise IOError(filename + " not found or in correct format")
-
         # synonym - file name pair dictionary
         synonym_fileName = {}
 
-        for child in root.iter("SYN"):
-            code = child.find("code").text
-            manufacturer = child.find("manu").text
-            file = child.find("file").text
-            ICAO = child.find("ICAO").text
+        if os.path.isfile(filename):
+            try:
+                tree = ET.parse(filename)
+                root = tree.getroot()
+            except:
+                raise IOError(filename + " not found or in correct format")
 
-            synonym_fileName[code] = file
+            for child in root.iter("SYN"):
+                code = child.find("code").text
+                manufacturer = child.find("manu").text
+                file = child.find("file").text
+                ICAO = child.find("ICAO").text
+
+                synonym_fileName[code] = file
 
         return synonym_fileName
 
     @staticmethod
     def parseSynonym(filePath, badaVersion, acName):
-
         synonym_fileName = Parser.readSynonym(filePath, badaVersion)
 
         if acName in synonym_fileName:
@@ -244,15 +244,24 @@ class Parser:
 
         merged_df = pd.DataFrame()
 
-        for synonym in synonym_fileName:
-            file = synonym_fileName[synonym]
+        if synonym_fileName:
+            for synonym in synonym_fileName:
+                file = synonym_fileName[synonym]
 
-            if file in subfolders:
-                # parse the original XML of a model
+                if file in subfolders:
+                    # parse the original XML of a model
+                    df = Parser.parseXML(filePath, badaVersion, file)
+
+                    # rename acName in the data frame to match the synonym model name
+                    df.at[0, "acName"] = synonym
+
+                    # Merge DataFrames
+                    merged_df = pd.concat([merged_df, df], ignore_index=True)
+
+        else:
+            for file in subfolders:
+                # Parse the original XML of a model
                 df = Parser.parseXML(filePath, badaVersion, file)
-
-                # rename acName in the dateaframe to match the synonym model name
-                df.at[0, "acName"] = synonym
 
                 # Merge DataFrames
                 merged_df = pd.concat([merged_df, df], ignore_index=True)
@@ -3565,7 +3574,6 @@ class BadaHAircraft(BADAH):
                 self.SearchedACName = acName
 
             if self.SearchedACName is not None:
-
                 acXmlFile = (
                     os.path.join(
                         self.filePath,
