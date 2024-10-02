@@ -1,0 +1,155 @@
+CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC SYNONYM.NEW CCCCCCCCCCCCCCC/
+CC                                                                    /
+CC                BADA SYNONYM FILE                                   /
+CC                                                                    /
+CC                                                                    /
+CC      File_name: SYNONYM.NEW                                        /
+CC                                                                    /
+CC      Creation_date: Apr 30 2002                                    /
+CC                                                                    /
+CC      Modification_date: Nov 24 2020                                /
+CC                                                                    /
+CC                                                                    /
+CC====== Aircraft List ===============================================/
+CC                                                                    /
+CC   A/C    MANUFACTURER        NAME OR MODEL             FILE   ICAO /
+CC   CODE                                                             /
+CC                                                                    /
+CD * A306   AIRBUS              A300B4-622               J2H___  Y    /
+CD * A30B   AIRBUS              A300B4-203               J2H___  Y    /
+CD * A310   AIRBUS              A310-204                 J2H___  Y    /
+CD * A318   AIRBUS              A318-112                 J2M___  Y    /
+CD * A319   AIRBUS              A319-131                 J2M___  Y    /
+CD * A320   AIRBUS              A320-231                 J2M___  Y    /
+CD * A321   AIRBUS              A321-111                 J2M___  Y    /
+CD * A332   AIRBUS              A330-243                 J2H___  Y    /
+CD * A333   AIRBUS              A330-301                 J2H___  Y    /
+CD * A342   AIRBUS              A340-213                 J4H___  Y    /
+CD * A343   AIRBUS              A340-313                 J4H___  Y    /
+CD * A345   AIRBUS              A340-541                 J4H___  Y    /
+CD * A346   AIRBUS              A340-642                 J4H___  Y    /
+CD * A388   AIRBUS              A380-841                 J4H___  Y    /
+CD * AT43   ATR                 42-300                   TP2M__  Y    /
+CD * AT44   ATR                 42-400                   TP2M__  Y    /
+CD * AT45   ATR                 42-500                   TP2M__  Y    /
+CD * AT46   ATR                 42-600                   TP2M__  Y    /
+CD * AT72   ATR                 72-200                   TP2M__  Y    /
+CD * AT73   ATR                 72-210                   TP2M__  Y    /
+CD * AT75   ATR                 72-210A                  TP2M__  Y    /
+CD * AT76   ATR                 72-212A 600              TP2M__  Y    /
+CD * B733   BOEING              B737-300                 J2M___  Y    /
+CD * B734   BOEING              B737-400e                J2M___  Y    /
+CD * B735   BOEING              B737-500                 J2M___  Y    /
+CD * B736   BOEING              B737-600                 J2M___  Y    /
+CD * B737   BOEING              B737-700                 J2M___  Y    /
+CD * B738   BOEING              B737-800                 J2M___  Y    /
+CD * B739   BOEING              B737-900ER               J2M___  Y    /
+CD * B742   BOEING              B747-200                 J4H___  Y    /
+CD * B743   BOEING              B747-300                 J4H___  Y    /
+CD * B744   BOEING              B747-400                 J4H___  Y    /
+CD * B748   BOEING              B747-8F                  J4H___  Y    /
+CD * B752   BOEING              B757-200                 J2H___  Y    /
+CD * B753   BOEING              B757-300                 J2H___  Y    /
+CD * B762   BOEING              B767-200                 J2H___  Y    /
+CD * B763   BOEING              B767-300ER               J2H___  Y    /
+CD * B764   BOEING              B767-400                 J2H___  Y    /
+CD * B772   BOEING              B777-200ER               J2H___  Y    /
+CD * B773   BOEING              B777-300                 J2H___  Y    /
+CD * B77L   BOEING              B777-200LR               J2H___  Y    /
+CD * B77W   BOEING              B777-300ER               J2H___  Y    /
+CD * B788   BOEING              B787-8                   J2H___  Y    /
+CD * B789   BOEING              B787-9                   J2H___  Y    /
+CD * BCS1   BOMBARDIER          CS100                    J2M___  Y    /
+CD * BCS3   BOMBARDIER          CS300                    J2M___  Y    /
+CD * BE33   BEECH               33 Bonanza               GA____  Y    /
+CD * BE35   BEECH               35 Bonanza               GA____  Y    /
+CD * BE36   BEECHCRAFT          Bonanza G36              GA____  Y    /
+CD * BE40   HAWKER              400XP                    BZJT__  Y    /
+CD * BE58   BEECHCRAFT          Baron 58                 GA____  Y    /
+CD - BZJT   (GENERIC)           Business jet             BZJT__  N    /
+CD * C150   CESSNA              150                      GA____  Y    /
+CD * C152   CESSNA              152                      GA____  Y    /
+CD * C162   CESSNA              162                      GA____  Y    /
+CD * C172   CESSNA              172S Skyhawk SP          GA____  Y    /
+CD * C182   CESSNA              182T Skylane             GA____  Y    /
+CD * C25A   CESSNA              Citation CJ2+            BZJT__  Y    /
+CD * C25B   CESSNA              Citation CJ3             BZJT__  Y    /
+CD * C25C   CESSNA              Citation CJ4             BZJT__  Y    /
+CD * C510   CESSNA              Citation Mustang         BZJT__  Y    /
+CD * C525   CESSNA              Citation CJ1+            BZJT__  Y    /
+CD * C550   CESSNA              Citation II              BZJT__  Y    /
+CD * C551   CESSNA              Citation II/SP           BZJT__  Y    /
+CD * C55B   CESSNA              Citation Bravo           BZJT__  Y    /
+CD * C560   CESSNA              Citation V               BZJT__  Y    /
+CD * C56X   CESSNA              Citation XLS+            BZJT__  Y    /
+CD * C650   CESSNA              Citation VII             BZJT__  Y    /
+CD * C680   CESSNA              Citation Sovereign       BZJT__  Y    /
+CD * C750   CESSNA              Citation X               BZJT__  Y    /
+CD * CL30   BOMBARDIER          Challenger 300           BZJT__  Y    /
+CD * CL35   BOMBARDIER          Challenger 350           BZJT__  Y    /
+CD * CL60   CANADAIR            Challenger 604           BZJT__  Y    /
+CD * CRJ1   CANADAIR            CRJ-100                  J2M___  Y    /
+CD * CRJ2   CANADAIR            CRJ-200                  J2M___  Y    /
+CD * CRJ7   BOMBARDIER          CRJ-700                  J2M___  Y    /
+CD * CRJ9   CANADAIR            CRJ-900                  J2M___  Y    /
+CD * CRJX   BOMBARDIER          CRJ-1000                 J2M___  Y    /
+CD * DA40   DIAMOND             DA40 NG                  GA____  Y    /
+CD * DA42   DIAMOND             DA42 Twin Star           GA____  Y    /
+CD * DH8A   DEHAVILLAND CANADA  DHC-8 100                TP2M__  Y    /
+CD * DH8B   DEHAVILLAND CANADA  DHC-8 200                TP2M__  Y    /
+CD * DH8C   DEHAVILLAND CANADA  DHC-8 300                TP2M__  Y    /
+CD * DH8D   DEHAVILLAND CANADA  Dash-8 Q400              TP2M__  Y    /
+CD * E170   EMBRAER             ERJ 170-100 IGW          J2M___  Y    /
+CD * E190   EMBRAER             ERJ 190-100 IGW          J2M___  Y    /
+CD * E195   EMBRAER             ERJ 190-200 IGW          J2M___  Y    /
+CD * E35L   EMBRAER             EMB-135BJ Legacy 600     BZJT__  Y    /
+CD * E50P   EMBRAER             EMB-500 Phenom 100       BZJT__  Y    /
+CD * E75L   EMBRAER             ERJ 170-200 IGW EWT      J2M___  Y    /
+CD * E75S   EMBRAER             ERJ 170-200 IGW          J2M___  Y    /
+CD * F2TH   DASSAULT            Falcon 2000EX            BZJT__  Y    /
+CD * F900   DASSAULT            Falcon 900EX             BZJT__  Y    /
+CD * FA50   DASSAULT            Falcon 50EX              BZJT__  Y    /
+CD * FA7X   DASSAULT            Falcon 7X                BZJT__  Y    /
+CD * G280   GULFSTREAM          G280                     BZJT__  Y    /
+CD - GA     (GENERIC)           General aviation a/c     GA____  N    /
+CD * GL5T   BOMBARDIER          Global 5000              BZJT__  Y    /
+CD * GLEX   BOMBARDIER          Global 6000              BZJT__  Y    /
+CD * GLF4   GULFSTREAM          IV                       BZJT__  Y    /
+CD * GLF5   GULFSTREAM          G550                     BZJT__  Y    /
+CD * GLF6   GULFSTREAM          G650                     BZJT__  Y    /
+CD * H25B   HAWKER              800XP                    BZJT__  Y    /
+CD * H25C   HAWKER              1000                     BZJT__  Y    /
+CD * HA4T   HAWKER              4000                     BZJT__  Y    /
+CD - J2H    (GENERIC)           Heavy twin jet           J2H___  N    /
+CD - J2M    (GENERIC)           Medium twin jet          J2M___  N    /
+CD - J4H    (GENERIC)           Heavy quad jet           J4H___  N    /
+CD * LJ35   LEARJET             35                       BZJT__  Y    /
+CD * LJ45   LEARJET             45                       BZJT__  Y    /
+CD * LJ60   LEARJET             60XR                     BZJT__  Y    /
+CD * MD11   MCDONNELL DOUGLAS   MD-11                    J4H___  Y    /
+CD * MD81   MCDONNELL DOUGLAS   MD-81                    J2M___  Y    /
+CD * MD82   MCDONNELL DOUGLAS   MD-82                    J2M___  Y    /
+CD * MD83   MCDONNELL DOUGLAS   MD-83                    J2M___  Y    /
+CD * MD87   MCDONNELL DOUGLAS   MD-87                    J2M___  Y    /
+CD * MD88   MCDONNELL DOUGLAS   MD-88                    J2M___  Y    /
+CD * MD90   MCDONNELL DOUGLAS   MD-90                    J2M___  Y    /
+CD * P28A   PIPER               PA-28-161                GA____  Y    /
+CD * P28B   PIPER               PA-28-236 Dakota         GA____  Y    /
+CD * P28R   PIPER               PA-28R-201               GA____  Y    /
+CD * P28S   PIPER               PA-28R-201T Turbo Arrow  GA____  Y    /
+CD * P28T   PIPER               PA-28RT-201              GA____  Y    /
+CD * P28U   PIPER               PA-28RT-201T             GA____  Y    /
+CD * PA32   PIPER               PA-32-301 Saratoga       GA____  Y    /
+CD * PA34   PIPER               PA-34-220T               GA____  Y    /
+CD * PA44   PIPER               PA-44-180 Seminole       GA____  Y    /
+CD * PA46   PIPER               PA-46-350P               GA____  Y    /
+CD * SB20   SAAB                2000                     TP2M__  Y    /
+CD * SF34   SAAB                SF 340B                  TP2M__  Y    /
+CD * SR20   CIRRUS              SR20                     GA____  Y    /
+CD * SR22   CIRRUS              SR22                     GA____  Y    /
+CD * SU95   SUKHOI              RRJ-95B SuperJet 100     J2M___  Y    /
+CD * TB20   SOCATA              TB 20 Trinidad           GA____  Y    /
+CD * TB21   SOCATA              TB 21 Trinidad TC        GA____  Y    /
+CD - TP2M   (GENERIC)           Twin turboprop           TP2M__  N    /
+CC ===================================================================/
+FI                                                                    /

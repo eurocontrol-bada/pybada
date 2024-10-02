@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:bada40="http://www.eurocontrol.int/eec/public/standard_page/bada40"
+      targetNamespace="http://www.eurocontrol.int/eec/public/standard_page/bada40">
+
+  <!-- The root element, BADA 4 GPF -->
+  <xs:element name="GPF" type="bada40:GPFType">
+    <xs:key name="HmaxPhaseKey">
+      <xs:selector xpath="./HmaxList/HmaxPhase"/>
+      <xs:field xpath="Phase"/>
+    </xs:key>
+    <xs:key name="VdPhaseKey">
+      <xs:selector xpath="./VdList/VdPhase/Phase"/>
+      <xs:field xpath="name"/>
+      <xs:field xpath="index"/>
+    </xs:key>
+  </xs:element>
+  
+  <!-- The root type -->
+  <xs:complexType name="GPFType">
+    <xs:sequence>
+      <xs:element name="CVminTO" type="xs:decimal"/>
+      <xs:element name="CVmin" type="xs:decimal"/>
+      <xs:element name="HmaxList" type="bada40:HmaxListType"/>
+      <xs:element name="VdList" type="bada40:VdListType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="HmaxListType">
+    <xs:sequence>
+      <xs:element name="HmaxPhase" type="bada40:HmaxPhaseType" minOccurs="4" maxOccurs="4"/>
+    </xs:sequence>
+  </xs:complexType>  
+  
+  <xs:complexType name="HmaxPhaseType">
+    <xs:sequence>
+      <xs:element name="Phase" type="bada40:HmaxPhaseNameType"/>
+      <xs:element name="Hmax" type="xs:nonNegativeInteger"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="HmaxPhaseNameType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="TO|IC|AP|LD"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="VdListType">
+    <xs:sequence>
+      <xs:element name="VdPhase" type="bada40:VdPhaseType" minOccurs="15" maxOccurs="15"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="VdPhaseType">
+    <xs:sequence>
+      <xs:element name="Phase" type="bada40:VdPhaseInfoType"/>
+      <xs:element name="Vd" type="xs:nonNegativeInteger"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="VdPhaseInfoType">
+    <xs:sequence>
+      <xs:element name="name" type="bada40:VdPhaseNameType"/>
+      <xs:element name="index" type="xs:positiveInteger"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="VdPhaseNameType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="CL|DES"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+</xs:schema>

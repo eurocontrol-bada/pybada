@@ -1,0 +1,556 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xs:schema  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+      xmlns:bada40="http://www.eurocontrol.int/eec/public/standard_page/bada40"
+      targetNamespace="http://www.eurocontrol.int/eec/public/standard_page/bada40">
+
+  <!-- The root element, BADA 4 ACM -->
+  <xs:element name="ACM" type="bada40:ACMType">
+    <xs:key name="HLidKey">
+      <xs:selector xpath="./AFCM/Configuration"/>
+      <xs:field xpath="@HLid"/>
+    </xs:key>
+    <xs:keyref name="TransitionFrom" refer="bada40:HLidKey">
+      <xs:selector xpath="./OPM/HLO/Transition"/>
+      <xs:field xpath="from"/>
+    </xs:keyref>
+    <xs:keyref name="TransitionTo" refer="bada40:HLidKey">
+      <xs:selector xpath="./OPM/HLO/Transition"/>
+      <xs:field xpath="to"/>
+    </xs:keyref>
+    <xs:keyref name="AeroPhaseId" refer="bada40:HLidKey">
+      <xs:selector xpath="./ARPM/AeroConfSchedule/AeroPhase"/>
+      <xs:field xpath="HLid"/> 
+    </xs:keyref>
+  </xs:element>
+  
+  <!-- The root type -->
+  <xs:complexType name="ACMType">
+    <xs:annotation>
+      <xs:documentation>
+        ACM is the root type of the document.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="model" type="xs:string"/>
+      <xs:element name="type" type="bada40:enginetypeType"/>
+      <xs:element name="engine" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+      <xs:element name="ICAO" type="bada40:ICAOType"/>
+      <xs:element name="AFCM" type="bada40:AFCMType"/>
+      <xs:element name="PFM" type="bada40:PFMType"/>
+      <xs:element name="OPM" type="bada40:OPMType" minOccurs="0"/>
+      <xs:element name="ALM" type="bada40:ALMType"/>
+      <xs:element name="Ground" type="bada40:GroundType" minOccurs="0"/>
+      <xs:element name="ARPM" type="bada40:ARPMType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="enginetypeType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="JET|TURBOPROP|PISTON"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- ICAO type, designator and WTC -->
+  <xs:complexType name="ICAOType">
+    <xs:sequence>
+      <xs:element name="designator">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:minLength value="1"/>
+            <xs:maxLength value="4"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+      <xs:element name="WTC">
+        <xs:simpleType>
+          <xs:restriction base="xs:string">
+            <xs:pattern value="L|M|H|J"/>
+          </xs:restriction>
+        </xs:simpleType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Aerodynamic forces and configurations model, AFCM -->
+  <xs:complexType name="AFCMType">
+    <xs:sequence>
+      <xs:element name="S" type="bada40:positiveDoubleType"/>
+      <xs:element name="Configuration" type="bada40:ConfigurationType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Configurations -->
+  <xs:complexType name="ConfigurationType">
+    <xs:sequence>
+      <xs:element name="HLPosition" type="xs:string"/>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="vfe" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="LGUP" type="bada40:LGUPType" minOccurs="0"/>
+      <xs:element name="LGDN" type="bada40:LGDNType" minOccurs="0"/>
+    </xs:sequence>
+    <xs:attribute name="HLid" type="xs:nonNegativeInteger" use="required"/>
+  </xs:complexType>
+
+  <!-- Landing gear up, LGUP -->
+  <xs:complexType name="LGUPType">
+    <xs:sequence>
+      <xs:choice>
+        <xs:element name="DPM_clean" type="bada40:DPM_cleanType"/>
+        <xs:element name="DPM_nonclean" type="bada40:DPM_noncleanType" minOccurs="0"/>
+      </xs:choice>
+      <xs:choice>
+        <xs:element name="BLM_clean" type="bada40:BLM_cleanType"/>
+        <xs:element name="BLM" type="bada40:BLM_othersType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Landing gear down, LGDN -->
+  <xs:complexType name="LGDNType">
+    <xs:sequence>
+      <xs:element name="DPM_nonclean" type="bada40:DPM_noncleanType" minOccurs="0"/>
+      <xs:element name="BLM" type="bada40:BLM_othersType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Clean configuration drag polar model, DPM -->
+  <xs:complexType name="DPM_cleanType">
+    <xs:sequence>
+      <xs:element name="M_max" type="bada40:positiveDoubleType"/>
+      <xs:element name="scalar" type="bada40:positiveDoubleType"/>
+      <xs:element name="CD_clean" type="bada40:coef15dType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Buffet limitation model -->
+  <xs:complexType name="BLM_cleanType">
+    <xs:sequence>
+      <xs:element name="Mmin" type="bada40:nonNegativeDoubleType"/>
+      <xs:element name="Mmax" type="bada40:positiveDoubleType"/>
+      <xs:element name="CL_Mach0" type="bada40:positiveDoubleType"/>
+      <xs:element name="CL_clean" type="bada40:coef5bfType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Non-clean configuration drag polar model, DPM -->
+  <xs:complexType name="DPM_noncleanType">
+    <xs:sequence>
+      <xs:element name="CD_nonclean" type="bada40:coef3dType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Non-clean buffet limitation model -->
+  <xs:complexType name="BLM_othersType">
+    <xs:sequence>
+      <xs:element name="CL_max" type="bada40:positiveDoubleType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Propulsion forces model -->
+  <xs:complexType name="PFMType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        The PFMType describes the propulsion forces model. It
+        has a TFM, TPM or PEM model as child and gives
+        information about the fuel density and heating value.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="MREF" type="bada40:positiveDoubleType"/>
+      <xs:element name="LHV" type="bada40:positiveDoubleType"/>
+      <xs:element name="rho" type="bada40:positiveDoubleType"/>
+      <xs:element name="n_eng" type="xs:positiveInteger"/>
+      <xs:element name="TFA" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:choice>
+        <xs:element name="TFM" type="bada40:TFMType"/>
+        <xs:element name="TPM" type="bada40:TPMType"/>
+        <xs:element name="PEM" type="bada40:PEMType"/>
+      </xs:choice>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Turbo Fan Model, TFM -->
+  <xs:complexType name="TFMType">
+    <xs:sequence>
+      <xs:element name="CT" type="bada40:coef36aType"/>
+      <xs:element name="CF" type="bada40:coef25fType"/>
+      <xs:element name="MCRZ" type="bada40:RTJMType" minOccurs="0"/>
+      <xs:element name="MCMB" type="bada40:RTJMType" minOccurs="0"/>
+      <xs:element name="MTKF" type="bada40:RTJMType" minOccurs="0"/>
+      <xs:element name="LIDL" type="bada40:IDJMType" minOccurs="0"/>
+      <xs:element name="throttle" type="bada40:throttle"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Turbo Fan Rating Model, RTMJ -->
+  <xs:complexType name="RTJMType">
+    <xs:sequence>
+      <xs:element name="kink" type="xs:double"/>
+      <xs:sequence>
+        <xs:element name="flat_rating" type="bada40:coef36bType"/>
+        <xs:element name="temp_rating" type="bada40:coef45cType"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Turbo Fan Idle Rating Model, IDJM -->
+  <xs:complexType name="IDJMType">
+    <xs:sequence>
+      <xs:element name="CT" type="bada40:coef12tiType"/>
+      <xs:element name="CF" type="bada40:coef9fiType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Turboprop Model, TPM -->
+  <xs:complexType name="TPMType">
+    <xs:sequence>
+      <xs:element name="prop_dia" type="bada40:positiveDoubleType"/>
+      <xs:element name="max_eff" type="bada40:positiveDoubleType"/>
+      <xs:element name="CP" type="bada40:coef36aType"/>
+      <xs:element name="CF" type="bada40:coef25fType"/>
+      <xs:element name="MCRZ" type="bada40:RTPMType" minOccurs="0"/>
+      <xs:element name="MCMB" type="bada40:RTPMType" minOccurs="0"/>
+      <xs:element name="LIDL" type="bada40:IDPMType" minOccurs="0"/>
+      <xs:element name="throttle" type="bada40:throttle" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Turboprop rating model, RTPM -->
+  <xs:complexType name="RTPMType">
+    <xs:sequence>
+      <xs:element name="max_power" type="bada40:positiveDoubleType"/>
+      <xs:element name="rating" type="bada40:coef36pType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Turboprop idle rating model, IDPM -->
+  <xs:complexType name="IDPMType">
+    <xs:sequence>
+      <xs:element name="CT" type="bada40:coef32tiType"/>
+      <xs:element name="CF" type="bada40:coef14fiType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Piston engine model, PEM -->
+  <xs:complexType name="PEMType">
+    <xs:sequence>
+      <xs:element name="P" type="bada40:positiveDoubleType"/>
+      <xs:element name="prop_dia" type="bada40:positiveDoubleType"/>
+      <xs:element name="Hd_turbo" type="bada40:nonNegativeDoubleType"/>
+      <xs:element name="max_eff" type="bada40:positiveDoubleType"/>
+      <xs:element name="CPSFC" type="bada40:positiveDoubleType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Throttle -->
+  <xs:complexType name="throttle">
+    <xs:sequence>
+      <xs:element name="low" type="xs:double"/>
+      <xs:element name="high" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Operations model, OPM -->
+  <xs:complexType name="OPMType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        The OPMType describes the operations model. It contains
+        the landing gear and the high lift devices operation
+        details, namely transition times from one position to
+        another.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="LGO" type="bada40:OPMOperationType" minOccurs="0"/>
+      <xs:element name="HLO" type="bada40:OPMOperationType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Operation type, OperationType  -->
+  <xs:complexType name="OPMOperationType">
+    <xs:sequence>
+      <xs:element name="Transition" type="bada40:OPMTransitionType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- OPM Transition type, transition time for different operations -->
+  <xs:complexType name="OPMTransitionType">
+    <xs:sequence>
+      <xs:element name="from" type="xs:nonNegativeInteger"/>
+      <xs:element name="to" type="xs:nonNegativeInteger"/>
+      <xs:element name="time" type="bada40:nonNegativeDoubleType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Aircraft limitations model, ALM -->
+  <xs:complexType name="ALMType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        The ALMType describes the limitations model. It
+        consists of geometric, kinetic, environmental and
+        dynamic limitations.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="GLM" type="bada40:GLMType" minOccurs="0"/>
+      <xs:element name="KLM" type="bada40:KLMType" minOccurs="0"/>
+      <xs:element name="ELM" type="bada40:ELMType" minOccurs="0"/>
+      <xs:element name="DLM" type="bada40:DLMType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Geometric limitation model, GLM -->
+  <xs:complexType name="GLMType">
+    <xs:sequence>
+      <xs:element name="hmo" type="bada40:positiveDoubleType"/>
+      <xs:element name="mfa" type="bada40:positiveDoubleType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Kinetic limitation model, KLM -->
+  <xs:complexType name="KLMType">
+    <xs:sequence>
+      <xs:element name="mmo" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="vmo" type="bada40:positiveDoubleType"/>
+      <xs:element name="mle" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="vle" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="mlo" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="vloe" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="vlor" type="bada40:positiveDoubleType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Environmental limitation model, ELM -->
+  <xs:complexType name="ELMType">
+    <xs:sequence>
+      <xs:element name="Tmin_f" type="bada40:ELMboundaryType" minOccurs="0"/>
+      <xs:element name="Tmax_f" type="bada40:ELMboundaryType" minOccurs="0"/>
+      <xs:element name="Tmin_g" type="bada40:ELMboundaryType" minOccurs="0"/>
+      <xs:element name="Tmax_g" type="bada40:ELMboundaryType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ELMboundaryType">
+    <xs:sequence>
+      <xs:element name="point" type="bada40:ELMboundaryPointType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+ 
+  <xs:complexType name="ELMboundaryPointType">
+    <xs:sequence>
+      <xs:element name="Hp" type="xs:double"/>
+      <xs:element name="DeltaT" type="xs:double"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Dynamic limitation model, DLM -->
+  <xs:complexType name="DLMType">
+    <xs:sequence>
+      <xs:element name="MTW" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="MTOW" type="bada40:positiveDoubleType"/>
+      <xs:element name="MLW" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="MZFW" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="OEW" type="bada40:positiveDoubleType"/>
+      <xs:element name="MPL" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="MFL" type="bada40:positiveDoubleType" minOccurs="0"/>
+      <xs:element name="n1" type="xs:double" minOccurs="0"/>
+      <xs:element name="n2" type="xs:double" minOccurs="0"/>
+      <xs:element name="n3" type="xs:double" minOccurs="0"/>
+      <xs:element name="nf1" type="xs:double" minOccurs="0"/>
+      <xs:element name="nf3" type="xs:double" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Ground type, contains ground parameters -->
+  <xs:complexType name="GroundType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        The GroundType contains additional aircraft information. It
+        includes aircraft dimensions and runway lengths.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="Dimensions" type="bada40:DimensionsType" minOccurs="0"/>
+      <xs:element name="Runway" type="bada40:RunwayType" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Dimensions type, aircraft span and length -->
+  <xs:complexType name="DimensionsType">
+    <xs:sequence>
+      <xs:element name="span" type="bada40:positiveDoubleType"/>
+      <xs:element name="length" type="bada40:positiveDoubleType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Runway type, takeoff length and landing length -->
+  <xs:complexType name="RunwayType">
+    <xs:sequence>
+      <xs:element name="TOL" type="bada40:positiveDoubleType"/>
+      <xs:element name="LDL" type="bada40:positiveDoubleType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Airline Procedure Model, ARPM  -->
+  <xs:complexType name="ARPMType">
+    <xs:annotation>
+      <xs:documentation xml:lang="en">
+        The ARPMType contains proposed aerodynamic configurations and speeds
+        for differents flight phases.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="AeroConfSchedule" type="bada40:AeroConfScheduleType"/>
+      <xs:element name="SpeedScheduleList" type="bada40:SpeedScheduleListType"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <xs:complexType name="AeroConfScheduleType">
+    <xs:sequence>
+      <xs:element name="AeroPhase" type="bada40:AeroPhaseType" maxOccurs="5"/>
+    </xs:sequence>
+  </xs:complexType>  
+  
+  <!-- Per-phase high-lift and landing gear positions -->
+  <xs:complexType name="AeroPhaseType">
+    <xs:sequence>
+      <xs:element name="name" type="bada40:AeroPhaseNameType"/>
+      <xs:element name="HLid" type="xs:nonNegativeInteger"/>
+      <xs:element name="LG" type="bada40:LGposType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="AeroPhaseNameType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="TO|IC|CR|AP|LD"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="LGposType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="UP|DN"/>
+    </xs:restriction>
+  </xs:simpleType>
+  
+  <xs:complexType name="SpeedScheduleListType">
+    <xs:sequence>
+      <xs:element name="SpeedSchedule" type="bada40:SpeedScheduleType" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+  
+  <!-- Per-company (i.e. airline) speed schedule  -->
+  <xs:complexType name="SpeedScheduleType">
+    <xs:sequence>
+      <xs:element name="CompanyName" type="xs:string"/>
+      <xs:sequence>
+        <xs:element name="SpeedPhase" type="bada40:SpeedPhaseType" maxOccurs="3"/>
+      </xs:sequence>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Per-phase speed schedule -->
+  <xs:complexType name="SpeedPhaseType">
+    <xs:sequence>
+      <xs:element name="name" type="bada40:SpeedPhaseNameType"/>
+      <xs:element name="CAS1" type="bada40:positiveDoubleType"/>
+      <xs:element name="CAS2" type="bada40:positiveDoubleType"/>
+      <xs:element name="M" type="bada40:positiveDoubleType"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:simpleType name="SpeedPhaseNameType">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="Climb|Cruise|Descent"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+
+  <!-- Miscellaneous types used to restrict the range of some values -->
+  <xs:simpleType name="positiveDoubleType">
+    <xs:restriction base="xs:double">
+      <xs:minExclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="nonNegativeDoubleType">
+    <xs:restriction base="xs:double">
+      <xs:minInclusive value="0"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- Miscellaneous types used to represent vectors of coefficients -->
+  <xs:complexType name="coef15dType">
+    <xs:sequence>
+      <xs:element name="d" type="xs:double" minOccurs="15" maxOccurs="15"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef3dType">
+    <xs:sequence>
+      <xs:element name="d" type="xs:double" minOccurs="3" maxOccurs="3"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef5bfType">
+    <xs:sequence>
+      <xs:element name="bf" type="xs:double" minOccurs="5" maxOccurs="5"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef36aType">
+    <xs:sequence>
+      <xs:element name="a" type="xs:double" minOccurs="36" maxOccurs="36"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef25fType">
+    <xs:sequence>
+      <xs:element name="f" type="xs:double" minOccurs="25" maxOccurs="25"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef36bType">
+    <xs:sequence>
+      <xs:element name="b" type="xs:double" minOccurs="36" maxOccurs="36"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef45cType">
+    <xs:sequence>
+      <xs:element name="c" type="xs:double" minOccurs="45" maxOccurs="45"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef36pType">
+    <xs:sequence>
+      <xs:element name="p" type="xs:double" minOccurs="36" maxOccurs="36"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef12tiType">
+    <xs:sequence>
+      <xs:element name="ti" type="xs:double" minOccurs="12" maxOccurs="12"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef32tiType">
+    <xs:sequence>
+      <xs:element name="ti" type="xs:double" minOccurs="32" maxOccurs="32"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef9fiType">
+    <xs:sequence>
+      <xs:element name="fi" type="xs:double" minOccurs="9" maxOccurs="9"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="coef14fiType">
+    <xs:sequence>
+      <xs:element name="fi" type="xs:double" minOccurs="14" maxOccurs="14"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
