@@ -26,13 +26,13 @@ bearing = 310
 distance_haversine = geo.Haversine.distance(
     LAT_init=LAT_init, LON_init=LON_init, LAT_final=LAT_final, LON_final=LON_final
 )
-print("Haversine distance:", conv.nm2m(distance_haversine))
+print("Haversine distance:", distance_haversine)
 
 # Vincenty formula
 distance_vincenty = geo.Vincenty.distance(
     LAT_init=LAT_init, LON_init=LON_init, LAT_final=LAT_final, LON_final=LON_final
 )
-print("Vincenty distance: ", conv.nm2m(distance_vincenty))
+print("Vincenty distance: ", distance_vincenty)
 print("")
 
 # ===========================================================
@@ -55,7 +55,7 @@ print("Vincenty initial bearing: ", bearing_vincenty)
 bearing_vincenty = geo.Vincenty.bearing_final(
     LAT_init=LAT_init, LON_init=LON_init, LAT_final=LAT_final, LON_final=LON_final
 )
-print("Vincenty final bearing:   ", bearing_vincenty)
+# print("Vincenty final bearing:   ", bearing_vincenty)
 print("")
 
 # =====================================================================================
@@ -64,13 +64,30 @@ print("")
 
 # Haversine formula
 destPoint_haversine = geo.Haversine.destinationPoint(
-    LAT_init=LAT_init, LON_init=LON_init, distance=conv.m2nm(distance), bearing=bearing
+    LAT_init=LAT_init, LON_init=LON_init, distance=distance, bearing=bearing
 )
 print("Haversine destination point:", destPoint_haversine)
 
 # Vincenty formula
 destPoint_vincenty = geo.Vincenty.destinationPoint(
-    LAT_init=LAT_init, LON_init=LON_init, distance=conv.m2nm(distance), bearing=bearing
+    LAT_init=LAT_init, LON_init=LON_init, distance=distance, bearing=bearing
+)
+print("Vincenty destination point: ", destPoint_vincenty)
+print("")
+
+# =====================================================================================
+# calculation of destination point based in initial point, distance and initial bearing
+# =====================================================================================
+
+# Haversine formula
+destPoint_haversine = geo.Haversine.destinationPoint(
+    LAT_init=LAT_init, LON_init=LON_init, distance=distance, bearing=bearing
+)
+print("Haversine destination point:", destPoint_haversine)
+
+# Vincenty formula
+destPoint_vincenty = geo.Vincenty.destinationPoint(
+    LAT_init=LAT_init, LON_init=LON_init, distance=distance, bearing=bearing
 )
 print("Vincenty destination point: ", destPoint_vincenty)
 
