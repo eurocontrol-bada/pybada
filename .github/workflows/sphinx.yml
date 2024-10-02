@@ -1,12 +1,9 @@
-name: Build and Upload Sphinx Documentation
+name: Publish updated version of the docs
 
 on:
   push:
     branches:
-      - main # Trigger action on push to the main branch
-  pull_request:
-    branches:
-      - main # Trigger action on pull requests targeting the main branch
+      - main
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -16,6 +13,7 @@ permissions:
   
 jobs:
   build-docs:
+    name: Build HTML docs
     runs-on: ubuntu-latest
 
     steps:
@@ -32,7 +30,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Build Sphinx documentation
+      - name: Run Sphinx build
         run: |
           cd docs
           make html
@@ -44,7 +42,7 @@ jobs:
 
   deploy:
     name: Deploy to GitHub pages
-    # Do not run this unless *pushing* to `main`.
+    # Do not run this unless pushing to main.
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     environment:
       name: github-pages
