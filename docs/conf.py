@@ -12,6 +12,7 @@
 #
 import os
 import sys
+sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('../src/pyBADA'))
 
 
@@ -25,7 +26,12 @@ author = "EUROCONTROL"
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ["sphinx_rtd_theme"]
+extensions = [
+    'sphinx.ext.autodoc',     # For automatic documentation from docstrings
+    'sphinx.ext.napoleon',    # For NumPy and Google style docstrings
+    'sphinx.ext.viewcode',    # Optional: Add links to highlighted source code
+    'sphinx.ext.autosummary', # Optional: Generate summary tables
+]
 
 templates_path = ["_templates"]
 exclude_patterns = []
