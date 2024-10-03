@@ -6,16 +6,6 @@ Developed @EUROCONTROL (EIH)
 2024
 """
 
-__author__ = "Henrich Glaser-Opitz"
-__copyright__ = "Copyright 2024, EUROCONTROL (EIH)"
-__license__ = "BADA Eurocontrol"
-__version__ = "1.0.0"
-__maintainer__ = "Henrich Glaser-Opitz"
-__email__ = "henrich.glaser-opitz@eurocontrol.int"
-__status__ = "Development"
-__docformat__ = "reStructuredText"
-
-
 from math import sqrt, pow, pi, isnan, sin, asin
 
 import numpy as np
@@ -87,9 +77,6 @@ class Parser:
                 root = tree.getroot()
             except:
                 raise IOError(filename + " not found or in correct format")
-
-            # synonym - file name pair dictionary
-            code_fileName = {}
 
             for child in root.iter("MAP"):
                 code = child.find("code").text

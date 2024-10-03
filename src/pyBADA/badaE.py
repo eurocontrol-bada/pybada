@@ -2,19 +2,9 @@
 """
 pyBADA
 Generic BADAE aircraft performance module
-Developped @EUROCONTROL (EIH) by Henrich Glaser-Opitz, PhD
+Developped @EUROCONTROL (EIH)
 2024
 """
-
-__author__ = "Henrich Glaser-Opitz"
-__copyright__ = "Copyright 2024, EUROCONTROL (EIH)"
-__license__ = "BADA Eurocontrol"
-__version__ = "1.0.0"
-__maintainer__ = "Henrich Glaser-Opitz"
-__email__ = "henrich.glaser-opitz@eurocontrol.int"
-__status__ = "Development"
-__docformat__ = "reStructuredText"
-
 
 import xml.etree.ElementTree as ET
 from datetime import date

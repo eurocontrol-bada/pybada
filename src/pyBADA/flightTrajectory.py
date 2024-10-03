@@ -6,16 +6,6 @@ Developped @EUROCONTROL (EIH)
 2024
 """
 
-__author__ = "Henrich Glaser-Opitz"
-__copyright__ = "Copyright 2024, EUROCONTROL (EIH)"
-__license__ = "BADA Eurocontrol"
-__version__ = "1.0.0"
-__maintainer__ = "Henrich Glaser-Opitz"
-__email__ = "henrich.glaser-opitz@eurocontrol.int"
-__status__ = "Development"
-__docformat__ = "reStructuredText"
-
-
 import os
 import datetime
 import pandas as pd

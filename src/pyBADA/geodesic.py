@@ -6,16 +6,6 @@ Developped @EUROCONTROL (EIH)
 2024
 """
 
-__author__ = "Henrich Glaser-Opitz"
-__copyright__ = "Copyright 2024, EUROCONTROL (EIH)"
-__license__ = "BADA Eurocontrol"
-__version__ = "1.0.0"
-__maintainer__ = "Henrich Glaser-Opitz"
-__email__ = "henrich.glaser-opitz@eurocontrol.int"
-__status__ = "Development"
-__docformat__ = "reStructuredText"
-
-
 from math import tan, atan2, sin, asin, cos, radians, degrees, sqrt, pi, log, log2, acos
 from pyBADA.aircraft import Airplane as airplane
 from pyBADA import conversions as conv
@@ -266,8 +256,8 @@ class Vincenty(object):
         :rtype: float.
         """
 
-        dist = Vincenty.distance_bearing(LAT_init, LON_init, LAT_final, LON_final)
-        return dist[0]
+        dist_bearing = Vincenty.distance_bearing(LAT_init, LON_init, LAT_final, LON_final)
+        return dist_bearing[0]
 
     @staticmethod
     def bearing_initial(LAT_init, LON_init, LAT_final, LON_final):
@@ -635,9 +625,6 @@ class RhumbLine(object):
 
 class Turn(object):
     """This class implements the calculations of geodesics turns
-
-    .. note::
-
     """
 
     @staticmethod

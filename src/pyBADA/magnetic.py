@@ -6,16 +6,6 @@ Developped @EUROCONTROL (EIH)
 2024
 """
 
-__author__ = "Henrich Glaser-Opitz"
-__copyright__ = "Copyright 2024, EUROCONTROL (EIH)"
-__license__ = "BADA Eurocontrol"
-__version__ = "1.0.0"
-__maintainer__ = "Henrich Glaser-Opitz"
-__email__ = "henrich.glaser-opitz@eurocontrol.int"
-__status__ = "Development"
-__docformat__ = "reStructuredText"
-
-
 import json
 import bisect
 from pyBADA import configuration
@@ -23,9 +13,6 @@ from pyBADA import configuration
 
 class Grid:
     """This class implements the calculations on the magnetic declination using the grid data
-
-    .. note::
-
     """
 
     def __init__(self, inputJSON=None):
