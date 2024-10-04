@@ -1,4 +1,7 @@
 """
+Aircraft Trajectory Calculation on Earth
+========================================
+
 Example of BADA3 and BADA4 trajectory including geodesic calculations using TCL
 """
 

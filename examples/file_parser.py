@@ -1,4 +1,7 @@
 """
+BADA File Parser
+================
+
 Example of BADA3, BADA4 and BADAH file parser
 """
 
