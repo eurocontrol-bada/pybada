@@ -27,7 +27,7 @@ class TrajectoryPrediction:
         fuelReserve=3600,
         flightPlanInitialMass=None,
     ):
-        """This function returns calculated (estimated) aircrat initial masssss
+        """This function returns calculated (estimated) aircrat initial mass
                 derived from the breguet leduc formula
 
         :param AC: aircraft {BADA3/4/H/E}
@@ -49,7 +49,13 @@ class TrajectoryPrediction:
         """
 
         def initialMassCalculation(
-            AC, distance, altitude, M, payload, fuelReserve, flightPlanInitialMass
+            AC,
+            distance,
+            altitude,
+            M,
+            payload,
+            fuelReserve,
+            flightPlanInitialMass,
         ):
             DeltaTemp = 0
             [theta, delta, sigma] = atm.atmosphereProperties(
@@ -72,7 +78,11 @@ class TrajectoryPrediction:
                 THR = Drag
 
                 fuelFlow = AC.ff(
-                    h=altitude, v=TAS, T=THR, config=config, flightPhase=flightPhase
+                    h=altitude,
+                    v=TAS,
+                    T=THR,
+                    config=config,
+                    flightPhase=flightPhase,
                 )
 
             elif AC.BADAFamily.BADA4:

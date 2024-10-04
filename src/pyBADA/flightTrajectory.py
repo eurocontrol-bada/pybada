@@ -24,7 +24,7 @@ class FlightTrajectory:
         self.flightData = {}
 
     def createFT(self):
-        """This function creates a flightTrajectory and populate it with input data
+        """This function creates a flightTrajectory and populate it with input dataaaa
 
         :param AC: aircraft {BADA3/4/H/E}
         :param Hp: altitude
@@ -146,7 +146,9 @@ class FlightTrajectory:
         columns_to_explode = [key for key in flight_data]
 
         # Explode the DataFrame
-        flightTrajectory_exploded = flightTrajectory.explode(columns_to_explode)
+        flightTrajectory_exploded = flightTrajectory.explode(
+            columns_to_explode
+        )
 
         return flightTrajectory_exploded
 
@@ -279,9 +281,9 @@ class FlightTrajectory:
                     ].astype(float)
 
                     # Perform the cumulative addition using .loc[]
-                    flightTrajectoryToAppend.loc[:, col] = flightTrajectoryToAppend[
-                        col
-                    ] + float(last_value)
+                    flightTrajectoryToAppend.loc[:, col] = (
+                        flightTrajectoryToAppend[col] + float(last_value)
+                    )
 
         # Concatenating the two trajectory data
         flightTrajectoryCombined = pd.concat(
@@ -854,7 +856,9 @@ class FlightTrajectory:
 
             # Save to xlsx file, since xlsx format doesn’t use a separator
             with pd.ExcelWriter(filename, engine="xlsxwriter") as writer:
-                flightTrajectory.to_excel(writer, index=False, header=customHeader)
+                flightTrajectory.to_excel(
+                    writer, index=False, header=customHeader
+                )
 
     def save2kml(self, saveToPath):
         """
@@ -889,8 +893,12 @@ class FlightTrajectory:
             # Flight Trajectory data
             flightTrajectory = self.getFT(AC)
 
-            if not all(col in flightTrajectory.columns for col in ["LAT", "LON", "Hp"]):
-                print(f"Skipping {AC_ID}: Required columns (LAT, LON, Hp) are missing.")
+            if not all(
+                col in flightTrajectory.columns for col in ["LAT", "LON", "Hp"]
+            ):
+                print(
+                    f"Skipping {AC_ID}: Required columns (LAT, LON, Hp) are missing."
+                )
                 continue
 
             filename = os.path.join(filepath, f"{AC.acName}_ID{AC_ID}.kml")
@@ -906,7 +914,9 @@ class FlightTrajectory:
             )  # Set altitude mode to absolute
 
             # Customize the line style for altitude extrusion and color (Yellow)
-            linestring.style.linestyle.color = simplekml.Color.yellow  # Yellow line
+            linestring.style.linestyle.color = (
+                simplekml.Color.yellow
+            )  # Yellow line
             linestring.style.linestyle.width = 3  # Line width in pixels
             linestring.extrude = 1  # Enable altitude extrusion
 
