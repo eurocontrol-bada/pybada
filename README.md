@@ -30,8 +30,11 @@ python3 -m venv env
 source env/bin/activate
 # Install package in editable mode
 pip install -e .
-# Install a couple of packages for formatting and linting
-pip install -r requirements-dev.txt
+# Install a couple of packages for formatting, linting and building the docs
+pip install -e .[dev]
+# To build the docs
+cd docs
+make html
 ```
 
 ## License

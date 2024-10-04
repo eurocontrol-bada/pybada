@@ -24,6 +24,13 @@ dependencies = [
 ]
 license = { text = "EUPL-1.2" }
 
+# Some additional deps not needed to run the package but to develop on it
+# linter, formatter, to build the docs, ..
+[project.optional-dependencies]
+dev = ["black==23.9.1",
+  "flake8==6.1.0",
+  "sphinx-rtd-theme==2.0.0",
+  "Sphinx==7.4.7"]
 
 [project.urls]
 "Homepage" = "https://github.com/eurocontrol/pybada"
