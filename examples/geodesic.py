@@ -1,9 +1,13 @@
 """
+Geodesic Calculation
+====================
+
 Example of using the geodesic module and comparision 
 between Haversine and Vincenty implementation
+
 """
 
-import folium
+# import folium
 
 from pyBADA import conversions as conv
 from pyBADA import geodesic as geo
@@ -24,13 +28,19 @@ bearing = 310
 
 # Haversine formula
 distance_haversine = geo.Haversine.distance(
-    LAT_init=LAT_init, LON_init=LON_init, LAT_final=LAT_final, LON_final=LON_final
+    LAT_init=LAT_init,
+    LON_init=LON_init,
+    LAT_final=LAT_final,
+    LON_final=LON_final,
 )
 print("Haversine distance:", distance_haversine)
 
 # Vincenty formula
 distance_vincenty = geo.Vincenty.distance(
-    LAT_init=LAT_init, LON_init=LON_init, LAT_final=LAT_final, LON_final=LON_final
+    LAT_init=LAT_init,
+    LON_init=LON_init,
+    LAT_final=LAT_final,
+    LON_final=LON_final,
 )
 print("Vincenty distance: ", distance_vincenty)
 print("")
@@ -41,19 +51,28 @@ print("")
 
 # Haversine formula
 bearing_haversine = geo.Haversine.bearing(
-    LAT_init=LAT_init, LON_init=LON_init, LAT_final=LAT_final, LON_final=LON_final
+    LAT_init=LAT_init,
+    LON_init=LON_init,
+    LAT_final=LAT_final,
+    LON_final=LON_final,
 )
 print("Haversine initial bearing:", bearing_haversine)
 
 # Vincenty formula for initial bearing
 bearing_vincenty = geo.Vincenty.bearing_initial(
-    LAT_init=LAT_init, LON_init=LON_init, LAT_final=LAT_final, LON_final=LON_final
+    LAT_init=LAT_init,
+    LON_init=LON_init,
+    LAT_final=LAT_final,
+    LON_final=LON_final,
 )
 print("Vincenty initial bearing: ", bearing_vincenty)
 
 # Vincenty formula for final bearing
 bearing_vincenty = geo.Vincenty.bearing_final(
-    LAT_init=LAT_init, LON_init=LON_init, LAT_final=LAT_final, LON_final=LON_final
+    LAT_init=LAT_init,
+    LON_init=LON_init,
+    LAT_final=LAT_final,
+    LON_final=LON_final,
 )
 # print("Vincenty final bearing:   ", bearing_vincenty)
 print("")
@@ -98,7 +117,7 @@ print("Vincenty destination point: ", destPoint_vincenty)
 initPoint = (LAT_init, LON_init)
 
 # create a base map
-myMap = folium.Map(location=initPoint, zoom_start=10)
+# myMap = folium.Map(location=initPoint, zoom_start=10)
 
 # construct the lines
 haversineLine = []
@@ -110,23 +129,23 @@ vincentyLine.append(initPoint)
 vincentyLine.append(destPoint_vincenty)
 
 # draw the lines on the map
-folium.PolyLine(haversineLine, color="red", weight=2).add_to(myMap)
-folium.PolyLine(vincentyLine, color="blue", weight=2).add_to(myMap)
+# folium.PolyLine(haversineLine, color="red", weight=2).add_to(myMap)
+# folium.PolyLine(vincentyLine, color="blue", weight=2).add_to(myMap)
 
 # add markers on the map
-folium.Marker(initPoint).add_to(myMap)
-folium.Marker(
-    destPoint_haversine,
-    popup="<i>Haversine</i>",
-    tooltip="Haversine",
-    icon=folium.Icon(color="red"),
-).add_to(myMap)
-folium.Marker(
-    destPoint_vincenty,
-    popup="<i>Vincenty</i>",
-    tooltip="Vincenty",
-    icon=folium.Icon(color="blue"),
-).add_to(myMap)
+# folium.Marker(initPoint).add_to(myMap)
+# folium.Marker(
+# destPoint_haversine,
+# popup="<i>Haversine</i>",
+# tooltip="Haversine",
+# icon=folium.Icon(color="red"),
+# ).add_to(myMap)
+# folium.Marker(
+# destPoint_vincenty,
+# popup="<i>Vincenty</i>",
+# tooltip="Vincenty",
+# icon=folium.Icon(color="blue"),
+# ).add_to(myMap)
 
 # saving the map in the HTML file. This map then can be viewed in the browser and you can interact with it
-myMap.save("map_geodesic.html")
+# myMap.save("map_geodesic.html")
