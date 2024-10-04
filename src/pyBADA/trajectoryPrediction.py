@@ -49,7 +49,13 @@ class TrajectoryPrediction:
         """
 
         def initialMassCalculation(
-            AC, distance, altitude, M, payload, fuelReserve, flightPlanInitialMass
+            AC,
+            distance,
+            altitude,
+            M,
+            payload,
+            fuelReserve,
+            flightPlanInitialMass,
         ):
             DeltaTemp = 0
             [theta, delta, sigma] = atm.atmosphereProperties(
@@ -72,7 +78,11 @@ class TrajectoryPrediction:
                 THR = Drag
 
                 fuelFlow = AC.ff(
-                    h=altitude, v=TAS, T=THR, config=config, flightPhase=flightPhase
+                    h=altitude,
+                    v=TAS,
+                    T=THR,
+                    config=config,
+                    flightPhase=flightPhase,
                 )
 
             elif AC.BADAFamily.BADA4:
