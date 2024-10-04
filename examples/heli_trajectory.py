@@ -1,4 +1,7 @@
 """
+Helicopter Trajectory Calculation
+=================================
+
 Example of BADAH trajectory using TCL
 """
 
