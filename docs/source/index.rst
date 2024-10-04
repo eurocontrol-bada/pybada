@@ -1,5 +1,17 @@
-Welcome to pyBADA's documentation!
+pyBADA documentation
 ==================================
+
+pyBADA provides aircraft performance modelling, trajectory prediction and optimisation, and visualisation with BADA in Python.
+
+To get started:
+
+.. code-block:: bash
+
+    pip install pybada
+
+
+About BADA
+==========
 
 Efficient air traffic operations rely on the capability of air traffic management (ATM) systems to accurately predict aircraft trajectories. Likewise, ATM research and development activities require modelling and simulation tools capable of replicating real-life operations and aircraft performances as perfectly as possible.
 
