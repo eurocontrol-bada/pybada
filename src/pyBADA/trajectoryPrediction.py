@@ -27,7 +27,7 @@ class TrajectoryPrediction:
         fuelReserve=3600,
         flightPlanInitialMass=None,
     ):
-        """This function returns calculated (estimated) aircrat initial mass
+        """This function returns calculated (estimated) aircrat initial masssss
                 derived from the breguet leduc formula
 
         :param AC: aircraft {BADA3/4/H/E}
