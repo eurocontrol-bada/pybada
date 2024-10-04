@@ -1,5 +1,5 @@
-pyBADA documentation
-====================
+Welcome to pyBADA's documentation!
+==================================
 
 Efficient air traffic operations rely on the capability of air traffic management (ATM) systems to accurately predict aircraft trajectories. Likewise, ATM research and development activities require modelling and simulation tools capable of replicating real-life operations and aircraft performances as perfectly as possible.
 
@@ -12,28 +12,24 @@ Owing to this cooperation, BADA prevails as a unique product provided by EUROCON
 BADA APM is based on a kinetic approach to aircraft performance modelling. It is made of two components: the Model specifications, which provide the theoretical fundaments used to calculate aircraft performance parameters, and the Datasets containing the aircraft-specific coefficients necessary to perform calculations. 
 
 
+
 .. toctree::
-   :caption: pyBADA Modules
-   :maxdepth: 1
-   
+   :maxdepth: 2
+   :caption: Contents:
+
+   TCL
    aircraft
    atmosphere
+   bada3
+   bada4
+   badaH
    configuration
    constants
    conversions
    flightTrajectory
    geodesic
    magnetic
-   bada3
-   bada4
-   badaH
-   TCL
    trajectoryPrediction
-
-.. toctree::
-   :caption: Guide
-   :maxdepth: 1
-
 
 Indices and tables
 ==================

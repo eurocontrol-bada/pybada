@@ -1,7 +1,7 @@
-constants module
+FlightTrajectory
 ================
 
-.. automodule:: constants
+.. automodule:: pyBADA.flightTrajectory
    :members:
    :undoc-members:
    :show-inheritance:

@@ -1,7 +1,7 @@
-configuration module
+TrajectoryPrediction
 ====================
 
-.. automodule:: configuration
+.. automodule:: pyBADA.trajectoryPrediction
    :members:
    :undoc-members:
    :show-inheritance:
