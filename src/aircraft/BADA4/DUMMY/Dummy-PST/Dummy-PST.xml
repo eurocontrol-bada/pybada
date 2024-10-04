@@ -113,10 +113,12 @@
       </Configuration>
    </AFCM>
    <PFM>
+      <n_eng>1</n_eng>
       <MREF>1400</MREF>
       <LHV>43710000</LHV>
       <rho>715</rho>
-      <n_eng>1</n_eng>
+      <p_delta>1</p_delta>
+      <p_theta>0.5</p_theta>
       <PEM>
          <P>300</P>
          <prop_dia>1.9</prop_dia>

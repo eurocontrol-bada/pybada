@@ -158,10 +158,12 @@
       </xs:documentation>
     </xs:annotation>
     <xs:sequence>
+      <xs:element name="n_eng" type="xs:positiveInteger"/>
       <xs:element name="MREF" type="bada40:positiveDoubleType"/>
       <xs:element name="LHV" type="bada40:positiveDoubleType"/>
       <xs:element name="rho" type="bada40:positiveDoubleType"/>
-      <xs:element name="n_eng" type="xs:positiveInteger"/>
+      <xs:element name="p_delta" type="bada40:positiveDoubleType"/>
+      <xs:element name="p_theta" type="bada40:positiveDoubleType"/>
       <xs:element name="TFA" type="bada40:positiveDoubleType" minOccurs="0"/>
       <xs:choice>
         <xs:element name="TFM" type="bada40:TFMType"/>
