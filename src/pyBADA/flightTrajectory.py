@@ -24,7 +24,7 @@ class FlightTrajectory:
         self.flightData = {}
 
     def createFT(self):
-        """This function creates a flight trajectory and populate it with input data
+        """This function creates a flightTrajectory and populate it with input data
 
         :param AC: aircraft {BADA3/4/H/E}
         :param Hp: altitude
