@@ -7,8 +7,9 @@ sys.path.insert(0, os.path.abspath('../../src'))
 # -- Project information -----------------------------------------------------
 
 project = 'pybada'
-author = 'Your Name'
-release = '0.1'  # Replace with your project's version
+author = 'EUROCONTROL'
+copyright = "2024, EUROCONTROL"
+release = '0.1.0'
 
 # -- General configuration ---------------------------------------------------
 
@@ -17,6 +18,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'sphinx.ext.autosummary',
+    'sphinx_rtd_theme'
 ]
 
 autosummary_generate = True
@@ -29,4 +31,4 @@ modindex_common_prefix = ['pyBADA.']
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+# html_static_path = ['_static']
