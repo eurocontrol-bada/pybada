@@ -33,7 +33,8 @@ dev = ["black==23.9.1",
   "Sphinx==7.4.7",
   "pre-commit==3.8.0",
   "sphinx-gallery==0.17.1",
-  "matplotlib==3.9.2"]
+  "matplotlib==3.9.2",
+  "folium==0.17.0"]
 
 [project.urls]
 "Homepage" = "https://github.com/eurocontrol/pybada"
