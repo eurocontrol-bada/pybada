@@ -3,13 +3,13 @@
 import os
 import sys
 
-sys.path.insert(0, os.path.abspath("../../src"))
+sys.path.append(os.path.abspath("../../src"))
 
 # -- Project information -----------------------------------------------------
 
-project = "pybada"
-author = "Your Name"
-release = "0.1"  # Replace with your project's version
+project = "pyBADA"
+author = "Henrich Glaser - Opitz"
+release = "0.1.0"  # Replace with your project's version
 
 # -- General configuration ---------------------------------------------------
 
@@ -25,6 +25,15 @@ sphinx_gallery_conf = {
     "examples_dirs": "../../examples",  # Path to your example scripts
     "gallery_dirs": "auto_examples",  # Path where to save generated output
     "filename_pattern": "^((?!skip_).)*$",  # Only include scripts not starting with 'skip_'
+    "reset_modules_order": "after",  # Reset modules after each example
+    "run_stale_examples": True,  # Force re-execution of examples
+    "remove_config_comments": True,  # Clean up the code blocks
+    "capture_repr": ("_repr_html_",),
+    "default_thumb_file": os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__), "_static", "default_thumbnail.png"
+        )
+    ),
 }
 
 autosummary_generate = True
