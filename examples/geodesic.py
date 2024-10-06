@@ -7,7 +7,7 @@ between Haversine and Vincenty implementation
 
 """
 
-# import folium
+import folium
 
 from pyBADA import conversions as conv
 from pyBADA import geodesic as geo
@@ -129,23 +129,26 @@ vincentyLine.append(initPoint)
 vincentyLine.append(destPoint_vincenty)
 
 # draw the lines on the map
-# folium.PolyLine(haversineLine, color="red", weight=2).add_to(myMap)
-# folium.PolyLine(vincentyLine, color="blue", weight=2).add_to(myMap)
+folium.PolyLine(haversineLine, color="red", weight=2).add_to(myMap)
+folium.PolyLine(vincentyLine, color="blue", weight=2).add_to(myMap)
 
 # add markers on the map
-# folium.Marker(initPoint).add_to(myMap)
-# folium.Marker(
-# destPoint_haversine,
-# popup="<i>Haversine</i>",
-# tooltip="Haversine",
-# icon=folium.Icon(color="red"),
-# ).add_to(myMap)
-# folium.Marker(
-# destPoint_vincenty,
-# popup="<i>Vincenty</i>",
-# tooltip="Vincenty",
-# icon=folium.Icon(color="blue"),
-# ).add_to(myMap)
+folium.Marker(initPoint).add_to(myMap)
+folium.Marker(
+    destPoint_haversine,
+    popup="<i>Haversine</i>",
+    tooltip="Haversine",
+    icon=folium.Icon(color="red"),
+).add_to(myMap)
+folium.Marker(
+    destPoint_vincenty,
+    popup="<i>Vincenty</i>",
+    tooltip="Vincenty",
+    icon=folium.Icon(color="blue"),
+).add_to(myMap)
 
 # saving the map in the HTML file. This map then can be viewed in the browser and you can interact with it
 # myMap.save("map_geodesic.html")
+
+# display the map
+myMap
