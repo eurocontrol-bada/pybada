@@ -7,13 +7,7 @@ Developped @EUROCONTROL (EIH)
 """
 
 import os
-import sys
-from pathlib import Path
-import inspect
-
-# get current and parent directory
-currentDir = Path(os.path.dirname(os.path.realpath(__file__)))
-parentDir = currentDir.parent
+import importlib.resources
 
 
 def getVersionsList(badaFamily):
@@ -44,7 +38,12 @@ def getAircraftList(badaFamily, badaVersion):
             xml = False
             break
 
-    if badaFamily == "BADA4" or badaFamily == "BADAH" or badaFamily == "BADAE" or xml:
+    if (
+        badaFamily == "BADA4"
+        or badaFamily == "BADAH"
+        or badaFamily == "BADAE"
+        or xml
+    ):
         aircraftList = []
         for item in items:
             if os.path.isdir(os.path.join(path, item)):
@@ -76,13 +75,22 @@ def getBadaVersionPath(badaFamily, badaVersion):
 
 
 def getAircraftPath():
-    # path = os.path.join(parentDir, "aircraft")
-    package_dir = os.path.dirname(__file__)
-    path = os.path.join(package_dir, "aircraft")
-    return path
+    package_name = "pyBADA"
+    resource_name = "aircraft"
+
+    # Get the path to the 'aircraft' resource directory
+    with importlib.resources.as_file(
+        importlib.resources.files(package_name) / resource_name
+    ) as resource_path:
+        return str(resource_path)
 
 
 def getDataPath():
-    package_dir = os.path.dirname(__file__)
-    path = os.path.join(package_dir, "data")
-    return path
+    package_name = "pyBADA"
+    resource_name = "data"
+
+    # Get the path to the 'data' resource directory
+    with importlib.resources.as_file(
+        importlib.resources.files(package_name) / resource_name
+    ) as resource_path:
+        return str(resource_path)
