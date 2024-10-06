@@ -117,7 +117,7 @@ print("Vincenty destination point: ", destPoint_vincenty)
 initPoint = (LAT_init, LON_init)
 
 # create a base map
-# myMap = folium.Map(location=initPoint, zoom_start=10)
+myMap = folium.Map(location=initPoint, zoom_start=10)
 
 # construct the lines
 haversineLine = []
