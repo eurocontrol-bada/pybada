@@ -24,15 +24,20 @@ def proper_round(num, dec=0):
 
 
 def theta(h, DeltaTemp):
-    """This function returns normalised temperature according to the ISA model
+    """
+    Calculates the normalized temperature according to the International Standard Atmosphere (ISA) model.
 
-    :param h: altitude [m]
-    :param DeltaTemp: deviation with respect to ISA [K]
+    :param h: Altitude in meters (m).
+    :param DeltaTemp: Deviation from ISA temperature in Kelvin (K).
     :type h: float
     :type DeltaTemp: float
-    :returns: normalised temperature [-]
+    :returns: Normalized temperature [-].
 
+    The function accounts for whether the altitude is below or above the tropopause (11,000 m).
+    Below the tropopause, it applies the temperature lapse rate.
+    Above the tropopause, a constant temperature is assumed.
     """
+
     if h < const.h_11:
         theta = 1 - const.temp_h * h / const.temp_0 + DeltaTemp / const.temp_0
 
@@ -43,15 +48,18 @@ def theta(h, DeltaTemp):
 
 
 def delta(h, DeltaTemp):
-    """This function returns normalised pressure according to the ISA model
+    """
+    Calculates the normalized pressure according to the ISA model.
 
-    :param h: altitude [m]
-    :param DeltaTemp: deviation with respect to ISA [K]
+    :param h: Altitude in meters (m).
+    :param DeltaTemp: Deviation from ISA temperature in Kelvin (K).
     :type h: float
     :type DeltaTemp: float
-    :returns: normalised pressure [-]
+    :returns: Normalized pressure [-].
 
+    The function uses the barometric equation for pressure changes below and above the tropopause.
     """
+
     p = pow(
         (theta(h, DeltaTemp) - DeltaTemp / const.temp_0),
         const.g / (const.temp_h * const.R),
@@ -66,28 +74,33 @@ def delta(h, DeltaTemp):
 
 
 def sigma(theta, delta):
-    """This function returns normalised air denstity according to the ISA model
+    """
+    Calculates the normalized air density according to the ISA model.
 
-    :param theta: normalised temperature according to the ISA model [-]
-    :param delta: normalised pressure according to the ISA model [-]
+    :param theta: Normalized temperature [-].
+    :param delta: Normalized pressure [-].
     :type theta: float
     :type delta: float
-    :returns: normalised air density [-]
+    :returns: Normalized air density [-].
 
+    The function uses the ideal gas law to relate pressure, temperature, and density.
     """
 
     return proper_round(
-        ((delta * const.p_0) / (theta * const.temp_0 * const.R)) / const.rho_0, 10
+        ((delta * const.p_0) / (theta * const.temp_0 * const.R)) / const.rho_0,
+        10,
     )
 
 
 def aSound(theta):
-    """This function calculates the speed of sound
+    """
+    Calculates the speed of sound based on the normalized air temperature.
 
-    :param theta: normalised air temperature [-]
+    :param theta: Normalized temperature [-].
     :type theta: float
-    :returns: speed of sound [m s^-1]
+    :returns: Speed of sound in meters per second (m/s).
 
+    The speed of sound depends on air temperature and is calculated using the specific heat ratio and the gas constant.
     """
 
     a = sqrt(const.Agamma * const.R * theta * const.temp_0)
@@ -95,15 +108,16 @@ def aSound(theta):
 
 
 def mach2Tas(Mach, theta):
-    """This function converts Mach number to true airspeed
-
-    :param Mach: Mach number [-]
-    :param theta: normalised air temperature [-]
-    :type theta: float
-    :type Mach: float
-    :returns: true airspeed [m s^-1]
-
     """
+    Converts Mach number to true airspeed (TAS).
+
+    :param Mach: Mach number [-].
+    :param theta: Normalized air temperature [-].
+    :type Mach: float
+    :type theta: float
+    :returns: True airspeed in meters per second (m/s).
+    """
+
     if Mach == float("inf"):
         tas = float("inf")
     elif Mach == float("-inf"):
@@ -115,30 +129,34 @@ def mach2Tas(Mach, theta):
 
 
 def tas2Mach(v, theta):
-    """This function converts true airspeed to Mach
+    """
+    Converts true airspeed (TAS) to Mach number.
 
-    :param v: true airspeed [m s^-1]
-    :param theta: normalised air temperature [-]
+    :param v: True airspeed in meters per second (m/s).
+    :param theta: Normalized air temperature [-].
     :type v: float
     :type theta: float
-    :returns: Mach number [-]
-
+    :returns: Mach number [-].
     """
+
     return v / aSound(theta)
 
 
 def tas2Cas(tas, delta, sigma):
-    """This function converts true airspeed to callibrated airspeed
+    """
+    Converts true airspeed (TAS) to calibrated airspeed (CAS).
 
-    :param tas: callibrated airspeed [m s^-1]
-    :param sigma: normalised air density [-]
-    :param delta: normalised air pressure [-]
+    :param tas: True airspeed in meters per second (m/s).
+    :param sigma: Normalized air density [-].
+    :param delta: Normalized air pressure [-].
+    :type tas: float
     :type sigma: float
     :type delta: float
-    :type tas: float
-    :returns: callibrated airspeed [m s^-1]
+    :returns: Calibrated airspeed in meters per second (m/s).
 
+    The function uses a complex formula to account for air compressibility effects at high speeds.
     """
+
     if tas == float("inf"):
         cas = float("inf")
     elif tas == float("-inf"):
@@ -155,22 +173,28 @@ def tas2Cas(tas, delta, sigma):
 
 
 def cas2Tas(cas, delta, sigma):
-    """This function converts callibrated airspeed to true airspeed
+    """
+    Converts calibrated airspeed (CAS) to true airspeed (TAS).
 
-    :param cas: callibrated airspeed [m s^-1]
-    :param sigma: normalised air density [-]
-    :param delta: normalised air pressure [-]
+    :param cas: Calibrated airspeed in meters per second (m/s).
+    :param sigma: Normalized air density [-].
+    :param delta: Normalized air pressure [-].
+    :type cas: float
     :type delta: float
     :type sigma: float
-    :type cas: float
-    :returns: true airspeed [m s^-1]
+    :returns: True airspeed in meters per second (m/s).
 
+    This function inverts the compressibility adjustments to compute TAS from CAS.
     """
+
     rho = sigma * const.rho_0
     p = delta * const.p_0
 
     A = (
-        pow(1 + const.Amu * const.rho_0 * cas * cas / (2 * const.p_0), 1 / const.Amu)
+        pow(
+            1 + const.Amu * const.rho_0 * cas * cas / (2 * const.p_0),
+            1 / const.Amu,
+        )
         - 1
     )
     B = pow(1 + (1 / delta) * A, const.Amu) - 1
@@ -180,21 +204,20 @@ def cas2Tas(cas, delta, sigma):
 
 
 def mach2Cas(Mach, theta, delta, sigma):
-    """This function converts Mach to callibrated airspeed
+    """
+    Converts Mach number to calibrated airspeed (CAS).
 
-    :param Mach: Mach number [-]
-    :param theta: normalised air temperature [-]
-    :param delta: normalised air pressure [-]
-    :param sigma: normalised air density [-]
+    :param Mach: Mach number [-].
+    :param theta: Normalized air temperature [-].
+    :param delta: Normalized air pressure [-].
+    :param sigma: Normalized air density [-].
     :type Mach: float
     :type theta: float
     :type delta: float
     :type sigma: float
-    :type h: float
-    :type DeltaTemp: float
-    :returns: true airspeed [m s^-1]
-
+    :returns: Calibrated airspeed in meters per second (m/s).
     """
+
     if Mach == float("inf"):
         cas = float("inf")
     elif Mach == float("-inf"):
@@ -207,19 +230,20 @@ def mach2Cas(Mach, theta, delta, sigma):
 
 
 def cas2Mach(cas, theta, delta, sigma):
-    """This function converts callibrated airspeed to Mach
+    """
+    Converts calibrated airspeed (CAS) to Mach number.
 
-    :param cas: callibrated airspeed [m s^-1]
-    :param theta: normalised air temperature [-]
-    :param delta: normalised air pressure [-]
-    :param sigma: normalised air density [-]
+    :param cas: Calibrated airspeed in meters per second (m/s).
+    :param theta: Normalized air temperature [-].
+    :param delta: Normalized air pressure [-].
+    :param sigma: Normalized air density [-].
     :type cas: float
     :type theta: float
     :type delta: float
     :type sigma: float
-    :returns: true airspeed [m s^-1]
-
+    :returns: Mach number [-].
     """
+
     tas = cas2Tas(cas, delta, sigma)
     M = tas2Mach(tas, theta)
 
@@ -227,15 +251,20 @@ def cas2Mach(cas, theta, delta, sigma):
 
 
 def hp(delta, QNH=101325.0):
-    """This function calculates pressure altitude
+    """
+    Calculates pressure altitude based on normalized pressure and reference pressure (QNH).
 
-    :param QNH: reference pressure [Pa]
-    :param delta: normalised air pressure [-]
+    :param QNH: Reference pressure in Pascals (Pa), default is standard sea level pressure (101325 Pa).
+    :param delta: Normalized air pressure [-].
     :type delta: float
     :type QNH: float
-    :returns: pressure altitude [m]
+    :returns: Pressure altitude in meters (m).
 
+    The pressure altitude is calculated by applying the barometric formula.
+    Below the tropopause, the altitude is computed using the standard temperature lapse rate.
+    Above the tropopause, it applies an exponential relationship for altitude based on pressure ratio.
     """
+
     if delta * const.p_0 > const.p_11:
         hp = (const.temp_0 / const.temp_h) * (
             1 - pow(delta * const.p_0 / QNH, const.R * const.temp_h / const.g)
@@ -249,15 +278,19 @@ def hp(delta, QNH=101325.0):
 
 
 def crossOver(cas, Mach):
-    """This function calculates cross-over altitude
+    """
+    Calculates the cross-over altitude where calibrated airspeed (CAS) and Mach number intersect.
 
-    :param cas: callibrated airspeed [m s^-1]
-    :param Mach: Mach number [-]
+    :param cas: Calibrated airspeed in meters per second (m/s).
+    :param Mach: Mach number [-].
     :type cas: float
     :type Mach: float
-    :returns: cross-over altitude [m]
+    :returns: Cross-over altitude in meters (m).
 
+    The cross-over altitude is where CAS and Mach produce the same true airspeed.
+    The function calculates pressure and temperature at this altitude based on the given Mach number and CAS.
     """
+
     p_trans = const.p_0 * (
         (
             pow(
@@ -266,7 +299,13 @@ def crossOver(cas, Mach):
             )
             - 1.0
         )
-        / (pow(1 + ((const.Agamma - 1.0) / 2.0) * (Mach**2), pow(const.Amu, -1)) - 1.0)
+        / (
+            pow(
+                1 + ((const.Agamma - 1.0) / 2.0) * (Mach**2),
+                pow(const.Amu, -1),
+            )
+            - 1.0
+        )
     )
 
     theta_trans = pow(p_trans / const.p_0, (const.temp_h * const.R) / const.g)
@@ -282,14 +321,14 @@ def crossOver(cas, Mach):
 
 
 def atmosphereProperties(h, DeltaTemp):
-    """This function calculates the atmosphere properties in form of a density, temperature and pressure ratio
-    based on altitude and deviation from ISA temperature
+    """
+    Calculates atmospheric properties: normalized temperature, pressure, and density ratios based on altitude and temperature deviation from ISA.
 
-    :param h: altitude [m]
-    :param DeltaTemp: deviation with respect to ISA [K]
+    :param h: Altitude in meters (m).
+    :param DeltaTemp: Deviation from ISA temperature in Kelvin (K).
     :type h: float
     :type DeltaTemp: float
-    :returns: normalised temperature, pressure and density [-]
+    :returns: Normalized temperature, pressure, and density ratios as a list [-].
     """
 
     theta_norm = theta(h=h, DeltaTemp=DeltaTemp)
@@ -300,19 +339,20 @@ def atmosphereProperties(h, DeltaTemp):
 
 
 def convertSpeed(v, speedType, theta, delta, sigma):
-    """This function calculates the M, TAS and CAS speed based on imput speed and its type
+    """
+    Calculates Mach, true airspeed (TAS), and calibrated airspeed (CAS) based on input speed and its type.
 
-    :param v: airspeed {M,CAS,TAS}[-,kt,kt]
-    :param speedType: type of speed as input {M,CAS,TAS}
-    :param theta: normalised air temperature [-]
-    :param delta: normalised air pressure [-]
-    :param sigma: normalised air density [-]
+    :param v: Airspeed value, depending on the type provided (M, CAS, TAS) [-, kt, kt].
+    :param speedType: Type of input speed, which can be one of "M" (Mach), "CAS", or "TAS".
+    :param theta: Normalized air temperature [-].
+    :param delta: Normalized air pressure [-].
+    :param sigma: Normalized air density [-].
     :type v: float
     :type speedType: string
     :type theta: float
     :type delta: float
     :type sigma: float
-    :returns: [M, CAS, TAS] [-, m/s, m/s]
+    :returns: A list of [Mach number, CAS in m/s, TAS in m/s].
     """
 
     if speedType == "TAS":
