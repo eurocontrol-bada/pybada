@@ -48,28 +48,32 @@ class Airplane(object):
 
     @staticmethod
     def loadFactor(fi):
-        """This function computes the load factor from bank angle
-
-        :param fi: bank angle [deg].
-        :type fi: float.
-        :returns: load factor [-].
-        :rtype: float.
-
         """
-        # rounding implemented to try to minimize errors on small decimal places, like 1.9999999999999 instead of 2.0
+        Computes the load factor from a given bank angle.
+
+        The load factor is calculated based on the cosine of the bank angle,
+        which is expressed in degrees. A small rounding operation is applied
+        to avoid precision issues with small decimal places.
+
+        :param fi: Bank angle in degrees.
+        :type fi: float
+        :returns: The load factor (dimensionless).
+        :rtype: float
+        """
+
         return 1 / round(cos(radians(fi)), 10)
 
     @staticmethod
     def bankAngle(rateOfTurn, v):
-        """This function computes bank angle based on TAS and rate of turn
+        """
+        Computes the bank angle based on true airspeed (TAS) and rate of turn.
 
-        :param v: true airspeed TAS [m s^-1].
-        :param rateOfTurn: rateOfTurn [deg/s].
-        :type v: float.
-        :type rateOfTurn: float.
-        :returns: bank angle [deg].
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param rateOfTurn: Rate of turn in degrees per second (deg/s).
+        :type v: float
+        :type rateOfTurn: float
+        :returns: Bank angle in degrees.
         :rtype: float
-
         """
 
         ROT = conv.deg2rad(rateOfTurn)
@@ -79,15 +83,15 @@ class Airplane(object):
 
     @staticmethod
     def rateOfTurn_bankAngle(TAS, bankAngle):
-        """This function computes the rate of turn
+        """
+        Computes the rate of turn based on true airspeed (TAS) and bank angle.
 
-        :param TAS: true airspeed TAS [m s^-1].
-        :param bankAngle: bank angle [deg].
-        :type TAS: float.
-        :type bankAngle: float.
-        :returns: rate of turn [deg s^-1].
-        :rtype: float.
-
+        :param TAS: True airspeed (TAS) in meters per second (m/s).
+        :param bankAngle: Bank angle in degrees.
+        :type TAS: float
+        :type bankAngle: float
+        :returns: Rate of turn in degrees per second (deg/s).
+        :rtype: float
         """
 
         ROT = tan(radians(bankAngle)) * const.g / TAS
@@ -96,79 +100,83 @@ class Airplane(object):
 
     @staticmethod
     def rateOfTurn(v, nz=1.0):
-        """This function computes the rate of turn
-
-        :param v: true airspeed TAS [m s^-1].
-        :param nz: load factor [-].
-        :type v: float.
-        :type nz: float.
-        :returns: rate of turn [rad s^-1].
-        :rtype: float.
-
         """
+        Computes the rate of turn based on true airspeed (TAS) and load factor.
+
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param nz: Load factor (default is 1.0), dimensionless.
+        :type v: float
+        :type nz: float
+        :returns: Rate of turn in degrees per second (deg/s).
+        :rtype: float
+        """
+
         return degrees((const.g / v) * sqrt(nz * nz - 1))
 
     @staticmethod
     def turnRadius(v, nz=1.0):
-        """This function computes the turn radius from load factor and speed
-
-        :param v: true airspeed TAS [m s^-1].
-        :param nz: load factor [-].
-        :type v: float.
-        :type nz: float.
-        :returns: turn radius [m].
-        :rtype: float.
-
         """
+        Computes the turn radius based on true airspeed (TAS) and load factor.
+
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param nz: Load factor (default is 1.0), dimensionless.
+        :type v: float
+        :type nz: float
+        :returns: Turn radius in meters.
+        :rtype: float
+        """
+
         return (v * v / const.g) * (1 / sqrt(nz * nz - 1))
 
     @staticmethod
     def turnRadius_bankAngle(v, ba):
-        """This function computes the turn radius from bank angle and speed
+        """
+        Computes the turn radius based on true airspeed (TAS) and bank angle.
 
-        :param v: true airspeed [m s^-1].
-        :param ba: bank angle [deg].
-        :type v: float.
-        :type ba: float.
-        :returns: turn radius [m].
-        :rtype: float.
-
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param ba: Bank angle in degrees.
+        :type v: float
+        :type ba: float
+        :returns: Turn radius in meters.
+        :rtype: float
         """
 
         return (v * v / const.g) * (1 / tan(conv.deg2rad(ba)))
 
     @staticmethod
     def GS(tas, gamma, Ws):
-        """This function computes the ground speed
-
-        :param tas: true airspeed [m s^-1].
-        :param gamma: flight path angle [deg].
-        :param Ws: longitudinal wind speed [m s^-1].
-        :type tas: float.
-        :type gamma: float.
-        :type Ws: float.
-        :returns: ground speed [m s^-1].
-        :rtype: float.
-
         """
+        Computes the ground speed based on true airspeed (TAS), flight path angle, and wind speed.
+
+        :param tas: True airspeed (TAS) in meters per second (m/s).
+        :param gamma: Flight path angle in degrees.
+        :param Ws: Longitudinal wind speed in meters per second (m/s).
+        :type tas: float
+        :type gamma: float
+        :type Ws: float
+        :returns: Ground speed in meters per second (m/s).
+        :rtype: float
+        """
+
         return tas * cos(radians(gamma)) + Ws
 
     @staticmethod
     def esf(**kwargs):
-        """This function computes the energy share factor
+        """
+        Computes the energy share factor based on flight conditions.
 
-        :param h: altitude [m]
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param flightEvolution: character of the flight evolution [constM/constCAS/acc/dec][-]
-        :param phase: phase of flight [cl/des][-]
-        :param v: constant speed [M][-]
-        :type h: float.
-        :type DeltaTemp: float.
-        :type flightEvolution: str.
-        :type phase: str.
-        :type v: float.
-        :returns: energy share factor [-].
-        :rtype: float.
+        :param h: Altitude in meters.
+        :param DeltaTemp: Temperature deviation with respect to ISA in Kelvin.
+        :param flightEvolution: Type of flight evolution [constM/constCAS/acc/dec].
+        :param phase: Phase of flight [cl/des].
+        :param v: Constant speed (Mach number).
+        :type h: float
+        :type DeltaTemp: float
+        :type flightEvolution: str
+        :type phase: str
+        :type v: float
+        :returns: Energy share factor (dimensionless).
+        :rtype: float
         """
 
         flightEvolution = checkArgument("flightEvolution", **kwargs)
@@ -202,7 +210,14 @@ class Airplane(object):
                 temp = atm.theta(h, DeltaTemp) * const.temp_0
                 ESF = 1 / (
                     1
-                    + (const.Agamma * const.R * (-const.temp_h) * M * M / (2 * const.g))
+                    + (
+                        const.Agamma
+                        * const.R
+                        * (-const.temp_h)
+                        * M
+                        * M
+                        / (2 * const.g)
+                    )
                     * ((temp - DeltaTemp) / temp)
                 )
 
@@ -213,9 +228,16 @@ class Airplane(object):
 
                 temp = atm.theta(h, DeltaTemp) * const.temp_0
                 A = (
-                    const.Agamma * const.R * (-const.temp_h) * M * M / (2 * const.g)
+                    const.Agamma
+                    * const.R
+                    * (-const.temp_h)
+                    * M
+                    * M
+                    / (2 * const.g)
                 ) * ((temp - DeltaTemp) / temp)
-                B = pow(1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1))
+                B = pow(
+                    1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1)
+                )
                 C = pow(1 + (const.Agamma - 1) * M * M / 2, 1 / const.Amu) - 1
                 ESF = 1 / (1 + A + B * C)
 
@@ -225,8 +247,16 @@ class Airplane(object):
 
                 ESF = 1 / (
                     1
-                    + (pow(1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1)))
-                    * (pow(1 + (const.Agamma - 1) * M * M / 2, 1 / const.Amu) - 1)
+                    + (
+                        pow(
+                            1 + (const.Agamma - 1) * M * M / 2,
+                            -1 / (const.Agamma - 1),
+                        )
+                    )
+                    * (
+                        pow(1 + (const.Agamma - 1) * M * M / 2, 1 / const.Amu)
+                        - 1
+                    )
                 )
 
             # contant TAS
@@ -255,41 +285,47 @@ class Helicopter(object):
 
     @staticmethod
     def loadFactor(fi):
-        """This function computes the load factor from bank angle
-
-        :param fi: bank angle [deg].
-        :type fi: float.
-        :returns: load factor [-].
-        :rtype: float.
-
         """
+        Computes the load factor from a given bank angle.
+
+        The load factor is calculated based on the cosine of the bank angle,
+        which is expressed in degrees. A small rounding operation is applied
+        to avoid precision issues with small decimal places.
+
+        :param fi: Bank angle in degrees.
+        :type fi: float
+        :returns: The load factor (dimensionless).
+        :rtype: float
+        """
+
         return 1 / round(cos(radians(fi)), 10)
 
     @staticmethod
     def rateOfTurn(v, nz=1.0):
-        """This function computes the rate of turn
-
-        :param v: true airspeed TAS [m s^-1].
-        :param nz: load factor [-].
-        :type v: float.
-        :type nz: float.
-        :returns: rate of turn [rad s^-1].
-        :rtype: float.
-
         """
+        Computes the rate of turn based on true airspeed (TAS) and load factor.
+
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param nz: Load factor (default is 1.0), dimensionless.
+        :type v: float
+        :type nz: float
+        :returns: Rate of turn in degrees per second (deg/s).
+        :rtype: float
+        """
+
         return degrees((const.g / v) * sqrt(nz * nz - 1))
 
     @staticmethod
     def rateOfTurn_bankAngle(TAS, bankAngle):
-        """This function computes the rate of turn
+        """
+        Computes the rate of turn based on true airspeed (TAS) and bank angle.
 
-        :param TAS: true airspeed TAS [m s^-1].
-        :param bankAngle: bank angle [deg].
-        :type TAS: float.
-        :type bankAngle: float.
-        :returns: rate of turn [deg s^-1].
-        :rtype: float.
-
+        :param TAS: True airspeed (TAS) in meters per second (m/s).
+        :param bankAngle: Bank angle in degrees.
+        :type TAS: float
+        :type bankAngle: float
+        :returns: Rate of turn in degrees per second (deg/s).
+        :rtype: float
         """
 
         ROT = tan(radians(bankAngle)) * const.g / TAS
@@ -298,49 +334,51 @@ class Helicopter(object):
 
     @staticmethod
     def turnRadius(v, nz=1.0):
-        """This function computes the turn radius from load factor and speed
-
-        :param v: true airspeed TAS [m s^-1].
-        :param nz: load factor [-].
-        :type v: float.
-        :type nz: float.
-        :returns: turn radius [m].
-        :rtype: float.
-
         """
+        Computes the turn radius based on true airspeed (TAS) and load factor.
+
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param nz: Load factor (default is 1.0), dimensionless.
+        :type v: float
+        :type nz: float
+        :returns: Turn radius in meters.
+        :rtype: float
+        """
+
         return (v * v / const.g) * (1 / sqrt(nz * nz - 1))
 
     @staticmethod
     def turnRadius_bankAngle(v, ba):
-        """This function computes the turn radius from bank angle and speed
+        """
+        Computes the turn radius based on true airspeed (TAS) and bank angle.
 
-        :param v: true airspeed [m s^-1].
-        :param ba: bank angle [deg].
-        :type v: float.
-        :type ba: float.
-        :returns: turn radius [m].
-        :rtype: float.
-
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param ba: Bank angle in degrees.
+        :type v: float
+        :type ba: float
+        :returns: Turn radius in meters.
+        :rtype: float
         """
 
         return (v * v / const.g) * (1 / tan(conv.deg2rad(ba)))
 
     @staticmethod
     def esf(**kwargs):
-        """This function computes the energy share factor
+        """
+        Computes the energy share factor based on flight conditions.
 
-        :param h: altitude [m]
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param flightEvolution: character of the flight evolution {constTAS,constCAS,acc,dec}[-]
-        :param phase: phase of flight {Climb,Descent}[-]
-        :param M: constant speed M [-]
-        :type h: float.
-        :type DeltaTemp: float.
-        :type flightEvolution: str.
-        :type phase: str.
-        :type M: float.
-        :returns: energy share factor ESF [-].
-        :rtype: float.
+        :param h: Altitude in meters.
+        :param DeltaTemp: Temperature deviation with respect to ISA in Kelvin.
+        :param flightEvolution: Type of flight evolution [constTAS/constCAS/acc/dec].
+        :param phase: Phase of flight [Climb/Descent].
+        :param v: Constant speed (Mach number).
+        :type h: float
+        :type DeltaTemp: float
+        :type flightEvolution: str
+        :type phase: str
+        :type v: float
+        :returns: Energy share factor (dimensionless).
+        :rtype: float
         """
 
         flightEvolution = checkArgument("flightEvolution", **kwargs)
@@ -370,9 +408,16 @@ class Helicopter(object):
                 temp = theta * const.temp_0
 
                 A = (
-                    const.Agamma * const.R * (-const.temp_h) * M * M / (2 * const.g)
+                    const.Agamma
+                    * const.R
+                    * (-const.temp_h)
+                    * M
+                    * M
+                    / (2 * const.g)
                 ) * ((temp - DeltaTemp) / temp)
-                B = pow(1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1))
+                B = pow(
+                    1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1)
+                )
                 C = pow(1 + (const.Agamma - 1) * M * M / 2, 1 / const.Amu) - 1
                 ESF = 1 / (1 + A + B * C)
 
@@ -387,15 +432,15 @@ class Helicopter(object):
 
     @staticmethod
     def bankAngle(rateOfTurn, v):
-        """This function computes bank angle based on TAS and rate of turn
+        """
+        Computes the bank angle based on true airspeed (TAS) and rate of turn.
 
-        :param v: true airspeed TAS [m s^-1].
-        :param rateOfTurn: rateOfTurn [deg/s].
-        :type v: float.
-        :type rateOfTurn: float.
-        :returns: bank angle [deg].
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param rateOfTurn: Rate of turn in degrees per second (deg/s).
+        :type v: float
+        :type rateOfTurn: float
+        :returns: Bank angle in degrees.
         :rtype: float
-
         """
 
         ROT = conv.deg2rad(rateOfTurn)
