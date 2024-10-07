@@ -24,30 +24,34 @@ class FlightTrajectory:
         self.flightData = {}
 
     def createFT(self):
-        """This function creates a flightTrajectory and populate it with input data
+        """
+        Creates and returns an empty DataFrame for storing aircraft flight trajectory data. This DataFrame includes various
+        flight parameters such as altitude, speed, fuel consumption, acceleration, and more. The columns are predefined to
+        match the data typically recorded during a flight.
 
-        :param AC: aircraft {BADA3/4/H/E}
-        :param Hp: altitude
-        :param TAS: True Air Speed (TAS)
-        :param CAS: Calibrated Air Speed (CAS)
-        :param M: Mach speed (M)
-        :param ROCD: Rate of Climb/Descent
-        :param FUEL: fuel consumption
-        :param P: Power
-        :param slope: trajectory slope
-        :param acc: acceleration
-        :param THR: thrust
-        :param config: aerodynamic configuration
-        :param HLid: High Lift Device - Level of deployement
-        :param LG: Landing Gear level of deployment
-        :param mass: aircraft mass
-        :param LAT: Geographical Latitude
-        :param LON: Geographical Longitude
-        :param HDG: aircraft heading
-        :param time: time flown
-        :param dist: distance flown
-        :param comment: comment describing the trajectory segment
-        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
+        :param AC: Aircraft object from the BADA family (BADA3/4/H/E).
+        :param Hp: Pressure altitude [ft].
+        :param TAS: True Airspeed [kt].
+        :param CAS: Calibrated Airspeed [kt].
+        :param M: Mach number [-].
+        :param ROCD: Rate of Climb/Descent [ft/min].
+        :param FUEL: Fuel consumption rate [kg/s].
+        :param P: Power output of the engines [W].
+        :param slope: Flight path slope [degrees].
+        :param acc: Aircraft acceleration [m/s^2].
+        :param THR: Thrust produced by the engines [N].
+        :param config: Aerodynamic configuration of the aircraft (e.g., clean, takeoff, landing).
+        :param HLid: High Lift Device deployment level [-].
+        :param LG: Landing gear deployment status (e.g., retracted, deployed).
+        :param mass: Aircraft mass [kg].
+        :param LAT: Geographical latitude [degrees].
+        :param LON: Geographical longitude [degrees].
+        :param HDG: Aircraft heading [degrees].
+        :param time: Elapsed flight time [s].
+        :param dist: Distance traveled [NM].
+        :param comment: Optional comment describing the trajectory segment.
+
+        :type AC: BadaAircraft {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
         :type Hp: float
         :type TAS: float
         :type CAS: float
@@ -58,68 +62,71 @@ class FlightTrajectory:
         :type slope: float
         :type acc: float
         :type THR: float
-        :type config: string
+        :type config: str
         :type HLid: float
-        :type LG: string
+        :type LG: str
         :type mass: float
         :type LAT: float
         :type LON: float
         :type HDG: float
         :type time: float
         :type dist: float
-        :type comment: string
+        :type comment: str
 
-        :returns: aircraft flight trajectory
-        :rtype: dict{list[float]}.
+        :returns: An empty DataFrame for flight trajectory data.
+        :rtype: pd.DataFrame
         """
 
-        # Define the empty DataFrame with columns
+        # Create an empty DataFrame with the required flight parameters as columns
         flightTrajectory = pd.DataFrame(
             columns=[
-                "Hp",
-                "TAS",
-                "CAS",
-                "GS",
-                "M",
-                "ROCD",
-                "ESF",
-                "FUEL",
-                "FUELCONSUMED",
-                "Preq",
-                "Peng",
-                "Pav",
-                "slope",
-                "acc",
-                "THR",
-                "DRAG",
-                "config",
-                "HLid",
-                "LG",
-                "mass",
-                "LAT",
-                "LON",
-                "HDGTrue",
-                "HDGMagnetic",
-                "time",
-                "dist",
-                "comment",
-                "BankAngle",
-                "ROT",
+                "Hp",  # Pressure altitude [ft]
+                "TAS",  # True Airspeed [kt]
+                "CAS",  # Calibrated Airspeed [kt]
+                "GS",  # Ground Speed [kt]
+                "M",  # Mach number [-]
+                "ROCD",  # Rate of Climb/Descent [ft/min]
+                "ESF",  # Engine specific fuel consumption [-]
+                "FUEL",  # Fuel flow rate [kg/s]
+                "FUELCONSUMED",  # Total fuel consumed [kg]
+                "Preq",  # Required power [W]
+                "Peng",  # Generated power [W]
+                "Pav",  # Available power [W]
+                "slope",  # Flight path slope [degrees]
+                "acc",  # Acceleration [m/s^2]
+                "THR",  # Thrust [N]
+                "DRAG",  # Drag force [N]
+                "config",  # Aircraft aerodynamic configuration (clean, takeoff, etc.)
+                "HLid",  # High Lift Device deployment level [-]
+                "LG",  # Landing gear deployment status (e.g., up, down)
+                "mass",  # Aircraft mass [kg]
+                "LAT",  # Geographical latitude [degrees]
+                "LON",  # Geographical longitude [degrees]
+                "HDGTrue",  # True heading [degrees]
+                "HDGMagnetic",  # Magnetic heading [degrees]
+                "time",  # Time flown [s]
+                "dist",  # Distance traveled [NM]
+                "comment",  # Optional comment about the flight segment
+                "BankAngle",  # Bank angle during the turn [degrees]
+                "ROT",  # Rate of turn [degrees/s]
             ]
         )
         return flightTrajectory
 
     @staticmethod
     def createFlightTrajectoryDataframe(flight_data):
-        """This function creates a pandas dataframe from the trajectory data in form of a list of data,
-        and fill in the missing values with None, to ensure the same size columns
-
-        :param flight_data: trajectory data
-        :type flight_data: dict{list[float]}.
-
-        :returns: aircraft flight trajectory
-        :rtype: pandas dataframe.
         """
+        Creates a pandas DataFrame from flight trajectory data, ensuring that all lists of data have the
+        same length by padding shorter lists with None. This makes sure the resulting DataFrame has equal
+        column lengths for each parameter.
+
+        :param flight_data: Dictionary containing flight trajectory data, where values are lists of float
+                           values representing various parameters.
+        :type flight_data: dict{list[float]}
+        :returns: A pandas DataFrame representing the aircraft's flight trajectory.
+        :rtype: pandas.DataFrame
+        """
+
         # Find the maximum length of all lists in the flight data (ignore the Aircraft object)
         max_length = max(
             len(lst) if isinstance(lst, list) else 0
@@ -153,49 +160,46 @@ class FlightTrajectory:
         return flightTrajectory_exploded
 
     def getACList(self):
-        """This function return the list of aircraft in the flightTrajectory object
+        """Returns a list of aircraft present in the flight trajectory object.
 
-        :returns: list of aircraft in the current flight trajectory object
-        :rtype: list[BadaAircraft].
+        :returns: A list of BadaAircraft objects corresponding to the aircraft in the current flight trajectory.
+        :rtype: list[BadaAircraft]
         """
 
         return list(self.flightData.keys())
 
     def addFT(self, AC, flightTrajectory):
-        """This function adds the flight trajectory based on the aircraft
+        """Adds a flight trajectory for a specific aircraft to the internal data structure.
 
-        .. note::this will overwrite the stored data for the same aircraft
+        .. note:: This will overwrite any previously stored flight trajectory for the same aircraft.
 
-        :param AC: BadaAircraft {BADA3/4/H/E}
-        :param flightTrajectory: aircraft full flight trajectory
-        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
-        :type flightTrajectory: pandas dataframe.
+        :param AC: Aircraft object (BADA3/4/H/E) whose trajectory is being stored.
+        :param flightTrajectory: Pandas DataFrame containing the full flight trajectory for the aircraft.
+        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
+        :type flightTrajectory: pandas.DataFrame
         """
 
         self.flightData[AC] = flightTrajectory
 
     def getFT(self, AC):
-        """This function returns the flight trajectory based on the aircraft
+        """Returns the flight trajectory DataFrame for a specific aircraft.
 
-        :param AC: BadaAircraft {BADA3/4/H/E}
-        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
-
-        :returns: aircraft flight trajectory
-        :rtype: pandas dataframe.
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is being retrieved.
+        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
+        :returns: A pandas DataFrame containing the flight trajectory data of the aircraft.
+        :rtype: pandas.DataFrame
         """
 
         return self.flightData.get(AC)
 
     def getAllValues(self, AC, parameter):
-        """This function returns the list of values corresponding to the aircarft trajectory
-        and defined parameter name
+        """Retrieves all values for a specific parameter from the aircraft's flight trajectory.
 
-        :param AC: BadaAircraft {BADA3/4/H/E}
-        :param parameter: name of the parameter to search for in the flight trajectory
-        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
-        :type parameter: string
-
-        :returns: value of a selected parameter for the whole trajectory
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight data is being queried.
+        :param parameter: The name of the parameter to retrieve values for (e.g., 'altitude', 'speed').
+        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
+        :type parameter: str
+        :returns: A list of values corresponding to the specified parameter throughout the flight.
         :rtype: list[float]
         """
 
@@ -207,16 +211,14 @@ class FlightTrajectory:
             return []
 
     def getFinalValue(self, AC, parameter):
-        """This function returns last value corresponding to the aircarft trajectory
-        and defined parameter name
+        """Retrieves the last value for a specific parameter or a list of parameters from the aircraft's flight trajectory.
 
-        :param AC: BadaAircraft {BADA3/4/H/E}
-        :param parameter: name of the parameter to search for in the flight trajectory
-        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
-        :type parameter: list[string]
-
-        :returns: final value in the list of a selected parameter for the whole trajectory
-        :rtype: float or string
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight data is being queried.
+        :param parameter: The name or list of names of the parameter(s) to retrieve the final value(s) for.
+        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
+        :type parameter: list[str] or str
+        :returns: The last value (or list of last values) for the specified parameter(s).
+        :rtype: float or list[float]
         """
 
         if isinstance(parameter, list):
@@ -238,13 +240,13 @@ class FlightTrajectory:
                 return self.getAllValues(AC, parameter)[-1]
 
     def append(self, AC, flightTrajectoryToAppend):
-        """This function will append data of 2 consecutive flight trajectories and merge them in terms of time and distance
-        if the aircraft is not in the list, the trajectory will be added to the flightTrajectory object
+        """Appends two consecutive flight trajectories and merges them, adjusting cumulative fields such as time, distance,
+        and fuel consumed. If the aircraft is not already present, the new trajectory will be added.
 
-        :param AC: BadaAircraft {BADA3/4/H/E}
-        :param flightTrajectoryToAppend: second flight trajectory to combine with original one [dict]
-        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
-        :type flightTrajectoryToAppend: dict{list[float]}.
+        :param AC: Aircraft object (BADA3/4/H/E) whose trajectory is being appended.
+        :param flightTrajectoryToAppend: The second flight trajectory to append, in the form of a DataFrame.
+        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
+        :type flightTrajectoryToAppend: dict{list[float]}
         """
 
         # retrieve the original trajectory
@@ -294,18 +296,19 @@ class FlightTrajectory:
         self.addFT(AC, flightTrajectoryCombined)
 
     def cut(self, AC, parameter, threshold, direction="BELOW"):
-        """This function cuts data from aircraft flight trajectory based on input field name and value.
+        """Cuts the aircraft's flight trajectory based on a specified parameter and threshold value,
+        keeping either the data above or below the threshold, depending on the direction.
 
-        .. note::The value should be sorted to work as expected.
+        .. note:: The data must be sorted by the parameter for the cut to work as expected.
 
-        :param AC: BadaAircraft {BADA3/4/H/E}
-        :param parameter: name of the parameter to take into account
-        :param threshold: value of the parameter where the cut shall be performed []
-        :param direction: cut above or below set threshold value []
-        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
-        :type parameter: string.
-        :type threshold: float.
-        :type direction: string {BELOW/ABOVE}.
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is being modified.
+        :param parameter: The name of the parameter (e.g., altitude, speed) used for filtering the data.
+        :param threshold: The value of the parameter that defines the cutting point.
+        :param direction: The direction of the cut. 'ABOVE' removes values above the threshold, 'BELOW' removes values below it.
+        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
+        :type parameter: str
+        :type threshold: float
+        :type direction: str {'ABOVE', 'BELOW'}
         """
 
         flightTrajectory = self.getFT(AC)
@@ -323,12 +326,13 @@ class FlightTrajectory:
 
     def save2csv(self, saveToPath, separator=","):
         """
-        This function saves the trajectory into a CSV file.
+        Saves the aircraft flight trajectory data into a CSV file with a custom header depending on the BADA family.
+        The CSV file will be saved with a timestamp in the filename.
 
-        :param saveToPath: Path to directory where the file should be stored.
-        :param separator: Separator to be used in the CSV file (only applicable for CSV). Default is a comma (',').
-        :type saveToPath: string
-        :type separator: string
+        :param saveToPath: Path to the directory where the file should be stored.
+        :param separator: Separator to be used in the CSV file. Default is a comma (',').
+        :type saveToPath: str
+        :type separator: str
         :returns: None
         """
 
@@ -592,12 +596,11 @@ class FlightTrajectory:
 
     def save2xlsx(self, saveToPath):
         """
-        This function saves the trajectory into a Excel/xlsx file.
+        Saves the aircraft flight trajectory data into an Excel (.xlsx) file with a custom header depending on the BADA family.
+        The Excel file will be saved with a timestamp in the filename.
 
-        :param saveToPath: Path to directory where the file should be stored.
-        :param separator: Separator to be used in the CSV file (only applicable for CSV). Default is a comma (',').
-        :type saveToPath: string
-        :type separator: string
+        :param saveToPath: Path to the directory where the file should be stored.
+        :type saveToPath: str
         :returns: None
         """
 
@@ -862,14 +865,14 @@ class FlightTrajectory:
 
     def save2kml(self, saveToPath):
         """
-        This function saves the trajectory into a KML file.
+        Saves the aircraft flight trajectory data into a KML (Keyhole Markup Language) file for visualization in tools like Google Earth.
+        The KML file is generated with a timestamp in the filename and includes aircraft trajectory details with altitude extrusion.
 
-        :param saveToPath: Path to directory where the file should be stored.
-        :param separator: Separator to be used in the CSV file (only applicable for CSV). Default is a comma (',').
-        :type saveToPath: string
-        :type separator: string
+        :param saveToPath: Path to the directory where the file should be stored.
+        :type saveToPath: str
         :returns: None
         """
+
         # Create a KML object
         kml = simplekml.Kml()
 
