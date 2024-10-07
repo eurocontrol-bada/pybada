@@ -43,28 +43,52 @@ class Parser(object):
 
     @staticmethod
     def list_subfolders(folderPath):
+        """
+        Lists all subfolders within a specified directory.
+
+        :param folderPath: Path to the directory where subfolders are to be listed.
+        :type folderPath: str
+        :returns: A list of subfolder names within the specified directory.
+        :rtype: list of str
+
+        This function retrieves all entries in the given directory and filters out
+        the ones that are not directories. Only the names of the subfolders are returned.
+        """
+
         # List all entries in the directory
         entries = os.listdir(folderPath)
 
         # Filter out entries that are directories
         subfolders = [
-            entry for entry in entries if os.path.isdir(os.path.join(folderPath, entry))
+            entry
+            for entry in entries
+            if os.path.isdir(os.path.join(folderPath, entry))
         ]
 
         return subfolders
 
     @staticmethod
     def parseXML(filePath, badaVersion, acName):
-        """This function parses BADA3 xml formatted file
+        """
+        Parses a BADA3 XML formatted file for aircraft performance data.
 
-        :param filePath: path to the folder with BADA4 xml formatted file.
-        :param acName: name of Aircraft for BADA3 xml formatted file.
-        :type filePath: str.
-        :type acName: str.
-        :raises: IOError
+        :param filePath: Path to the XML file containing BADA data.
+        :param badaVersion: Version of BADA to be parsed.
+        :param acName: Name of the aircraft for which data is being parsed from the XML file.
+        :type filePath: str
+        :type badaVersion: str
+        :type acName: str
+        :raises IOError: If the file cannot be found or read.
+        :raises ValueError: If the BADA version is unsupported or if parsing fails.
+
+        :returns: A pandas DataFrame containing the parsed aircraft performance data.
+        :rtype: pd.DataFrame
         """
 
-        filename = os.path.join(filePath, "BADA3", badaVersion, acName, acName) + ".xml"
+        filename = (
+            os.path.join(filePath, "BADA3", badaVersion, acName, acName)
+            + ".xml"
+        )
 
         try:
             tree = ET.parse(filename)
@@ -143,7 +167,9 @@ class Parser(object):
                     Clbo = float(CL_clean.find("Clbo").text)
                     k = float(CL_clean.find("k").text)
 
-            if LGDN is not None:  # Landing gear NOT allowed in clean configuration
+            if (
+                LGDN is not None
+            ):  # Landing gear NOT allowed in clean configuration
 
                 d[HLid]["LGDN"] = []
                 for i in LGDN.find("DPM").find("CD").findall("d"):
@@ -340,6 +366,19 @@ class Parser(object):
 
     @staticmethod
     def findData(f):
+        """
+        Searches for specific data lines in an open file stream.
+
+        :param f: An open file object from which lines are read.
+        :type f: file object
+        :returns: A tuple containing the file object and a parsed line split into a list, or None if no relevant line is found.
+        :rtype: tuple(file object, list of str or None)
+
+        This function reads the file line by line until it finds a line that starts with "CD".
+        Once found, the line is stripped of extra spaces, split into a list, and returned.
+        If no such line is found, it returns None for the line.
+        """
+
         line = f.readline()
         while line is not None and not line.startswith("CD"):
             line = f.readline()
@@ -353,13 +392,18 @@ class Parser(object):
 
     @staticmethod
     def parseOPF(filePath, badaVersion, acName):
-        """This function parses BADA3 ascii formatted file
+        """
+        Parses a BADA3 OPF (Operational Performance File) ASCII formatted file for aircraft performance data.
 
-        :param filePath: path to the BADA3 ascii formatted file.
-        :param acName: ICAO aircraft designation
-        :type filePath: str.
+        :param filePath: Path to the BADA3 OPF ASCII formatted file.
+        :param badaVersion: BADA version being used.
+        :param acName: ICAO aircraft designation (e.g., 'A320').
+        :type filePath: str
+        :type badaVersion: str
         :type acName: str
-        :raises: IOError
+        :raises IOError: If the file cannot be opened or read.
+        :returns: A pandas DataFrame containing the parsed aircraft performance data.
+        :rtype: pd.DataFrame
         """
 
         filename = (
@@ -379,7 +423,9 @@ class Parser(object):
 
                 if idx == 13:
                     if "with" in line:
-                        engines = line.split("with")[1].split("engines")[0].strip()
+                        engines = (
+                            line.split("with")[1].split("engines")[0].strip()
+                        )
                     else:
                         engines = "unknown"
                 idx += 1
@@ -579,16 +625,23 @@ class Parser(object):
 
     @staticmethod
     def parseAPF(filePath, badaVersion, acName):
-        """This function parses BADA3 APF ascii formatted file
+        """
+        Parses a BADA3 APF ASCII formatted file for aircraft performance data.
 
-        :param filePath: path to the BADA3 APF ascii formatted file.
-        :param acName: ICAO aircraft designation
-        :type filePath: str.
+        :param filePath: Path to the BADA3 APF ASCII formatted file.
+        :param badaVersion: BADA version being used.
+        :param acName: ICAO aircraft designation (e.g., 'A320').
+        :type filePath: str
+        :type badaVersion: str
         :type acName: str
-        :raises: IOError
+        :raises IOError: If the file cannot be opened or read.
+        :returns: A pandas DataFrame containing the parsed aircraft performance data.
+        :rtype: pd.DataFrame
         """
 
-        filename = os.path.join(filePath, "BADA3", badaVersion, acName) + ".APF"
+        filename = (
+            os.path.join(filePath, "BADA3", badaVersion, acName) + ".APF"
+        )
 
         dataLines = list()
         with open(filename, "r", encoding="latin-1") as f:
@@ -598,7 +651,9 @@ class Parser(object):
                 if line.startswith("CC"):
                     if "Modification_date" in line:
                         data = line.split(":")[1].strip().split(" ")
-                        modificationDateAPF = " ".join([data[0], data[1], data[2]])
+                        modificationDateAPF = " ".join(
+                            [data[0], data[1], data[2]]
+                        )
                 if line.startswith("CD"):
                     line = " ".join(line.split())
                     line = line.strip().split(" ")
@@ -613,7 +668,9 @@ class Parser(object):
                     dataLines.append(line)
                 elif "THE END" in line:
                     break
-        dataLines.pop(0)  # remove first line that does not contain usefull data
+        dataLines.pop(
+            0
+        )  # remove first line that does not contain usefull data
 
         # AV - average - line with average data
         AVLine = dataLines[1]
@@ -647,10 +704,23 @@ class Parser(object):
 
     @staticmethod
     def combineOPF_APF(OPFDataFrame, APFDataFrame):
+        """
+        Combines data from OPF and APF DataFrames.
+
+        :param OPFDataFrame: DataFrame containing parsed data from the OPF file.
+        :param APFDataFrame: DataFrame containing parsed data from the APF file.
+        :type OPFDataFrame: pd.DataFrame
+        :type APFDataFrame: pd.DataFrame
+        :returns: A single DataFrame combining both OPF and APF data.
+        :rtype: pd.DataFrame
+        """
 
         # Combine data with GPF data (temporary solution)
         combined_df = pd.concat(
-            [OPFDataFrame.reset_index(drop=True), APFDataFrame.reset_index(drop=True)],
+            [
+                OPFDataFrame.reset_index(drop=True),
+                APFDataFrame.reset_index(drop=True),
+            ],
             axis=1,
         )
 
@@ -658,6 +728,16 @@ class Parser(object):
 
     @staticmethod
     def readSynonym(filePath, badaVersion):
+        """
+        Reads a BADA3 SYNONYM.NEW ASCII file and returns a dictionary of model-synonym pairs.
+
+        :param filePath: Path to the directory containing BADA3 files.
+        :param badaVersion: BADA version being used.
+        :type filePath: str
+        :type badaVersion: str
+        :returns: A dictionary where the keys are aircraft models and the values are the corresponding file names.
+        :rtype: dict
+        """
 
         filename = os.path.join(filePath, "BADA3", badaVersion, "SYNONYM.NEW")
 
@@ -685,6 +765,20 @@ class Parser(object):
 
     @staticmethod
     def readSynonymXML(filePath, badaVersion):
+        """
+        Reads a BADA3 SYNONYM.xml file and returns a dictionary of model-synonym pairs.
+
+        :param filePath: Path to the directory containing BADA3 files.
+        :param badaVersion: BADA version being used.
+        :type filePath: str
+        :type badaVersion: str
+        :returns: A dictionary where the keys are aircraft models (codes) and the values are the corresponding file names.
+        :rtype: dict
+        :raises IOError: If the XML file is not found or cannot be read.
+
+        This function parses the 'SYNONYM.xml' file to extract aircraft model codes and their associated file names.
+        If the XML file is not found or is improperly formatted, an IOError is raised.
+        """
 
         filename = os.path.join(filePath, "BADA3", badaVersion, "SYNONYM.xml")
 
@@ -710,6 +804,22 @@ class Parser(object):
 
     @staticmethod
     def parseSynonym(filePath, badaVersion, acName):
+        """
+        Parses either the ASCII or XML synonym file and returns the file name corresponding to the aircraft.
+
+        :param filePath: Path to the directory containing BADA3 files.
+        :param badaVersion: BADA version being used.
+        :param acName: ICAO aircraft designation for which the file name is needed.
+        :type filePath: str
+        :type badaVersion: str
+        :type acName: str
+        :returns: The file name corresponding to the aircraft, or None if not found.
+        :rtype: str or None
+
+        This function first attempts to read the aircraft synonym from the ASCII file ('SYNONYM.NEW').
+        If the synonym is not found, it then tries to read the XML version ('SYNONYM.xml').
+        It returns the associated file name or None if the aircraft synonym is not found.
+        """
 
         synonym_fileName = Parser.readSynonym(filePath, badaVersion)
 
@@ -725,11 +835,15 @@ class Parser(object):
 
     @staticmethod
     def readGPF(filePath, badaVersion):
-        """This function parses BADA3 GPF ascii formatted file
+        """
+        Parses a BADA3 GPF ASCII formatted file.
 
-        :param filePath: path to the BADA3 GPF ascii formatted file.
-        :type filePath: str.
-        :raises: IOError
+        :param filePath: Path to the directory containing BADA3 files.
+        :param badaVersion: BADA version being used.
+        :type filePath: str
+        :raises IOError: If the GPF file cannot be opened or read.
+        :returns: A list of dictionaries, each containing GPF parameters like engine type, flight phase, and parameter values.
+        :rtype: list of dict
         """
 
         filename = os.path.join(filePath, "BADA3", badaVersion, "BADA.GPF")
@@ -760,11 +874,19 @@ class Parser(object):
 
     @staticmethod
     def readGPFXML(filePath, badaVersion):
-        """This function parses BADA3 GPF xml formatted file
+        """
+        Parses a BADA3 GPF XML formatted file.
 
-        :param filePath: path to the GPF xml formatted file.
-        :type filePath: str.
-        :raises: IOError
+        :param filePath: Path to the directory containing BADA3 files.
+        :param badaVersion: BADA version being used.
+        :type filePath: str
+        :raises IOError: If the XML file is not found or cannot be read.
+        :returns: A list of dictionaries, each containing GPF parameters such as engine type, flight phase, and performance values.
+        :rtype: list of dict
+
+        This function reads the 'GPF.xml' file and extracts general performance parameters for the aircraft,
+        including maximum acceleration, bank angles, thrust coefficients, speed limits, and more.
+        It parses the XML structure and returns a list of dictionaries representing these parameters.
         """
 
         filename = os.path.join(filePath, "BADA3", badaVersion, "GPF.xml")
@@ -807,7 +929,9 @@ class Parser(object):
             GPFparamList.append(
                 {
                     "name": "ang_bank_nom",
-                    "value": float(AngBank.find("Nom").find("Civ").find("ToLd").text),
+                    "value": float(
+                        AngBank.find("Nom").find("Civ").find("ToLd").text
+                    ),
                     "engine": allEngines,
                     "phase": ["to", "ld"],
                     "flight": ["civ"],
@@ -816,7 +940,9 @@ class Parser(object):
             GPFparamList.append(
                 {
                     "name": "ang_bank_nom",
-                    "value": float(AngBank.find("Nom").find("Civ").find("Others").text),
+                    "value": float(
+                        AngBank.find("Nom").find("Civ").find("Others").text
+                    ),
                     "engine": allEngines,
                     "phase": ["ic", "cl", "cr", "des", "hold", "app"],
                     "flight": ["civ"],
@@ -834,7 +960,9 @@ class Parser(object):
             GPFparamList.append(
                 {
                     "name": "ang_bank_max",
-                    "value": float(AngBank.find("Max").find("Civ").find("ToLd").text),
+                    "value": float(
+                        AngBank.find("Max").find("Civ").find("ToLd").text
+                    ),
                     "engine": allEngines,
                     "phase": ["to", "ld"],
                     "flight": ["civ"],
@@ -843,7 +971,9 @@ class Parser(object):
             GPFparamList.append(
                 {
                     "name": "ang_bank_max",
-                    "value": float(AngBank.find("Max").find("Civ").find("Hold").text),
+                    "value": float(
+                        AngBank.find("Max").find("Civ").find("Hold").text
+                    ),
                     "engine": allEngines,
                     "phase": ["hold"],
                     "flight": ["civ"],
@@ -852,7 +982,9 @@ class Parser(object):
             GPFparamList.append(
                 {
                     "name": "ang_bank_max",
-                    "value": float(AngBank.find("Max").find("Civ").find("Others").text),
+                    "value": float(
+                        AngBank.find("Max").find("Civ").find("Others").text
+                    ),
                     "engine": allEngines,
                     "phase": ["ic", "cl", "cr", "des", "app"],
                     "flight": ["civ"],
@@ -917,7 +1049,9 @@ class Parser(object):
             HmaxList = {}
             for phase in root.find("HmaxList").findall("HmaxPhase"):
 
-                HmaxList[phase.find("Phase").text] = float(phase.find("Hmax").text)
+                HmaxList[phase.find("Phase").text] = float(
+                    phase.find("Hmax").text
+                )
 
                 if phase.find("Phase").text == "TO":
                     GPFparamList.append(
@@ -1297,6 +1431,17 @@ class Parser(object):
 
     @staticmethod
     def parseGPF(filePath, badaVersion):
+        """
+        Parses a BADA3 (GPF) from either ASCII or XML format.
+
+        :param filePath: Path to the directory containing BADA3 files.
+        :param badaVersion: BADA version being used.
+        :type filePath: str
+        :type badaVersion: str
+        :returns: A pandas DataFrame containing GPF data.
+        :rtype: pd.DataFrame
+        """
+
         GPFdata = Parser.readGPF(filePath, badaVersion)
 
         # if ASCI GPF does not exist, try XML GPF file
@@ -1311,19 +1456,23 @@ class Parser(object):
 
     @staticmethod
     def getGPFValue(GPFdata, name, engine="JET", phase="cr", flight="civ"):
-        """This function returns value of the GPF parameter based on the defined features
-        like flight, Engine and Phase of flight
-
-        :param Name: name of the GPF parameter.
-        :param Engine: type of the engine where this parameter can be applied.
-        :param Phase: phase of the flight, where this parameter can be applied.
-        :param flight: flight where this parameter can be applied (civ or mil).
-        :type Name: str.
-        :type Engine: str.
-        :type Phase: str.
-        :type flight: str.
-
         """
+        Retrieves the value of a specified GPF parameter based on engine type, flight phase, and flight type.
+
+        :param GPFdata: List of dictionaries containing GPF parameters.
+        :param name: Name of the GPF parameter to retrieve.
+        :param engine: Engine type to filter by (e.g., 'JET', 'TURBOPROP', 'PISTON', 'ELECTRIC'). Default is 'JET'.
+        :param phase: Flight phase to filter by (e.g., 'cr', 'cl', 'des'). Default is 'cr'.
+        :param flight: Flight type to filter by ('civ' or 'mil'). Default is 'civ'.
+        :type GPFdata: list
+        :type name: str
+        :type engine: str
+        :type phase: str
+        :type flight: str
+        :returns: The value of the specified GPF parameter or None if not found.
+        :rtype: float or None
+        """
+
         # implementation required because 3.16 GPF contains different engine names than 3.15 GPF file
         if engine == "JET":
             engineList = [engine, "jet"]
@@ -1346,13 +1495,23 @@ class Parser(object):
 
     @staticmethod
     def combineACDATA_GPF(ACDataFrame, GPFDataframe):
-        """This function combines 2 dataframes, the parsed aircraft file
-        and parsed GPF file
+        """
+        Combines two DataFrames: one containing aircraft-specific data (ACData) and another containing (GPF) data.
+
+        :param ACDataFrame: DataFrame containing parsed aircraft data.
+        :param GPFDataframe: DataFrame containing parsed GPF data.
+        :type ACDataFrame: pd.DataFrame
+        :type GPFDataframe: pd.DataFrame
+        :returns: A combined DataFrame containing both ACData and GPF data.
+        :rtype: pd.DataFrame
         """
 
         # Combine data with GPF data (temporary solution)
         combined_df = pd.concat(
-            [ACDataFrame.reset_index(drop=True), GPFDataframe.reset_index(drop=True)],
+            [
+                ACDataFrame.reset_index(drop=True),
+                GPFDataframe.reset_index(drop=True),
+            ],
             axis=1,
         )
 
@@ -1360,12 +1519,16 @@ class Parser(object):
 
     @staticmethod
     def parseAll(badaVersion, filePath=None):
-        """This function parses all BADA3 formatted file and stores
-        all data in the final dataframe containing all the BADA data.
+        """
+        Parses all BADA3 formatted files and combines them into a final DataFrame.
 
-        :param filePath: path to the BADA3 formatted file.
-        :type filePath: str.
-        :raises: IOError
+        :param badaVersion: BADA version being used.
+        :param filePath: Path to the BADA3 formatted files. If not provided, the default path is used.
+        :type badaVersion: str
+        :type filePath: str, optional
+        :returns: A pandas DataFrame containing all parsed BADA3 data.
+        :rtype: pd.DataFrame
+        :raises IOError: If any of the required files cannot be opened or read.
         """
 
         if filePath == None:
@@ -1404,7 +1567,9 @@ class Parser(object):
                 combined_df = Parser.combineACDATA_GPF(df, GPFparsedDataframe)
 
                 # Merge DataFrames
-                merged_df = pd.concat([merged_df, combined_df], ignore_index=True)
+                merged_df = pd.concat(
+                    [merged_df, combined_df], ignore_index=True
+                )
 
             return merged_df
 
@@ -1426,25 +1591,31 @@ class Parser(object):
                     df.at[0, "acName"] = synonym
 
                     # Combine data with GPF data (temporary solution)
-                    combined_df = Parser.combineACDATA_GPF(df, GPFparsedDataframe)
+                    combined_df = Parser.combineACDATA_GPF(
+                        df, GPFparsedDataframe
+                    )
 
                     # Merge DataFrames
-                    merged_df = pd.concat([merged_df, combined_df], ignore_index=True)
+                    merged_df = pd.concat(
+                        [merged_df, combined_df], ignore_index=True
+                    )
 
             return merged_df
 
     @staticmethod
     def getBADAParameters(df, acName, parameters):
-        """Retrieves specified parameters for a given aircraft name from the DataFrame.
+        """
+        Retrieves specified parameters for a given aircraft name from a DataFrame.
 
-        :param df: The DataFrame containing aircraft data.
-        :param acName: The name of the aircraft to search for
-        :param parameters: A list of column names to retrieve or a single column name
-        :type df: pandas dataframe.
-        :type acName: list[string].
-        :type parameters: list[string].
-        :return: parameter values: dataframe
-        :rtype: dataframe.
+        :param df: DataFrame containing BADA aircraft data.
+        :param acName: Name of the aircraft or list of aircraft names to search for.
+        :param parameters: List of column names (or a single column name) to retrieve.
+        :type df: pd.DataFrame
+        :type acName: list or str
+        :type parameters: list or str
+        :returns: A DataFrame containing the specified parameters for the given aircraft.
+        :rtype: pd.DataFrame
+        :raises ValueError: If any of the specified columns or aircraft names are not found.
         """
 
         # Ensure parameters is a list
@@ -1470,12 +1641,25 @@ class Parser(object):
             raise ValueError(f"No entries found for aircraft(s): {acName}.")
         else:
             # Select the required columns
-            result_df = filtered_df[["acName"] + parameters].reset_index(drop=True)
+            result_df = filtered_df[["acName"] + parameters].reset_index(
+                drop=True
+            )
             return result_df
 
     @staticmethod
     def safe_get(df, column_name, default_value=None):
-        """Accessing a potentially dropped column from a dataframe"""
+        """
+        Safely retrieves a column's value from a DataFrame, returning a default value if the column does not exist.
+
+        :param df: DataFrame to retrieve the value from.
+        :param column_name: Name of the column to retrieve.
+        :param default_value: Value to return if the column does not exist. Default is None.
+        :type df: pd.DataFrame
+        :type column_name: str
+        :type default_value: any
+        :returns: The value from the specified column or the default value if the column is missing.
+        :rtype: any
+        """
 
         if column_name in df.columns:
             return df[column_name].iloc[0]
@@ -1495,38 +1679,50 @@ class BADA3(Airplane):
         self.AC = AC
 
     def CL(self, sigma, mass, tas, nz=1.0):
-        """This function computes the lift coefficient
+        """
+        Computes the lift coefficient for the aircraft.
 
-        :param tas: true airspeed [m s^-1].
-        :param sigma: normalised air density [-].
-        :param mass: aircraft mass [kg].
-        :param nz: load factor [-].
-        :type tas: float.
-        :type sigma: float.
-        :type mass: float.
-        :type nz: float.
+        :param sigma: Normalized air density [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param tas: True airspeed in meters per second [m/s].
+        :param nz: Load factor [-], default is 1.0 (straight and level flight).
+        :type sigma: float
+        :type mass: float
+        :type tas: float
+        :type nz: float
         :returns: Lift coefficient [-].
-        :rtype: float.
+        :rtype: float
         """
 
-        return 2 * mass * const.g * nz / (sigma * const.rho_0 * tas * tas * self.AC.S)
+        return (
+            2
+            * mass
+            * const.g
+            * nz
+            / (sigma * const.rho_0 * tas * tas * self.AC.S)
+        )
 
     def CD(
-        self, CL, config, expedite=False, speedBrakes={"deployed": False, "value": 0.03}
+        self,
+        CL,
+        config,
+        expedite=False,
+        speedBrakes={"deployed": False, "value": 0.03},
     ):
-        """This function computes the drag coefficient
+        """
+        Computes the drag coefficient based on the lift coefficient and aircraft configuration.
 
         :param CL: Lift coefficient [-].
-        :param config: aircraft aerodynamic configuration [CR/IC/TO/AP/LD][-].
-        :param expedite: expedite descend factor [-].
-        :param speedBrakes: speed brakes used or not [-].
-        :type CL: float.
-        :type config: str.
-        :type expedite: boolean.
-        :type speedBrakes: boolean.
+        :param config: Aircraft aerodynamic configuration (e.g., 'CR', 'IC', 'TO', 'AP', 'LD').
+        :param expedite: Flag indicating if expedite descent is used (default is False).
+        :param speedBrakes: Dictionary indicating if speed brakes are deployed and their effect.
+        :type CL: float
+        :type config: str
+        :type expedite: bool
+        :type speedBrakes: dict
         :returns: Drag coefficient [-].
         :rtype: float
-        :raises: ValueError
+        :raises: ValueError if an invalid configuration is provided.
         """
 
         if self.AC.xmlFiles:
@@ -1545,9 +1741,9 @@ class BADA3(Airplane):
                 and self.AC.DeltaCD == 0.0
             ):
 
-                CD = self.AC.CD0[HLid_CR][LG_CR] + self.AC.CD2[HLid_CR][LG_CR] * (
-                    CL * CL
-                )
+                CD = self.AC.CD0[HLid_CR][LG_CR] + self.AC.CD2[HLid_CR][
+                    LG_CR
+                ] * (CL * CL)
             else:
                 if config == "CR" or config == "IC" or config == "TO":
                     CD = (
@@ -1602,55 +1798,60 @@ class BADA3(Airplane):
         # expedite descent
         C_des_exp = 1.0
         if expedite:
-            C_des_exp = Parser.getGPFValue(self.AC.GPFdata, "C_des_exp", phase="des")
+            C_des_exp = Parser.getGPFValue(
+                self.AC.GPFdata, "C_des_exp", phase="des"
+            )
             CD = CD * C_des_exp
 
         return CD
 
     def D(self, sigma, tas, CD):
-        """This function computes the aerodynamic drag
+        """
+        Computes the aerodynamic drag force.
 
-        :param tas: true airspeed [m s^-1].
-        :param sigma: normalised air density [-].
+        :param sigma: Normalized air density [-].
+        :param tas: True airspeed in meters per second [m/s].
         :param CD: Drag coefficient [-].
-        :type tas: float.
-        :type sigma: float.
-        :type CD: float.
-        :returns: Aerodynamic drag [N].
-        :rtype: float.
+        :type sigma: float
+        :type tas: float
+        :type CD: float
+        :returns: Aerodynamic drag in Newtons [N].
+        :rtype: float
         """
 
         return 0.5 * sigma * const.rho_0 * tas * tas * self.AC.S * CD
 
     def L(self, sigma, tas, CL):
-        """This function computes the aerodynamic lift
+        """
+        Computes the aerodynamic lift force.
 
-        :param tas: true airspeed [m s^-1].
-        :param sigma: normalised air density [-].
+        :param sigma: Normalized air density [-].
+        :param tas: True airspeed in meters per second [m/s].
         :param CL: Lift coefficient [-].
-        :type tas: float.
-        :type sigma: float.
-        :type CL: float.
-        :returns: Aerodynamic lift [N].
-        :rtype: float.
+        :type sigma: float
+        :type tas: float
+        :type CL: float
+        :returns: Aerodynamic lift in Newtons [N].
+        :rtype: float
         """
 
         return 0.5 * sigma * const.rho_0 * tas * tas * self.AC.S * CL
 
     def Thrust(self, h, DeltaTemp, rating, v, config, **kwargs):
-        """This function computes the aircraft thrust
+        """
+        Computes the aircraft thrust based on engine rating and flight conditions.
 
-        :param rating: engine rating {MCMB,MCRZ,MTKF,LIDL}.
-        :param h: altitude [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param v: true airspeed (TAS) [m s^-1].
-        :param config: aircraft aerodynamic configuration [CR/IC/TO/AP/LD][-].
-        :type rating: string.
+        :param rating: Engine rating ('MCMB', 'MCRZ', 'MTKF', 'LIDL', 'ADAPTED').
+        :param h: Altitude in meters [m].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param v: True airspeed (TAS) in meters per second [m/s].
+        :param config: Aircraft aerodynamic configuration (e.g., 'CR', 'IC', 'TO', 'AP', 'LD').
+        :type rating: str
+        :type h: float
         :type DeltaTemp: float
-        :type h: float.
-        :type v: float.
-        :type config: string.
-        :returns: Thrust [N].
+        :type v: float
+        :type config: str
+        :returns: Thrust in Newtons [N].
         :rtype: float
         """
 
@@ -1678,7 +1879,13 @@ class BADA3(Airplane):
             acc = checkArgument("acc", **kwargs)
             Drag = checkArgument("Drag", **kwargs)
             T = self.TAdapted(
-                h=h, DeltaTemp=DeltaTemp, ROCD=ROCD, mass=mass, v=v, acc=acc, Drag=Drag
+                h=h,
+                DeltaTemp=DeltaTemp,
+                ROCD=ROCD,
+                mass=mass,
+                v=v,
+                acc=acc,
+                Drag=Drag,
             )
 
         else:
@@ -1687,22 +1894,24 @@ class BADA3(Airplane):
         return T
 
     def TAdapted(self, h, DeltaTemp, ROCD, mass, v, acc, Drag):
-        """This function computes the adapted thrust
+        """
+        Computes adapted thrust for non-standard flight conditions (e.g., climb, acceleration).
 
-        :param h: altitude [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param ROCD: rate of climb/descend [m s^-1].
-        :param mass: actual aircraft weight [kg]
-        :param v: true airspeed (TAS) [m s^-1].
-        :param acc: acceleration [m s^-2].
-        :param Drag: aerodynamic drag [N].
-        :type h: float.
-        :type DeltaTemp: float.
-        :type ROCD: float.
-        :type mass: float.
-        :type acc: float.
-        :type Drag: float.
-        :returns: maximum thrust [N].
+        :param h: Altitude in meters [m].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param ROCD: Rate of climb or descent in meters per second [m/s].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param v: True airspeed (TAS) in meters per second [m/s].
+        :param acc: Acceleration in meters per second squared [m/s²].
+        :param Drag: Aerodynamic drag in Newtons [N].
+        :type h: float
+        :type DeltaTemp: float
+        :type ROCD: float
+        :type mass: float
+        :type v: float
+        :type acc: float
+        :type Drag: float
+        :returns: Adapted thrust in Newtons [N].
         :rtype: float
         """
 
@@ -1713,17 +1922,18 @@ class BADA3(Airplane):
         return Tadapted
 
     def TMax(self, h, DeltaTemp, rating, v):
-        """This function computes the maximum thrust
+        """
+        Computes the maximum thrust based on engine type, altitude, and temperature deviation.
 
-        :param rating: engine rating {MCMB,MCRZ,MTKF}.
-        :param h: altitude [m].
-        :param v: true airspeed (TAS) [m s^-1].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type rating: string.
-        :type h: float.
-        :type v: float.
+        :param h: Altitude in meters [m].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param rating: Engine rating ('MCMB', 'MCRZ', 'MTKF').
+        :param v: True airspeed (TAS) in meters per second [m/s].
+        :type h: float
         :type DeltaTemp: float
-        :returns: maximum thrust [N].
+        :type rating: str
+        :type v: float
+        :returns: Maximum thrust in Newtons [N].
         :rtype: float
         """
 
@@ -1769,24 +1979,29 @@ class BADA3(Airplane):
             return TMax
 
         elif rating == "MCRZ":
-            return TMax * Parser.getGPFValue(self.AC.GPFdata, "C_th_cr", phase="cr")
+            return TMax * Parser.getGPFValue(
+                self.AC.GPFdata, "C_th_cr", phase="cr"
+            )
 
     def TDes(self, h, DeltaTemp, v, config):
-        """This function computes the descent thrust
+        """
+        Computes descent thrust based on altitude, temperature deviation, and configuration.
 
-        :param h: altitude [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param config: aircraft aerodynamic configuration [CR/IC/TO/AP/LD][-].
-        :param v: true airspeed (TAS) [m s^-1].
-        :type h: float.
-        :type DeltaTemp: float.
-        :type config: string.
-        :type v: float.
-        :returns: minimum thrust [N].
+        :param h: Altitude in meters [m].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param v: True airspeed (TAS) in meters per second [m/s].
+        :param config: Aircraft aerodynamic configuration (e.g., 'CR', 'IC', 'TO', 'AP', 'LD').
+        :type h: float
+        :type DeltaTemp: float
+        :type v: float
+        :type config: str
+        :returns: Descent thrust in Newtons [N].
         :rtype: float
         """
 
-        H_max_app = Parser.getGPFValue(self.AC.GPFdata, "H_max_app", phase="app")
+        H_max_app = Parser.getGPFValue(
+            self.AC.GPFdata, "H_max_app", phase="app"
+        )
 
         if (
             self.AC.engineType == "PISTON"
@@ -1842,18 +2057,23 @@ class BADA3(Airplane):
         return Tdes
 
     def ffnom(self, v, T):
-        """This function computes the nominal fuel flow
+        """
+        Computes the nominal fuel flow based on airspeed and thrust.
 
-        :param v: true airspeed (TAS) [m s^-1].
-        :param T: Thrust [N].
-        :type v: float.
-        :type T: float.
-        :returns: nominal fuel flow [kg s^-1].
+        :param v: True airspeed (TAS) in meters per second [m/s].
+        :param T: Thrust in Newtons [N].
+        :type v: float
+        :type T: float
+        :returns: Nominal fuel flow in kilograms per second [kg/s].
         :rtype: float
         """
 
         if self.AC.engineType == "JET":
-            eta = self.AC.Cf[0] * (1 + conv.ms2kt(v) / self.AC.Cf[1]) / (1000 * 60)
+            eta = (
+                self.AC.Cf[0]
+                * (1 + conv.ms2kt(v) / self.AC.Cf[1])
+                / (1000 * 60)
+            )
             ffnom = eta * T
 
         elif self.AC.engineType == "TURBOPROP":
@@ -1865,39 +2085,51 @@ class BADA3(Airplane):
             )
             ffnom = eta * T
 
-        elif self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
+        elif (
+            self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC"
+        ):
             ffnom = self.AC.Cf[0] / 60
 
         return ffnom
 
     def ffMin(self, h):
-        """This function computes the minimum fuel flow
+        """
+        Computes the minimum fuel flow based on altitude.
 
-        :param h: altitude [m].
-        :type h: float.
-        :returns: Minimum fuel flow [kg s^-1].
+        :param h: Altitude in meters [m].
+        :type h: float
+        :returns: Minimum fuel flow in kilograms per second [kg/s].
         :rtype: float
         """
 
         if self.AC.engineType == "JET" or self.AC.engineType == "TURBOPROP":
-            ffmin = self.AC.CfDes[0] * (1 - (conv.m2ft(h)) / self.AC.CfDes[1]) / 60
-        elif self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
+            ffmin = (
+                self.AC.CfDes[0] * (1 - (conv.m2ft(h)) / self.AC.CfDes[1]) / 60
+            )
+        elif (
+            self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC"
+        ):
             ffmin = self.AC.CfDes[0] / 60  # Cf3 param
 
         return ffmin
 
     def ff(self, h, v, T, config=None, flightPhase=None, adapted=False):
-        """This function computes the fuel flow based on the flight phase and flight situation
+        """
+        Computes the fuel flow based on flight phase and current flight conditions.
 
-        :param h: altitude [m].
-        :param rating: engine rating {MCMB,MCRZ,LIDL}.
-        :param v: true airspeed (TAS) [m s^-1].
-        :param T: Thrust [N].
-        :type h: float.
-        :type rating: string.
-        :type v: float.
-        :type T: float.
-        :returns: fuel flow [kg s^-1].
+        :param h: Altitude in meters [m].
+        :param v: True airspeed (TAS) in meters per second [m/s].
+        :param T: Thrust in Newtons [N].
+        :param config: Aircraft aerodynamic configuration (e.g., 'CR', 'AP', 'LD'). Optional.
+        :param flightPhase: Flight phase (e.g., 'Climb', 'Cruise', 'Descent'). Optional.
+        :param adapted: If True, computes fuel flow for adapted thrust. Default is False.
+        :type h: float
+        :type v: float
+        :type T: float
+        :type config: str, optional
+        :type flightPhase: str, optional
+        :type adapted: bool, optional
+        :returns: Fuel flow in kilograms per second [kg/s].
         :rtype: float
         """
 
@@ -1929,17 +2161,16 @@ class BADA3(Airplane):
         return ff
 
     def reducedPower(self, h, mass, DeltaTemp):
-        """This function computes the reduced climb power coefficient
+        """
+        Computes the reduced climb power coefficient based on altitude, mass, and temperature deviation.
 
-        :param h: altitude [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param mass: actual aircraft weight [kg]
-        :param hMax: aircraft flight envelope max Altitude [m]
-        :type h: float.
-        :type DeltaTemp: float.
-        :type mass: float.
-        :type hMax: float.
-        :returns: reduced climb power coefficient [-].
+        :param h: Altitude in meters [m].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param mass: Aircraft mass in kilograms [kg].
+        :type h: float
+        :type DeltaTemp: float
+        :type mass: float
+        :returns: Reduced climb power coefficient [-].
         :rtype: float
         """
 
@@ -1951,19 +2182,31 @@ class BADA3(Airplane):
         if (h + ep) < 0.8 * hMax:
             if self.AC.engineType == "JET":
                 CRed = Parser.getGPFValue(
-                    self.AC.GPFdata, "C_red_jet", engine=self.AC.engineType, phase="cl"
+                    self.AC.GPFdata,
+                    "C_red_jet",
+                    engine=self.AC.engineType,
+                    phase="cl",
                 )
             elif self.AC.engineType == "TURBOPROP":
                 CRed = Parser.getGPFValue(
-                    self.AC.GPFdata, "C_red_turbo", engine="TURBOPROP", phase="cl"
+                    self.AC.GPFdata,
+                    "C_red_turbo",
+                    engine="TURBOPROP",
+                    phase="cl",
                 )
             elif self.AC.engineType == "PISTON":
                 CRed = Parser.getGPFValue(
-                    self.AC.GPFdata, "C_red_piston", engine="PISTON", phase="cl"
+                    self.AC.GPFdata,
+                    "C_red_piston",
+                    engine="PISTON",
+                    phase="cl",
                 )
             elif self.AC.engineType == "ELECTRIC":
                 CRed = Parser.getGPFValue(
-                    self.AC.GPFdata, "C_red_elec", engine="ELECTRIC", phase="cl"
+                    self.AC.GPFdata,
+                    "C_red_elec",
+                    engine="ELECTRIC",
+                    phase="cl",
                 )
         else:
             CRed = 0
@@ -1972,25 +2215,26 @@ class BADA3(Airplane):
         return CPowRed
 
     def ROCD(self, T, D, v, mass, ESF, h, DeltaTemp, reducedPower=False):
-        """This function computes the Rate of Climb or Descent
+        """
+        Computes the rate of climb or descent (ROCD) based on thrust, drag, airspeed, and other flight parameters.
 
-        :param h: altitude [m].
-        :param T: aircraft thrust [N].
-        :param D: aircraft drag [N].
-        :param v: aircraft true airspeed [TAS] [m s^-1].
-        :param mass: actual aircraft mass  [kg].
-        :param ESF: energy share factor [-].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param reducedPower: power reduction [-]
-        :type h: float.
-        :type T: float.
-        :type D: float.
-        :type v: float.
-        :type mass: float.
-        :type ESF: float.
-        :type DeltaTemp: float.
-        :type reducedPower: boolean.
-        :returns: rate of climb/descend [m/s].
+        :param T: Aircraft thrust in Newtons [N].
+        :param D: Aircraft drag in Newtons [N].
+        :param v: True airspeed (TAS) in meters per second [m/s].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param ESF: Energy share factor [-].
+        :param h: Altitude in meters [m].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param reducedPower: Whether to account for reduced power in the calculation. Default is False.
+        :type T: float
+        :type D: float
+        :type v: float
+        :type mass: float
+        :type ESF: float
+        :type h: float
+        :type DeltaTemp: float
+        :type reducedPower: bool, optional
+        :returns: Rate of climb or descent in meters per second [m/s].
         :rtype: float
         """
 
@@ -2002,7 +2246,12 @@ class BADA3(Airplane):
             CPowRed = self.reducedPower(h=h, mass=mass, DeltaTemp=DeltaTemp)
 
         ROCD = (
-            ((temp - DeltaTemp) / temp) * (T - D) * v * ESF * CPowRed / (mass * const.g)
+            ((temp - DeltaTemp) / temp)
+            * (T - D)
+            * v
+            * ESF
+            * CPowRed
+            / (mass * const.g)
         )
 
         return ROCD
@@ -2020,14 +2269,19 @@ class FlightEnvelope(BADA3):
         super().__init__(AC)
 
     def maxAltitude(self, mass, DeltaTemp):
-        """This function computes the maximum altitude for any given aircraft mass
+        """
+        Computes the maximum altitude for a given aircraft mass and deviation from ISA.
 
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param mass: actual aircraft weight [kg]
-        :type DeltaTemp: float.
-        :type mass: float.
-        :returns: maximum altitude [m].
+        :param mass: Actual aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from International Standard Atmosphere (ISA) temperature in Kelvin [K].
+        :type mass: float
+        :type DeltaTemp: float
+        :returns: Maximum altitude in meters [m].
         :rtype: float
+
+        This function calculates the maximum possible altitude based on the aircraft's mass,
+        ISA temperature deviation, and engine-specific parameters such as temperature and mass gradients.
+        It considers the maximum operational altitude and adjusts for the given conditions.
         """
 
         Gt = self.AC.tempGrad
@@ -2047,18 +2301,21 @@ class FlightEnvelope(BADA3):
         if self.AC.Hmax == 0:
             hMax = self.AC.hmo
         else:
-            hMax = min(self.AC.hmo, self.AC.Hmax + Gt * var + Gw * (mMax - mass))
+            hMax = min(
+                self.AC.hmo, self.AC.Hmax + Gt * var + Gw * (mMax - mass)
+            )
 
         return conv.ft2m(hMax)
 
     def VStall(self, mass, config):
-        """This function computes the mass correction for stall speed calculation
+        """
+        Computes the stall speed based on the aircraft configuration and mass.
 
-        :param config: aircraft configuration [CR/IC/TO/AP/LD][-]
-        :param mass: aircraft operating mass [kg]
-        :type config: string.
-        :type mass: string
-        :returns: aircraft stall speed [m s^-1]
+        :param config: Aircraft configuration (e.g., 'CR', 'TO', 'AP', 'LD').
+        :param mass: Aircraft mass in kilograms [kg].
+        :type config: str
+        :type mass: float
+        :returns: Stall speed in meters per second [m/s].
         :rtype: float
         """
 
@@ -2074,18 +2331,25 @@ class FlightEnvelope(BADA3):
 
         return vStall
 
-    def VMin(self, h, mass, config, DeltaTemp, nz=1.2, envelopeType="OPERATIONAL"):
-        """This function computes the minimum speed
+    def VMin(
+        self, h, mass, config, DeltaTemp, nz=1.2, envelopeType="OPERATIONAL"
+    ):
+        """
+        Computes the minimum speed for a given configuration and conditions.
 
-        :param h: altitude [m].
-        :param config: aircraft configuration [CR/IC/TO/AP/LD][-]
-        :param mass: aircraft operating mass [kg]
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type h: float.
-        :type config: string
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param config: Aircraft configuration (e.g., 'CR', 'TO', 'LD').
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param nz: Load factor, default is 1.2.
+        :param envelopeType: Type of flight envelope ('OPERATIONAL' or 'CERTIFIED').
+        :type h: float
         :type mass: float
-        :type DeltaTemp: float.
-        :returns: minimum speed [m s^-1].
+        :type config: str
+        :type DeltaTemp: float
+        :type nz: float, optional
+        :type envelopeType: str, optional
+        :returns: Minimum speed in meters per second [m/s].
         :rtype: float
         """
 
@@ -2108,7 +2372,10 @@ class FlightEnvelope(BADA3):
                 Vmin = VminStall
             elif h >= conv.ft2m(15000):
                 # low speed buffeting limit applies only for JET and TURBOPROP
-                if self.AC.engineType == "JET" or self.AC.engineType == "TURBOPROP":
+                if (
+                    self.AC.engineType == "JET"
+                    or self.AC.engineType == "TURBOPROP"
+                ):
                     [theta, delta, sigma] = atm.atmosphereProperties(
                         h=h, DeltaTemp=DeltaTemp
                     )
@@ -2121,32 +2388,41 @@ class FlightEnvelope(BADA3):
                         Vmin = max(
                             VminStall,
                             atm.mach2Cas(
-                                buffetLimit, theta=theta, delta=delta, sigma=sigma
+                                buffetLimit,
+                                theta=theta,
+                                delta=delta,
+                                sigma=sigma,
                             ),
                         )
-                elif self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
+                elif (
+                    self.AC.engineType == "PISTON"
+                    or self.AC.engineType == "ELECTRIC"
+                ):
                     Vmin = VminStall
 
         return Vmin
 
     def Vmax_thrustLimited(self, h, mass, DeltaTemp, rating, config):
-        """This function computes the maximum CAS speed within the certified flight envelope taking into account the trust limitation.
+        """
+        Computes the maximum CAS speed considering thrust limitations within the certified flight envelope.
 
-        :param h: altitude [m].
-        :param mass: aircraft operating mass [kg]
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param rating: aircraft engine rating [MTKF/MCMB/MCRZ][-]
-        :param config: aircraft configuration [TO/IC/CR][-]
-        :type h: float.
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param rating: Aircraft engine rating (e.g., 'MTKF', 'MCMB', 'MCRZ').
+        :param config: Aircraft configuration (e.g., 'TO', 'CR').
+        :type h: float
         :type mass: float
-        :type DeltaTemp: float.
-        :type config: string
-        :type rating: string
-        :returns: maximum thrust lmited speed [m s^-1].
+        :type DeltaTemp: float
+        :type rating: str
+        :type config: str
+        :returns: Maximum thrust-limited speed in meters per second [m/s].
         :rtype: float
         """
 
-        [theta, delta, sigma] = atm.atmosphereProperties(h=h, DeltaTemp=DeltaTemp)
+        [theta, delta, sigma] = atm.atmosphereProperties(
+            h=h, DeltaTemp=DeltaTemp
+        )
 
         VmaxCertified = self.VMax(h=h, DeltaTemp=DeltaTemp)
         VminCertified = self.VMin(
@@ -2164,7 +2440,9 @@ class FlightEnvelope(BADA3):
         CDvalue = None
         CASValue = None
         MValue = None
-        for CAS in np.linspace(VminCertified, VmaxCertified, num=200, endpoint=True):
+        for CAS in np.linspace(
+            VminCertified, VmaxCertified, num=200, endpoint=True
+        ):
             TAS = atm.cas2Tas(cas=CAS, delta=delta, sigma=sigma)
             M = atm.cas2Mach(cas=CAS, theta=theta, delta=delta, sigma=sigma)
             maxThrust = self.Thrust(
@@ -2188,23 +2466,26 @@ class FlightEnvelope(BADA3):
             return max(maxCASList)
 
     def Vx(self, h, mass, DeltaTemp, rating, config):
-        """This function computes the best angle of climb CAS speed.
+        """
+        Computes the best angle of climb (Vx) speed.
 
-        :param h: altitude [m].
-        :param mass: aircraft operating mass [kg]
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param rating: aircraft engine rating [MTKF/MCMB/MCRZ][-]
-        :param config: aircraft configuration [TO/IC/CR][-]
-        :type h: float.
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param rating: Aircraft engine rating (e.g., 'MTKF', 'MCMB', 'MCRZ').
+        :param config: Aircraft configuration (e.g., 'TO', 'CR').
+        :type h: float
         :type mass: float
-        :type DeltaTemp: float.
-        :type config: string
-        :type rating: string
-        :returns: Vx - best angle of climb speed [m s^-1].
+        :type DeltaTemp: float
+        :type rating: str
+        :type config: str
+        :returns: Best angle of climb speed (Vx) in meters per second [m/s].
         :rtype: float
         """
 
-        [theta, delta, sigma] = atm.atmosphereProperties(h=h, DeltaTemp=DeltaTemp)
+        [theta, delta, sigma] = atm.atmosphereProperties(
+            h=h, DeltaTemp=DeltaTemp
+        )
 
         VmaxCertified = self.VMax(h=h, DeltaTemp=DeltaTemp)
         VminCertified = self.VMin(
@@ -2219,7 +2500,9 @@ class FlightEnvelope(BADA3):
         excessThrustList = []
         VxList = []
 
-        for CAS in np.linspace(VminCertified, VmaxCertified, num=200, endpoint=True):
+        for CAS in np.linspace(
+            VminCertified, VmaxCertified, num=200, endpoint=True
+        ):
             TAS = atm.cas2Tas(cas=CAS, delta=delta, sigma=sigma)
             maxThrust = self.Thrust(
                 h=h, DeltaTemp=DeltaTemp, rating=rating, v=TAS, config=config
@@ -2236,36 +2519,46 @@ class FlightEnvelope(BADA3):
         return VxList[idx]
 
     def VMax(self, h, DeltaTemp):
-        """This function computes the maximum speed
+        """
+        Computes the maximum speed based on altitude and temperature deviation.
 
-        :param h: altitude [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type h: float.
-        :type DeltaTemp: float.
-        :returns: maximum speed [m s^-1].
+        :param h: Altitude in meters [m].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type h: float
+        :type DeltaTemp: float
+        :returns: Maximum speed in meters per second [m/s].
         :rtype: float
         """
 
-        crossoverAlt = atm.crossOver(cas=conv.kt2ms(self.AC.VMO), Mach=self.AC.MMO)
+        crossoverAlt = atm.crossOver(
+            cas=conv.kt2ms(self.AC.VMO), Mach=self.AC.MMO
+        )
 
         if h >= crossoverAlt:
-            [theta, delta, sigma] = atm.atmosphereProperties(h=h, DeltaTemp=DeltaTemp)
-            VMax = atm.mach2Cas(Mach=self.AC.MMO, theta=theta, delta=delta, sigma=sigma)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=h, DeltaTemp=DeltaTemp
+            )
+            VMax = atm.mach2Cas(
+                Mach=self.AC.MMO, theta=theta, delta=delta, sigma=sigma
+            )
         else:
             VMax = conv.kt2ms(self.AC.VMO)
 
         return VMax
 
     def lowSpeedBuffetLimit(self, h, mass, DeltaTemp, nz=1.2):
-        """This function computes the low speed Buffeting limit using numerical methods by numpy
+        """
+        Computes the low-speed buffet limit using numerical methods.
 
-        :param h: altitude [m].
-        :param mass: aircraft mass [kg]
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type h: float.
-        :type mass: float.
-        :type DeltaTemp: float.
-        :returns: low speed buffet limit as M [-].
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param nz: Load factor, default is 1.2.
+        :type h: float
+        :type mass: float
+        :type DeltaTemp: float
+        :type nz: float, optional
+        :returns: Low-speed buffet limit as Mach number [-].
         :rtype: float
         """
 
@@ -2288,23 +2581,25 @@ class FlightEnvelope(BADA3):
         return min(Mb)
 
     def getConfig(self, phase, h, mass, v, DeltaTemp, hRWY=0.0, nz=1.2):
-        """This function returns the aircraft aerodynamic configuration
-        based on the aircraft altitude and speed and phase of flight
+        """
+        Returns the aerodynamic configuration based on altitude, speed, and phase of flight.
 
-        :param hRWY: runway elevation AMSL [m].
-        :param phase: aircraft phase of flight [cl/cr/des][-].
-        :param h: altitude [m].
-        :param v: calibrated airspeed (CAS) [m s^-1].
-        :param mass: aircraft mass [kg]
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type hRWY: float.
-        :type phase: string.
-        :type h: float.
-        :type v: float.
-        :type mass: float.
-        :type DeltaTemp: float.
-        :returns: aircraft aerodynamic configuration [TO/IC/CR/AP/LD][-].
-        :rtype: string
+        :param phase: Phase of flight (e.g., 'Climb', 'Cruise', 'Descent').
+        :param h: Altitude in meters [m].
+        :param v: Calibrated airspeed in meters per second [m/s].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param hRWY: Runway elevation above mean sea level in meters [m], default is 0.
+        :param nz: Load factor, default is 1.2.
+        :type phase: str
+        :type h: float
+        :type v: float
+        :type mass: float
+        :type DeltaTemp: float
+        :type hRWY: float, optional
+        :type nz: float, optional
+        :returns: Aerodynamic configuration (e.g., 'TO', 'IC', 'CR', 'AP', 'LD').
+        :rtype: str
         """
 
         config = None
@@ -2313,19 +2608,27 @@ class FlightEnvelope(BADA3):
         h_AGL = h - hRWY
 
         HmaxTO_AGL = (
-            conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "H_max_to", phase="to"))
+            conv.ft2m(
+                Parser.getGPFValue(self.AC.GPFdata, "H_max_to", phase="to")
+            )
             - hRWY
         )
         HmaxIC_AGL = (
-            conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "H_max_ic", phase="ic"))
+            conv.ft2m(
+                Parser.getGPFValue(self.AC.GPFdata, "H_max_ic", phase="ic")
+            )
             - hRWY
         )
         HmaxAPP_AGL = (
-            conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "H_max_app", phase="app"))
+            conv.ft2m(
+                Parser.getGPFValue(self.AC.GPFdata, "H_max_app", phase="app")
+            )
             - hRWY
         )
         HmaxLD_AGL = (
-            conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "H_max_ld", phase="lnd"))
+            conv.ft2m(
+                Parser.getGPFValue(self.AC.GPFdata, "H_max_ld", phase="lnd")
+            )
             - hRWY
         )
 
@@ -2334,8 +2637,12 @@ class FlightEnvelope(BADA3):
         elif phase == "Climb" and (h_AGL > HmaxTO_AGL and h_AGL <= HmaxIC_AGL):
             config = "IC"
         else:
-            vMinCR = self.VMin(h=h, mass=mass, config="CR", DeltaTemp=DeltaTemp, nz=nz)
-            vMinAPP = self.VMin(h=h, mass=mass, config="AP", DeltaTemp=DeltaTemp, nz=nz)
+            vMinCR = self.VMin(
+                h=h, mass=mass, config="CR", DeltaTemp=DeltaTemp, nz=nz
+            )
+            vMinAPP = self.VMin(
+                h=h, mass=mass, config="AP", DeltaTemp=DeltaTemp, nz=nz
+            )
             ep = 1e-6
             if (
                 phase == "Descent"
@@ -2375,13 +2682,13 @@ class FlightEnvelope(BADA3):
         return config
 
     def getAeroConfig(self, config):
-        """This function returns the aircraft aerodynamic configuration
-        based on the aerodynamic configuration ID
+        """
+        Returns the aerodynamic configuration ID for a given configuration.
 
-        :param config: aircraft configuration [CR/IC/TO/AP/LD][-]
-        :type config: string
-        :returns: aircraft aerodynamic configuration combination of HLID and LG [-].
-        :rtype: [float, string]
+        :param config: Aircraft configuration (e.g., 'CR', 'IC', 'TO', 'AP', 'LD').
+        :type config: str
+        :returns: A list containing the HLid and LG for the given configuration.
+        :rtype: [int, str]
         """
 
         HLid = self.AC.aeroConfig[config]["HLid"]
@@ -2390,58 +2697,84 @@ class FlightEnvelope(BADA3):
         return [HLid, LG]
 
     def getHoldSpeed(self, h, theta, delta, sigma, DeltaTemp):
-        """This function returns the aircraft holding speed based on the altitude
+        """
+        Computes the aircraft's holding speed (CAS) based on the current altitude.
 
-        :param h: altitude [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type h: float.
-        :type DeltaTemp: float.
-        :returns: aircraft Holding calibrated airspeed (CAS) [m s^-1].
+        :param h: Altitude in meters [m].
+        :param theta: Normalized temperature [-].
+        :param delta: Normalized pressure [-].
+        :param sigma: Normalized air density [-].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type h: float
+        :type theta: float
+        :type delta: float
+        :type sigma: float
+        :type DeltaTemp: float
+        :returns: Holding calibrated airspeed (CAS) in meters per second [m/s].
         :rtype: float
         """
 
         if h <= conv.ft2m(14000):
-            vHold = Parser.getGPFValue(self.AC.GPFdata, "V_hold_1", phase="hold")
+            vHold = Parser.getGPFValue(
+                self.AC.GPFdata, "V_hold_1", phase="hold"
+            )
         elif h > conv.ft2m(14000) and h <= conv.ft2m(20000):
-            vHold = Parser.getGPFValue(self.AC.GPFdata, "V_hold_2", phase="hold")
+            vHold = Parser.getGPFValue(
+                self.AC.GPFdata, "V_hold_2", phase="hold"
+            )
         elif h > conv.ft2m(20000) and h <= conv.ft2m(34000):
-            vHold = Parser.getGPFValue(self.AC.GPFdata, "V_hold_3", phase="hold")
+            vHold = Parser.getGPFValue(
+                self.AC.GPFdata, "V_hold_3", phase="hold"
+            )
         elif h > conv.ft2m(34000):
-            MHold = Parser.getGPFValue(self.AC.GPFdata, "V_hold_4", phase="hold")
+            MHold = Parser.getGPFValue(
+                self.AC.GPFdata, "V_hold_4", phase="hold"
+            )
             vHold = atm.mach2Cas(Mach=M, theta=theta, delta=delta, sigma=sigma)
 
         return conv.kt2ms(vHold)
 
     def getGroundMovementSpeed(self, pos):
-        """This function returns the aircraft ground movement speed based on postion on the ground
+        """
+        Returns the ground movement speed based on the aircraft's position on the ground.
 
-        :param pos: aircraft position on airport ground [backtrack/taxi/apron/gate][-].
-        :type pos: string.
-        :returns: aircraft ground movement calibrated airspeed (CAS) [m s^-1].
+        :param pos: Aircraft position on the airport ground (e.g., 'backtrack', 'taxi', 'apron', 'gate').
+        :type pos: str
+        :returns: Ground movement speed in meters per second [m/s].
         :rtype: float
+
         """
 
         if pos == "backtrack":
-            vGround = Parser.getGPFValue(self.AC.GPFdata, "V_backtrack", phase="gnd")
+            vGround = Parser.getGPFValue(
+                self.AC.GPFdata, "V_backtrack", phase="gnd"
+            )
         elif pos == "taxi":
-            vGround = Parser.getGPFValue(self.AC.GPFdata, "V_taxi", phase="gnd")
+            vGround = Parser.getGPFValue(
+                self.AC.GPFdata, "V_taxi", phase="gnd"
+            )
         elif pos == "apron":
-            vGround = Parser.getGPFValue(self.AC.GPFdata, "V_apron", phase="gnd")
+            vGround = Parser.getGPFValue(
+                self.AC.GPFdata, "V_apron", phase="gnd"
+            )
         elif pos == "gate":
-            vGround = Parser.getGPFValue(self.AC.GPFdata, "V_gate", phase="gnd")
+            vGround = Parser.getGPFValue(
+                self.AC.GPFdata, "V_gate", phase="gnd"
+            )
 
         return conv.kt2ms(vGround)
 
     def getBankAngle(self, phase, flightUnit, value):
-        """This function returns the aircraft bank angle based on phase of flight
+        """
+        Returns the nominal or maximum bank angle for the given flight phase and unit type.
 
-        :param phase: aircraft phase of flight [to/ic/cl/cr/...][-].
-        :param flightUnit: flight unit [civ/mil][-].
-        :param value: nominal or maximum value [nom/max][-].
-        :type phase: string.
-        :type flightUnit: string.
-        :type value: string.
-        :returns: bank angle [deg]
+        :param phase: Phase of flight (e.g., 'to', 'ic', 'cl', 'cr', etc.).
+        :param flightUnit: Flight unit (e.g., 'civ' for civilian, 'mil' for military).
+        :param value: Desired value, either 'nom' for nominal or 'max' for maximum bank angle.
+        :type phase: str
+        :type flightUnit: str
+        :type value: str
+        :returns: Bank angle in degrees [deg].
         :rtype: float
         """
 
@@ -2458,22 +2791,21 @@ class FlightEnvelope(BADA3):
             return maxBankAngle
 
     def isAccOK(self, v1, v2, type="long", flightUnit="civ", deltaTime=1.0):
-        """This function checks the limits for longitudinal and normal acceleration
+        """
+        Checks whether the acceleration between two time steps is within allowable limits.
 
-        :param type: logitudinal or normal acceleration [long/norm][-].
-        :param flightUnit: flight unit [civ/mil][-].
-        :param v1: (long) true airspeed (TAS) at step k-1 [m s^-1].
-        :param v1: (norm) vertical airspeed (ROCD) at step k-1 [m s^-1].
-        :param v2: (long) true airspeed (TAS) at step k [m s^-1].
-        :param v2: (norm) vertical airspeed (ROCD) at step k [m s^-1].
-        :param deltaTime: time interval between k and k-1 [s].
-        :type type: string.
-        :type flightUnit: string.
-        :type v1: float.
-        :type v2: float.
-        :type deltaTime: float.
-        :returns: acceleration OK [True] or NOK [False] [-]
-        :rtype: boolean
+        :param v1: Airspeed (or vertical speed for 'norm') at the previous time step [m/s].
+        :param v2: Airspeed (or vertical speed for 'norm') at the current time step [m/s].
+        :param type: Type of acceleration to check ('long' for longitudinal, 'norm' for normal).
+        :param flightUnit: Flight unit type ('civ' for civilian, 'mil' for military).
+        :param deltaTime: Time difference between the two time steps in seconds [s].
+        :type v1: float
+        :type v2: float
+        :type type: str
+        :type flightUnit: str
+        :type deltaTime: float
+        :returns: True if the acceleration is within limits, False otherwise.
+        :rtype: bool
         """
 
         OK = False
@@ -2482,7 +2814,9 @@ class FlightEnvelope(BADA3):
             if type == "long":
                 if (
                     abs(v2 - v1)
-                    <= conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "acc_long_max"))
+                    <= conv.ft2m(
+                        Parser.getGPFValue(self.AC.GPFdata, "acc_long_max")
+                    )
                     * deltaTime
                 ):
                     OK = True
@@ -2490,7 +2824,9 @@ class FlightEnvelope(BADA3):
         elif type == "norm":
             if (
                 abs(v2 - v1)
-                <= conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "acc_norm_max"))
+                <= conv.ft2m(
+                    Parser.getGPFValue(self.AC.GPFdata, "acc_norm_max")
+                )
                 * deltaTime
             ):
                 OK = True
@@ -2502,13 +2838,13 @@ class FlightEnvelope(BADA3):
         return OK
 
     def getSpeedSchedule(self, phase):
-        """This function returns the speed schedule
-        based on the phase of flight {Climb, Cruise, Descent}
+        """
+        Returns the speed schedule for a given phase of flight.
 
-        :param phase: aircraft phase of flight {Climb, Cruise, Descent}
-        :type phase: string
-        :returns: speed schedule combination of CAS1, CAS2 and M [m s^-1, m s^-1, -].
-        :rtype: [float, float, float]
+        :param phase: Flight phase ('Climb', 'Cruise', 'Descent').
+        :type phase: str
+        :returns: A list containing CAS1, CAS2, and Mach number for the specified phase [m/s, m/s, -].
+        :rtype: list[float, float, float]
         """
 
         if phase == "Climb":
@@ -2524,18 +2860,24 @@ class FlightEnvelope(BADA3):
 
         return [CAS1, CAS2, M]
 
-    def checkConfigurationContinuity(self, phase, previousConfig, currentConfig):
-        """This function ensures the continuity of the configuration change,
-        so, the aerodynamic configuration does not change in the wrong direction based on the phase of the flight
+    def checkConfigurationContinuity(
+        self, phase, previousConfig, currentConfig
+    ):
+        """
+        Ensures the continuity of aerodynamic configuration changes based on the phase of flight.
 
-        :param phase: aircraft phase of flight {Climb, Cruise, Descent}
-        :param previousConfig: aircraft previous aerodynamic configuration
-        :param currentConfig: aircraft current aerodynamic configuration
-        :type phase: string
-        :type previousConfig: string
-        :type currentConfig: string
-        :returns: speed new current configuration
-        :rtype: string
+        :param phase: Current flight phase ('Climb', 'Cruise', 'Descent').
+        :param previousConfig: The previous aerodynamic configuration.
+        :param currentConfig: The current aerodynamic configuration.
+        :type phase: str
+        :type previousConfig: str
+        :type currentConfig: str
+        :returns: Updated aerodynamic configuration.
+        :rtype: str
+
+        This function ensures that the aerodynamic configuration transitions logically
+        based on the phase of flight. For example, during descent, the configuration
+        should not revert to a clean configuration after deploying flaps for approach or landing.
         """
 
         newConfig = ""
@@ -2599,24 +2941,47 @@ class ARPM:
         NADP1_ALT=3000,
         NADP2_ALT=[1000, 3000],
     ):
-        """This function computes the climb speed schedule CAS speed for any given altitude
+        """
+        Computes the climb speed schedule (CAS) for the given altitude based on various procedures and aircraft parameters.
 
-        :param h: altitude [m].
-        :param mass: aircraft mass [kg].
-        :param theta: normalised air temperature [-].
-        :param delta: normalised air pressure [-].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param speedSchedule_default: default speed schedule that will overwrite the BADA schedule [Vcl1, Vcl2, Mcl].
-        :param applyLimits: apply min/max speed limitation [-].
-        :type h: float.
-        :type mass: float.
-        :type theta: float.
-        :type delta: float.
-        :type DeltaTemp: float.
-        :type speedSchedule_default: [float, float, float].
-        :type applyLimits: [boolean].
-        :returns: climb calibrated airspeed (CAS) [m s^-1].
-        :rtype: float
+        :param theta: Normalized air temperature [-].
+        :param delta: Normalized air pressure [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param h: Altitude in meters [m].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param speedSchedule_default: Optional, a default speed schedule that overrides the BADA schedule. It should be in the form [Vcl1, Vcl2, Mcl].
+        :param applyLimits: Boolean flag indicating whether to apply the minimum and maximum speed limits based on the flight envelope.
+        :param config: Optional, current aircraft aerodynamic configuration (TO/IC/CR/AP/LD).
+        :param procedure: Climb procedure to be followed, e.g., 'BADA', 'NADP1', 'NADP2'. Default is 'BADA'.
+        :param NADP1_ALT: Altitude in feet for NADP1 procedure. Default is 3000 feet.
+        :param NADP2_ALT: Altitude range in feet for NADP2 procedure. Default is [1000, 3000].
+        :type theta: float
+        :type delta: float
+        :type mass: float
+        :type h: float
+        :type DeltaTemp: float
+        :type speedSchedule_default: list[float, float, float], optional
+        :type applyLimits: bool
+        :type config: str, optional
+        :type procedure: str
+        :type NADP1_ALT: float
+        :type NADP2_ALT: list[float, float]
+        :returns: A tuple containing the climb calibrated airspeed (CAS) in meters per second [m/s] and a status flag indicating whether the calculated CAS is constrained ('C'), unconstrained ('V' or 'v'), or not altered ('').
+        :rtype: tuple[float, str]
+
+        This function computes the climb speed schedule for different phases of flight and aircraft types.
+        It supports BADA, NADP1, and NADP2 procedures for both jet and turboprop/piston/electric aircraft.
+
+        The climb schedule uses specific speed profiles depending on altitude and aircraft model. For jet engines, the speed is constrained
+        below 250 knots below 10,000 feet, and then it follows a defined speed schedule, either from BADA or NADP procedures.
+
+        Additionally, the function applies speed limits based on the aircraft's flight envelope, adjusting the calculated climb speed if necessary.
+
+        - For `procedure='BADA'`, it uses the BADA climb speed schedule.
+        - For `procedure='NADP1'`, it implements the Noise Abatement Departure Procedure 1.
+        - For `procedure='NADP2'`, it implements the Noise Abatement Departure Procedure 2.
+
+        The function also ensures that the calculated CAS remains within the bounds of the aircraft's minimum and maximum speeds.
         """
 
         phase = "cl"
@@ -2645,31 +3010,41 @@ class ARPM:
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_5", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_5", phase=phase
+                        )
                     )
                 )
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_4", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_4", phase=phase
+                        )
                     )
                 )
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_3", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_3", phase=phase
+                        )
                     )
                 )
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_2", phase=phase
+                        )
                     )
                 )
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_1", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_1", phase=phase
+                        )
                     )
                 )
 
@@ -2694,16 +3069,25 @@ class ARPM:
                 elif h >= conv.ft2m(10000) and h < crossOverAlt:
                     cas = Vcl2
                 elif h >= crossOverAlt:
-                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
+                    cas = atm.mach2Cas(
+                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
+                    )
 
-            elif acModel == "TURBOPROP" or acModel == "PISTON" or acModel == "ELECTRIC":
+            elif (
+                acModel == "TURBOPROP"
+                or acModel == "PISTON"
+                or acModel == "ELECTRIC"
+            ):
                 speed = list()
                 speed.append(min(Vcl1, conv.kt2ms(250)))
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
                         Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_8", engine="TURBOPROP", phase=phase
+                            self.AC.GPFdata,
+                            "V_cl_8",
+                            engine="TURBOPROP",
+                            phase=phase,
                         )
                     )
                 )
@@ -2711,7 +3095,10 @@ class ARPM:
                     Cvmin * VstallTO
                     + conv.kt2ms(
                         Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_7", engine="TURBOPROP", phase=phase
+                            self.AC.GPFdata,
+                            "V_cl_7",
+                            engine="TURBOPROP",
+                            phase=phase,
                         )
                     )
                 )
@@ -2719,7 +3106,10 @@ class ARPM:
                     Cvmin * VstallTO
                     + conv.kt2ms(
                         Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_6", engine="TURBOPROP", phase=phase
+                            self.AC.GPFdata,
+                            "V_cl_6",
+                            engine="TURBOPROP",
+                            phase=phase,
                         )
                     )
                 )
@@ -2741,7 +3131,9 @@ class ARPM:
                 elif h >= conv.ft2m(10000) and h < crossOverAlt:
                     cas = Vcl2
                 elif h >= crossOverAlt:
-                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
+                    cas = atm.mach2Cas(
+                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
+                    )
 
         elif procedure == "NADP1":
             if acModel == "JET":
@@ -2750,7 +3142,9 @@ class ARPM:
                 speed.append(
                     CvminTO * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_2", phase=phase
+                        )
                     )
                 )
                 n = 1
@@ -2767,7 +3161,9 @@ class ARPM:
                     cas = Vcl2
                 elif h >= crossOverAlt:
                     sigma = atm.sigma(theta=theta, delta=delta)
-                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
+                    cas = atm.mach2Cas(
+                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
+                    )
 
             elif acModel == "TURBOPROP" or acModel == "PISTON":
                 speed = list()
@@ -2775,7 +3171,9 @@ class ARPM:
                 speed.append(
                     CvminTO * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_1", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_1", phase=phase
+                        )
                     )
                 )
 
@@ -2793,7 +3191,9 @@ class ARPM:
                     cas = Vcl2
                 elif h >= crossOverAlt:
                     sigma = atm.sigma(theta=theta, delta=delta)
-                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
+                    cas = atm.mach2Cas(
+                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
+                    )
 
         elif procedure == "NADP2":
             if acModel == "JET":
@@ -2802,13 +3202,17 @@ class ARPM:
                 speed.append(
                     Cvmin * VstallCR
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_2", phase=phase
+                        )
                     )
                 )
                 speed.append(
                     CvminTO * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_2", phase=phase
+                        )
                     )
                 )
 
@@ -2820,7 +3224,9 @@ class ARPM:
 
                 if h < conv.ft2m(NADP2_ALT[0]):
                     cas = speed[2]
-                elif h >= conv.ft2m(NADP2_ALT[0]) and h < conv.ft2m(NADP2_ALT[1]):
+                elif h >= conv.ft2m(NADP2_ALT[0]) and h < conv.ft2m(
+                    NADP2_ALT[1]
+                ):
                     cas = speed[1]
                 elif h >= conv.ft2m(NADP2_ALT[1]) and h < conv.ft2m(10000):
                     cas = speed[0]
@@ -2828,7 +3234,9 @@ class ARPM:
                     cas = Vcl2
                 elif h >= crossOverAlt:
                     sigma = atm.sigma(theta=theta, delta=delta)
-                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
+                    cas = atm.mach2Cas(
+                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
+                    )
 
             elif acModel == "TURBOPROP" or acModel == "PISTON":
                 speed = list()
@@ -2836,13 +3244,17 @@ class ARPM:
                 speed.append(
                     Cvmin * VstallCR
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_2", phase=phase
+                        )
                     )
                 )
                 speed.append(
                     CvminTO * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_1", phase=phase)
+                        Parser.getGPFValue(
+                            self.AC.GPFdata, "V_cl_1", phase=phase
+                        )
                     )
                 )
 
@@ -2854,7 +3266,9 @@ class ARPM:
 
                 if h < conv.ft2m(NADP2_ALT[0]):
                     cas = speed[2]
-                elif h >= conv.ft2m(NADP2_ALT[0]) and h < conv.ft2m(NADP2_ALT[1]):
+                elif h >= conv.ft2m(NADP2_ALT[0]) and h < conv.ft2m(
+                    NADP2_ALT[1]
+                ):
                     cas = speed[1]
                 elif h >= conv.ft2m(NADP2_ALT[1]) and h < conv.ft2m(10000):
                     cas = speed[0]
@@ -2862,7 +3276,9 @@ class ARPM:
                     cas = Vcl2
                 elif h >= crossOverAlt:
                     sigma = atm.sigma(theta=theta, delta=delta)
-                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
+                    cas = atm.mach2Cas(
+                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
+                    )
 
         if applyLimits:
             # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
@@ -2904,24 +3320,36 @@ class ARPM:
         applyLimits=True,
         config=None,
     ):
-        """This function computes the cruise speed schedule CAS speed for any given altitude
+        """
+        Computes the cruise speed schedule (CAS) for a given altitude based on aircraft parameters and procedures.
 
-        :param h: altitude [m].
-        :param mass: aircraft mass [kg].
-        :param theta: normalised air temperature [-].
-        :param delta: normalised air pressure [-].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param speedSchedule_default: default speed schedule that will overwrite the BADA schedule [Vcr1, Vcr2, Mcr].
-        :param applyLimits: apply min/max speed limitation [-].
-        :type h: float.
-        :type mass: float.
-        :type theta: float.
-        :type delta: float.
-        :type DeltaTemp: float.
-        :type speedSchedule_default: [float, float, float].
-        :type applyLimits: [boolean].
-        :returns: climb calibrated airspeed (CAS) [m s^-1].
-        :rtype: float
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param theta: Normalized air temperature [-].
+        :param delta: Normalized air pressure [-].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param speedSchedule_default: Optional, a default speed schedule that overrides the BADA schedule. It should be in the form [Vcr1, Vcr2, Mcr].
+        :param applyLimits: Boolean flag indicating whether to apply the minimum and maximum speed limits based on the flight envelope.
+        :param config: Optional, current aircraft aerodynamic configuration (TO/IC/CR/AP/LD).
+        :type h: float
+        :type mass: float
+        :type theta: float
+        :type delta: float
+        :type DeltaTemp: float
+        :type speedSchedule_default: list[float, float, float], optional
+        :type applyLimits: bool
+        :type config: str, optional
+        :returns: A tuple containing the cruise calibrated airspeed (CAS) in meters per second [m/s] and a status flag indicating whether the calculated CAS is constrained ('C'), unconstrained ('V' or 'v'), or not altered ('').
+        :rtype: tuple[float, str]
+
+        This function computes the cruise speed schedule for various phases of flight and aircraft models.
+        It supports both jet and turboprop/piston/electric aircraft models by using the BADA (Base of Aircraft Data) speed schedules.
+
+        - If a `speedSchedule_default` is provided, it overwrites the BADA speed schedule.
+        - For jet engines, the speed is constrained based on altitude, starting with 170 knots below 3000 feet, 220 knots below 6000 feet, and then follows the standard speed schedule.
+        - For other aircraft types (TURBOPROP, PISTON, ELECTRIC), the speed limits are lower, starting with 150 knots below 3000 feet.
+
+        The function also applies limits based on the aircraft's flight envelope, ensuring the calculated speed does not exceed the minimum or maximum allowable speeds.
         """
 
         phase = "cr"
@@ -2949,9 +3377,15 @@ class ARPM:
             elif h >= conv.ft2m(14000) and h < crossOverAlt:
                 cas = Vcr2
             elif h >= crossOverAlt:
-                cas = atm.mach2Cas(Mach=Mcr, theta=theta, delta=delta, sigma=sigma)
+                cas = atm.mach2Cas(
+                    Mach=Mcr, theta=theta, delta=delta, sigma=sigma
+                )
 
-        elif acModel == "TURBOPROP" or acModel == "PISTON" or acModel == "ELECTRIC":
+        elif (
+            acModel == "TURBOPROP"
+            or acModel == "PISTON"
+            or acModel == "ELECTRIC"
+        ):
             if h < conv.ft2m(3000):
                 cas = min(Vcr1, conv.kt2ms(150))
             elif h >= conv.ft2m(3000) and h < conv.ft2m(6000):
@@ -2961,7 +3395,9 @@ class ARPM:
             elif h >= conv.ft2m(10000) and h < crossOverAlt:
                 cas = Vcr2
             elif h >= crossOverAlt:
-                cas = atm.mach2Cas(Mach=Mcr, theta=theta, delta=delta, sigma=sigma)
+                cas = atm.mach2Cas(
+                    Mach=Mcr, theta=theta, delta=delta, sigma=sigma
+                )
 
         if applyLimits:
             # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
@@ -3004,24 +3440,36 @@ class ARPM:
         applyLimits=True,
         config=None,
     ):
-        """This function computes the descent speed schedule CAS speed for any given altitude
+        """
+        Computes the descent speed schedule (CAS) for a given altitude based on aircraft parameters and procedures.
 
-        :param h: altitude [m].
-        :param mass: aircraft mass [kg].
-        :param theta: normalised air temperature [-].
-        :param delta: normalised air pressure [-].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param speedSchedule_default: default speed schedule that will overwrite the BADA schedule [Vdes1, Vdes2, Mdes].
-        :param applyLimits: apply min/max speed limitation [-].
-        :type h: float.
-        :type mass: float.
-        :type theta: float.
-        :type delta: float.
-        :type DeltaTemp: float.
-        :type speedSchedule_default: [float, float, float].
-        :type applyLimits: [boolean].
-        :returns: climb calibrated airspeed (CAS) [m s^-1].
-        :rtype: float
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param theta: Normalized air temperature [-].
+        :param delta: Normalized air pressure [-].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param speedSchedule_default: Optional, a default speed schedule that overrides the BADA schedule. It should be in the form [Vdes1, Vdes2, Mdes].
+        :param applyLimits: Boolean flag indicating whether to apply the minimum and maximum speed limits based on the flight envelope.
+        :param config: Optional, current aircraft aerodynamic configuration (TO/IC/CR/AP/LD).
+        :type h: float
+        :type mass: float
+        :type theta: float
+        :type delta: float
+        :type DeltaTemp: float
+        :type speedSchedule_default: list[float, float, float], optional
+        :type applyLimits: bool
+        :type config: str, optional
+        :returns: A tuple containing the descent calibrated airspeed (CAS) in meters per second [m/s] and a status flag indicating whether the calculated CAS is constrained ('C'), unconstrained ('V' or 'v'), or not altered ('').
+        :rtype: tuple[float, str]
+
+        This function computes the descent speed schedule for various phases of flight and aircraft models.
+        It supports both jet and turboprop/piston/electric aircraft models using the BADA (Base of Aircraft Data) speed schedules.
+
+        - If a `speedSchedule_default` is provided, it overwrites the BADA speed schedule.
+        - For jet and turboprop engines, the speed schedule is constrained based on altitude, starting from 220 knots below 3000 feet and then following the standard speed schedule.
+        - For piston and electric engines, lower speed limits are applied based on stall speeds.
+
+        The function also applies limits based on the aircraft's flight envelope, ensuring that the calculated speed does not exceed the minimum or maximum allowable speeds.
         """
 
         phase = "des"
@@ -3090,7 +3538,9 @@ class ARPM:
             elif h >= conv.ft2m(10000) and h < crossOverAlt:
                 cas = Vdes2
             elif h >= crossOverAlt:
-                cas = atm.mach2Cas(Mach=Mdes, theta=theta, delta=delta, sigma=sigma)
+                cas = atm.mach2Cas(
+                    Mach=Mdes, theta=theta, delta=delta, sigma=sigma
+                )
 
         elif acModel == "PISTON" or acModel == "ELECTRIC":
             speed = list()
@@ -3099,7 +3549,10 @@ class ARPM:
                 Cvmin * VstallDES
                 + conv.kt2ms(
                     Parser.getGPFValue(
-                        self.AC.GPFdata, "V_des_7", engine="PISTON", phase=phase
+                        self.AC.GPFdata,
+                        "V_des_7",
+                        engine="PISTON",
+                        phase=phase,
                     )
                 )
             )
@@ -3107,7 +3560,10 @@ class ARPM:
                 Cvmin * VstallDES
                 + conv.kt2ms(
                     Parser.getGPFValue(
-                        self.AC.GPFdata, "V_des_6", engine="PISTON", phase=phase
+                        self.AC.GPFdata,
+                        "V_des_6",
+                        engine="PISTON",
+                        phase=phase,
                     )
                 )
             )
@@ -3115,7 +3571,10 @@ class ARPM:
                 Cvmin * VstallDES
                 + conv.kt2ms(
                     Parser.getGPFValue(
-                        self.AC.GPFdata, "V_des_5", engine="PISTON", phase=phase
+                        self.AC.GPFdata,
+                        "V_des_5",
+                        engine="PISTON",
+                        phase=phase,
                     )
                 )
             )
@@ -3137,7 +3596,9 @@ class ARPM:
             elif h >= conv.ft2m(10000) and h < crossOverAlt:
                 cas = Vdes2
             elif h >= crossOverAlt:
-                cas = atm.mach2Cas(Mach=Mdes, theta=theta, delta=delta, sigma=sigma)
+                cas = atm.mach2Cas(
+                    Mach=Mdes, theta=theta, delta=delta, sigma=sigma
+                )
 
         if applyLimits:
             # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
@@ -3184,13 +3645,17 @@ class PTD(BADA3):
         self.ARPM = ARPM(AC)
 
     def create(self, DeltaTemp, saveToPath):
-        """This function creates the BADA3 PTD file
+        """
+        Creates a BADA3 PTD file based on specified temperature deviation from ISA
+        and saves it to the provided directory path. It generates performance data for different aircraft mass levels (low,
+        medium, high) in both climb and descent phases.
 
-        :param saveToPath: path to directory where PTF should be stored [-]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type saveToPath: string.
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param saveToPath: Path to the directory where the PTD file will be stored.
         :type DeltaTemp: float.
-        :returns: NONE
+        :type saveToPath: str.
+        :returns: None
+        :rtype: None
         """
 
         # 3 different mass levels [kg]
@@ -3199,7 +3664,11 @@ class PTD(BADA3):
         else:
             massLow = 1.2 * self.AC.mass["minimum"]
 
-        massList = [massLow, self.AC.mass["reference"], self.AC.mass["maximum"]]
+        massList = [
+            massLow,
+            self.AC.mass["reference"],
+            self.AC.mass["maximum"],
+        ]
         max_alt_ft = self.AC.hmo
 
         # original PTD altitude list
@@ -3237,23 +3706,32 @@ class PTD(BADA3):
         )
 
     def save2PTD(
-        self, saveToPath, CLList_low, CLList_med, CLList_high, DESList_med, DeltaTemp
+        self,
+        saveToPath,
+        CLList_low,
+        CLList_med,
+        CLList_high,
+        DESList_med,
+        DeltaTemp,
     ):
-        """This function saves data to PTD file
+        """
+        Saves BADA3 (PTD) to a file. It stores performance data for low, medium,
+        and high aircraft masses during the climb phase, and medium aircraft mass during the descent phase. The file
+        is saved in a predefined format.
 
-        :param saveToPath: path to directory where PTD should be stored [-]
-        :param CLList_low: list of PTD data in CLIMB at low aircraft mass [-].
-        :param CLList_med: list of PTD data in CLIMB at medium aircraft mass [-].
-        :param CLList_high: list of PTD data in CLIMB at high aircraft mass [-].
-        :param DESList_med: list of PTD data in DESCENT at medium aircraft mass [-].
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type saveToPath: string.
+        :param saveToPath: Path to the directory where the PTD file should be saved.
+        :param CLList_low: List containing PTD data for CLIMB at low aircraft mass.
+        :param CLList_med: List containing PTD data for CLIMB at medium aircraft mass.
+        :param CLList_high: List containing PTD data for CLIMB at high aircraft mass.
+        :param DESList_med: List containing PTD data for DESCENT at medium aircraft mass.
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type saveToPath: str.
         :type CLList_low: list.
         :type CLList_med: list.
         :type CLList_high: list.
         :type DESList_med: list.
         :type DeltaTemp: float.
-        :returns: NONE
+        :returns: None
         """
 
         def Nan2Zero(list):
@@ -3285,7 +3763,9 @@ class PTD(BADA3):
         file = open(filename, "w")
         file.write("BADA PERFORMANCE FILE RESULTS\n")
         file = open(filename, "a")
-        file.write("=============================\n=============================\n\n")
+        file.write(
+            "=============================\n=============================\n\n"
+        )
         file.write("Low mass CLIMBS\n")
         file.write("===============\n\n")
         file.write(
@@ -3411,15 +3891,16 @@ class PTD(BADA3):
         file.write("\nTDC stands for (Thrust - Drag) * Cred\n")
 
     def PTD_climb(self, mass, altitudeList, DeltaTemp):
-        """This function calculates the BADA3 PTD data in CLIMB
+        """
+        Calculates the BADA3 PTD data in climb phase.
 
-        :param mass: aircraft mass [kg]
-        :param altitudeList: aircraft altitude list [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type mass: float.
-        :type altitudeList: list of int.
-        :type DeltaTemp: float.
-        :returns: list of PTD CLIMB data [-]
+        :param mass: Aircraft mass [kg]
+        :param altitudeList: List of altitude levels for calculation (in feet)
+        :param DeltaTemp: Deviation from International Standard Atmosphere (ISA) temperature [K]
+        :type mass: float
+        :type altitudeList: list of int
+        :type DeltaTemp: float
+        :returns: A list of calculated PTD data for the climb phase
         :rtype: list
         """
 
@@ -3451,7 +3932,9 @@ class PTD(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
             [cas, speedUpdated] = self.ARPM.climbSpeed(
                 theta=theta,
                 delta=delta,
@@ -3547,16 +4030,20 @@ class PTD(BADA3):
         return CLList
 
     def PTD_descent(self, mass, altitudeList, DeltaTemp):
-        """This function calculates the BADA3 PTD data in DESCENT
+        """
+        Calculates the BADA3 PTD data in descent phase.
 
-        :param mass: aircraft mass [kg]
-        :param altitudeList: list of aircraft maximum altitude [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
+        This function generates a detailed list of descent performance metrics for different altitudes and
+        mass configurations based on BADA3 performance models.
+
+        :param mass: Aircraft mass [kg].
+        :param altitudeList: List of aircraft altitudes in feet [ft].
+        :param DeltaTemp: Deviation from ISA temperature [K].
         :type mass: float.
         :type altitudeList: list of int.
         :type DeltaTemp: float.
-        :returns: list of PTD DESCENT data [-]
-        :rtype: list
+        :returns: List of descent performance data.
+        :rtype: list.
         """
 
         FL_complet = []
@@ -3587,7 +4074,9 @@ class PTD(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
             [cas, speedUpdated] = self.ARPM.descentSpeed(
                 theta=theta,
                 delta=delta,
@@ -3609,10 +4098,17 @@ class PTD(BADA3):
             CD = self.CD(CL=CL, config=config)
             Drag = self.D(tas=tas, sigma=sigma, CD=CD)
 
-            if self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
+            if (
+                self.AC.engineType == "PISTON"
+                or self.AC.engineType == "ELECTRIC"
+            ):
                 # PISTON  and ELECTRIC uses LIDL throughout the whole descent phase
                 Thrust = self.Thrust(
-                    rating="LIDL", v=tas, h=H_m, config="CR", DeltaTemp=DeltaTemp
+                    rating="LIDL",
+                    v=tas,
+                    h=H_m,
+                    config="CR",
+                    DeltaTemp=DeltaTemp,
                 )
                 ff = (
                     self.ff(
@@ -3627,7 +4123,11 @@ class PTD(BADA3):
                 )
             else:
                 Thrust = self.Thrust(
-                    rating="LIDL", v=tas, h=H_m, config=config, DeltaTemp=DeltaTemp
+                    rating="LIDL",
+                    v=tas,
+                    h=H_m,
+                    config=config,
+                    DeltaTemp=DeltaTemp,
                 )
                 ff = (
                     self.ff(
@@ -3668,7 +4168,9 @@ class PTD(BADA3):
                 * 60
             )
 
-            tau_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+            tau_const = (theta * const.temp_0) / (
+                theta * const.temp_0 - DeltaTemp
+            )
             dhdt = (conv.ft2m(ROCD / 60)) * tau_const
 
             if self.AC.drone:
@@ -3716,7 +4218,7 @@ class PTD(BADA3):
 
 
 class PTF(BADA3):
-    """This class implements the PTD file creator for BADA3 aircraft following BADA3 manual.
+    """This class implements the PTF file creator for BADA3 aircraft following BADA3 manual.
 
     :param AC: parsed aircraft.
     :type AC: bada3.Parse.
@@ -3729,13 +4231,17 @@ class PTF(BADA3):
         self.ARPM = ARPM(AC)
 
     def create(self, DeltaTemp, saveToPath):
-        """This function creates the BADA3 PTF file
+        """
+        Creates a BADA3 PTF file based on specified temperature deviation from ISA
+        and saves it to the provided directory path. It generates performance data for different aircraft mass levels (low,
+        medium, high) in both climb and descent phases.
 
-        :param saveToPath: path to directory where PTF should be stored [-]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type saveToPath: string.
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param saveToPath: Path to the directory where the PTF file will be stored.
         :type DeltaTemp: float.
-        :returns: NONE
+        :type saveToPath: str.
+        :returns: None
+        :rtype: None
         """
 
         # 3 different mass levels [kg]
@@ -3744,7 +4250,11 @@ class PTF(BADA3):
         else:
             massLow = 1.2 * self.AC.mass["minimum"]
 
-        massList = [massLow, self.AC.mass["reference"], self.AC.mass["maximum"]]
+        massList = [
+            massLow,
+            self.AC.mass["reference"],
+            self.AC.mass["maximum"],
+        ]
         max_alt_ft = self.AC.hmo
 
         # original PTF altitude list
@@ -3780,25 +4290,33 @@ class PTF(BADA3):
         )
 
     def save2PTF(
-        self, saveToPath, CRList, CLList, DESList, altitudeList, massList, DeltaTemp
+        self,
+        saveToPath,
+        CRList,
+        CLList,
+        DESList,
+        altitudeList,
+        massList,
+        DeltaTemp,
     ):
-        """This function saves data to PTF file
+        """
+        Saves performance data to a PTF file.
 
-        :param saveToPath: path to directory where PTF should be stored [-]
-        :param altitudeList: aircraft altitude list [ft]
-        :param massList: aircraft mass list [kg]
-        :param CRList: list of PTF data in CRUISE [-].
-        :param CLList: list of PTF data in CLIMB [-].
-        :param DESList: list of PTF data in DESCENT [-].
-        :param DeltaTemp: deviation from ISA temperature [K]
+        :param saveToPath: Directory path where the PTF file will be stored.
+        :param CRList: List of cruise phase data.
+        :param CLList: List of climb phase data.
+        :param DESList: List of descent phase data.
+        :param altitudeList: List of aircraft altitudes [ft].
+        :param massList: List of aircraft masses [kg].
+        :param DeltaTemp: Deviation from ISA temperature [K].
         :type saveToPath: string.
-        :type altitudeList: list of int.
-        :type massList: list of int.
         :type CRList: list.
         :type CLList: list.
         :type DESList: list.
+        :type altitudeList: list of int.
+        :type massList: list of int.
         :type DeltaTemp: float.
-        :returns: NONE
+        :returns: None
         """
 
         def Nan2Zero(list):
@@ -3844,7 +4362,8 @@ class PTF(BADA3):
 
         file = open(filename, "w")
         file.write(
-            "BADA PERFORMANCE FILE                                        %s\n\n" % (d3)
+            "BADA PERFORMANCE FILE                                        %s\n\n"
+            % (d3)
         )
         file = open(filename, "a")
         file.write("AC/Type: %s\n" % (acName))
@@ -3940,16 +4459,16 @@ class PTF(BADA3):
         )
 
     def PTF_cruise(self, massList, altitudeList, DeltaTemp):
-        """This function calculates the BADA3 PTF data in CRUISE
+        """Calculates BADA3 PTF data for the cruise phase.
 
-        :param massList: list of aircraft mass [kg]
-        :param altitudeList: aircraft altitude list [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type massList: list.
+        :param massList: List of aircraft masses [kg] (low, nominal, and high).
+        :param altitudeList: List of aircraft altitudes [ft].
+        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature [K].
+        :type massList: list of float.
         :type altitudeList: list of int.
         :type DeltaTemp: float.
-        :returns: list of PTF CRUISE data [-]
-        :rtype: list
+        :returns: List containing cruise phase TAS and fuel flow data.
+        :rtype: list.
         """
 
         TAS_CR_complet = []
@@ -3968,7 +4487,9 @@ class PTF(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
             [cas, speedUpdated] = self.ARPM.cruiseSpeed(
                 theta=theta,
                 delta=delta,
@@ -3996,28 +4517,35 @@ class PTF(BADA3):
                 CD = self.CD(CL=CL, config="CR")
                 Drag = self.D(tas=tas, sigma=sigma, CD=CD)
                 Thrust = Drag
-                ff.append(self.ff(flightPhase="Cruise", v=tas, h=H_m, T=Thrust) * 60)
+                ff.append(
+                    self.ff(flightPhase="Cruise", v=tas, h=H_m, T=Thrust) * 60
+                )
 
             TAS_CR_complet.append(conv.ms2kt(tas_nominal))
             FF_CR_LO_complet.append(ff[0])
             FF_CR_NOM_complet.append(ff[1])
             FF_CR_HI_complet.append(ff[2])
 
-        CRList = [TAS_CR_complet, FF_CR_LO_complet, FF_CR_NOM_complet, FF_CR_HI_complet]
+        CRList = [
+            TAS_CR_complet,
+            FF_CR_LO_complet,
+            FF_CR_NOM_complet,
+            FF_CR_HI_complet,
+        ]
 
         return CRList
 
     def PTF_climb(self, massList, altitudeList, DeltaTemp):
-        """This function calculates the BADA3 PTF data in CLIMB
+        """Calculates BADA3 PTF data for the climb phase.
 
-        :param massList: list of aircraft mass [kg]
-        :param altitudeList: aircraft altitude list [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type massList: list.
+        :param massList: List of aircraft masses [kg] (low, nominal, high).
+        :param altitudeList: List of aircraft altitudes [ft].
+        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature [K].
+        :type massList: list of float.
         :type altitudeList: list of int.
         :type DeltaTemp: float.
-        :returns: list of PTF CLIMB data [-]
-        :rtype: list
+        :returns: List containing climb phase TAS, ROCD, and fuel flow data.
+        :rtype: list.
         """
 
         TAS_CL_complet = []
@@ -4038,7 +4566,9 @@ class PTF(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
             FL = h / 100
 
             ROC = []
@@ -4058,22 +4588,36 @@ class PTF(BADA3):
                 M = atm.tas2Mach(v=tas, theta=theta)
                 CL = self.CL(tas=tas, sigma=sigma, mass=mass)
                 config = self.flightEnvelope.getConfig(
-                    h=H_m, phase="Climb", v=cas, mass=massNominal, DeltaTemp=DeltaTemp
+                    h=H_m,
+                    phase="Climb",
+                    v=cas,
+                    mass=massNominal,
+                    DeltaTemp=DeltaTemp,
                 )
                 CD = self.CD(CL=CL, config=config)
                 Drag = self.D(tas=tas, sigma=sigma, CD=CD)
                 Thrust = self.Thrust(
-                    rating="MCMB", v=tas, h=H_m, config=config, DeltaTemp=DeltaTemp
+                    rating="MCMB",
+                    v=tas,
+                    h=H_m,
+                    config=config,
+                    DeltaTemp=DeltaTemp,
                 )
                 ff = self.ff(flightPhase="Climb", v=tas, h=H_m, T=Thrust) * 60
 
                 if H_m < crossAlt:
                     ESF = self.esf(
-                        h=H_m, flightEvolution="constCAS", M=M, DeltaTemp=DeltaTemp
+                        h=H_m,
+                        flightEvolution="constCAS",
+                        M=M,
+                        DeltaTemp=DeltaTemp,
                     )
                 else:
                     ESF = self.esf(
-                        h=H_m, flightEvolution="constM", M=M, DeltaTemp=DeltaTemp
+                        h=H_m,
+                        flightEvolution="constM",
+                        M=M,
+                        DeltaTemp=DeltaTemp,
                     )
 
                 # I think this should use all config, not just for nominal weight
@@ -4117,16 +4661,16 @@ class PTF(BADA3):
         return CLList
 
     def PTF_descent(self, massList, altitudeList, DeltaTemp):
-        """This function calculates the BADA3 PTF data in DESCENT
+        """Calculates BADA3 PTF data for the descent phase.
 
-        :param massList: list of aircraft mass [kg]
-        :param altitudeList: aircraft altitude list [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type massList: list.
+        :param massList: List of aircraft masses [kg] (low, nominal, high).
+        :param altitudeList: List of aircraft altitudes [ft].
+        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature [K].
+        :type massList: list of float.
         :type altitudeList: list of int.
         :type DeltaTemp: float.
-        :returns: list of PTF DESCENT data [-]
-        :rtype: list
+        :returns: List containing descent phase TAS, ROCD, and fuel flow data.
+        :rtype: list.
         """
 
         TAS_DES_complet = []
@@ -4145,7 +4689,9 @@ class PTF(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
             [cas, speedUpdated] = self.ARPM.descentSpeed(
                 theta=theta,
                 delta=delta,
@@ -4160,14 +4706,21 @@ class PTF(BADA3):
             FL = h / 100
 
             config = self.flightEnvelope.getConfig(
-                h=H_m, phase="Descent", v=cas, mass=massNominal, DeltaTemp=DeltaTemp
+                h=H_m,
+                phase="Descent",
+                v=cas,
+                mass=massNominal,
+                DeltaTemp=DeltaTemp,
             )
 
             CL = self.CL(tas=tas_nominal, sigma=sigma, mass=massNominal)
             CD = self.CD(CL=CL, config=config)
             Drag = self.D(tas=tas_nominal, sigma=sigma, CD=CD)
 
-            if self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
+            if (
+                self.AC.engineType == "PISTON"
+                or self.AC.engineType == "ELECTRIC"
+            ):
                 # PISTON  and ELECTRIC uses LIDL throughout the whole descent phase
                 Thrust_nominal = self.Thrust(
                     rating="LIDL",
@@ -4241,12 +4794,24 @@ class PTF(BADA3):
 
 
 class Bada3Aircraft(BADA3):
-    """This class implements the BADA3 performance model following the BADA3 manual.
+    """
+    Implements the BADA3 performance model for an aircraft following the BADA3 manual.
 
-    :param filePath: path to the BADA3 ascii formatted file.
-    :param acName: ICAO aircraft designation
-    :type filePath: str.
-    :type acName: str
+    This class handles the loading of aircraft-specific data from either a predefined
+    dataset or a set of BADA3 performance model files (e.g., OPF and APF files).
+    It initializes various parameters such as mass, speed schedules, and engine type
+    necessary for simulating the aircraft's performance.
+
+    :param badaVersion: The BADA version being used.
+    :param acName: The ICAO aircraft designation (e.g., "A320").
+    :param filePath: Optional path to the BADA3 formatted file. If not provided,
+                     the default aircraft directory is used.
+    :param allData: Optional DataFrame containing all aircraft data. If provided,
+                    the class will try to load the aircraft data from this DataFrame.
+    :type badaVersion: str.
+    :type acName: str.
+    :type filePath: str, optional.
+    :type allData: pd.DataFrame, optional.
     """
 
     def __init__(self, badaVersion, acName, filePath=None, allData=None):
@@ -4281,7 +4846,9 @@ class Bada3Aircraft(BADA3):
             )
 
             self.ICAO = Parser.safe_get(filtered_df, "ICAO", None)
-            self.numberOfEngines = Parser.safe_get(filtered_df, "numberOfEngines", None)
+            self.numberOfEngines = Parser.safe_get(
+                filtered_df, "numberOfEngines", None
+            )
             self.engineType = Parser.safe_get(filtered_df, "engineType", None)
             self.engines = Parser.safe_get(filtered_df, "engines", None)
             self.WTC = Parser.safe_get(filtered_df, "WTC", None)
@@ -4327,7 +4894,9 @@ class Bada3Aircraft(BADA3):
             self.drone = Parser.safe_get(filtered_df, "drone", None)
 
             self.DeltaCD = Parser.safe_get(filtered_df, "DeltaCD", None)
-            self.speedSchedule = Parser.safe_get(filtered_df, "speedSchedule", None)
+            self.speedSchedule = Parser.safe_get(
+                filtered_df, "speedSchedule", None
+            )
             self.aeroConfig = Parser.safe_get(filtered_df, "aeroConfig", None)
 
             self.flightEnvelope = FlightEnvelope(self)
@@ -4370,13 +4939,19 @@ class Bada3Aircraft(BADA3):
                 # check for existence of OPF and APF files
                 OPFfile = (
                     os.path.join(
-                        self.filePath, "BADA3", badaVersion, self.SearchedACName
+                        self.filePath,
+                        "BADA3",
+                        badaVersion,
+                        self.SearchedACName,
                     )
                     + ".OPF"
                 )
                 APFfile = (
                     os.path.join(
-                        self.filePath, "BADA3", badaVersion, self.SearchedACName
+                        self.filePath,
+                        "BADA3",
+                        badaVersion,
+                        self.SearchedACName,
                     )
                     + ".APF"
                 )
@@ -4403,7 +4978,9 @@ class Bada3Aircraft(BADA3):
                     )
 
                     self.acName = Parser.safe_get(combined_df, "acName", None)
-                    self.xmlFiles = Parser.safe_get(combined_df, "xmlFiles", None)
+                    self.xmlFiles = Parser.safe_get(
+                        combined_df, "xmlFiles", None
+                    )
 
                     self.modificationDateOPF = Parser.safe_get(
                         combined_df, "modificationDateOPF", None
@@ -4416,8 +4993,12 @@ class Bada3Aircraft(BADA3):
                     self.numberOfEngines = Parser.safe_get(
                         combined_df, "numberOfEngines", None
                     )
-                    self.engineType = Parser.safe_get(combined_df, "engineType", None)
-                    self.engines = Parser.safe_get(combined_df, "engines", None)
+                    self.engineType = Parser.safe_get(
+                        combined_df, "engineType", None
+                    )
+                    self.engines = Parser.safe_get(
+                        combined_df, "engines", None
+                    )
                     self.WTC = Parser.safe_get(combined_df, "WTC", None)
                     self.mass = Parser.safe_get(combined_df, "mass", None)
 
@@ -4429,7 +5010,9 @@ class Bada3Aircraft(BADA3):
                     self.MMO = Parser.safe_get(combined_df, "MMO", None)
                     self.hmo = Parser.safe_get(combined_df, "hmo", None)
                     self.Hmax = Parser.safe_get(combined_df, "Hmax", None)
-                    self.tempGrad = Parser.safe_get(combined_df, "tempGrad", None)
+                    self.tempGrad = Parser.safe_get(
+                        combined_df, "tempGrad", None
+                    )
 
                     self.S = Parser.safe_get(combined_df, "S", None)
                     self.Clbo = Parser.safe_get(combined_df, "Clbo", None)
@@ -4439,10 +5022,18 @@ class Bada3Aircraft(BADA3):
                     self.CD2 = Parser.safe_get(combined_df, "CD2", None)
                     self.HLids = Parser.safe_get(combined_df, "HLids", None)
                     self.Ct = Parser.safe_get(combined_df, "Ct", None)
-                    self.CTdeslow = Parser.safe_get(combined_df, "CTdeslow", None)
-                    self.CTdeshigh = Parser.safe_get(combined_df, "CTdeshigh", None)
-                    self.CTdesapp = Parser.safe_get(combined_df, "CTdesapp", None)
-                    self.CTdesld = Parser.safe_get(combined_df, "CTdesld", None)
+                    self.CTdeslow = Parser.safe_get(
+                        combined_df, "CTdeslow", None
+                    )
+                    self.CTdeshigh = Parser.safe_get(
+                        combined_df, "CTdeshigh", None
+                    )
+                    self.CTdesapp = Parser.safe_get(
+                        combined_df, "CTdesapp", None
+                    )
+                    self.CTdesld = Parser.safe_get(
+                        combined_df, "CTdesld", None
+                    )
                     self.HpDes = Parser.safe_get(combined_df, "HpDes", None)
                     self.Cf = Parser.safe_get(combined_df, "Cf", None)
                     self.CfDes = Parser.safe_get(combined_df, "CfDes", None)
@@ -4456,15 +5047,21 @@ class Bada3Aircraft(BADA3):
                     self.V2 = Parser.safe_get(combined_df, "V2", None)
                     self.M = Parser.safe_get(combined_df, "M", None)
 
-                    self.GPFdata = Parser.safe_get(combined_df, "GPFdata", None)
+                    self.GPFdata = Parser.safe_get(
+                        combined_df, "GPFdata", None
+                    )
 
                     self.drone = Parser.safe_get(combined_df, "drone", None)
 
-                    self.DeltaCD = Parser.safe_get(combined_df, "DeltaCD", None)
+                    self.DeltaCD = Parser.safe_get(
+                        combined_df, "DeltaCD", None
+                    )
                     self.speedSchedule = Parser.safe_get(
                         combined_df, "speedSchedule", None
                     )
-                    self.aeroConfig = Parser.safe_get(combined_df, "aeroConfig", None)
+                    self.aeroConfig = Parser.safe_get(
+                        combined_df, "aeroConfig", None
+                    )
 
                     self.flightEnvelope = FlightEnvelope(self)
                     self.ARPM = ARPM(self)
@@ -4478,10 +5075,14 @@ class Bada3Aircraft(BADA3):
                         self.filePath, badaVersion, self.SearchedACName
                     )
 
-                    combined_df = Parser.combineACDATA_GPF(XMLDataFrame, GPFDataFrame)
+                    combined_df = Parser.combineACDATA_GPF(
+                        XMLDataFrame, GPFDataFrame
+                    )
 
                     self.acName = Parser.safe_get(combined_df, "acName", None)
-                    self.xmlFiles = Parser.safe_get(combined_df, "xmlFiles", None)
+                    self.xmlFiles = Parser.safe_get(
+                        combined_df, "xmlFiles", None
+                    )
 
                     self.modificationDateOPF = Parser.safe_get(
                         combined_df, "modificationDateOPF", None
@@ -4494,8 +5095,12 @@ class Bada3Aircraft(BADA3):
                     self.numberOfEngines = Parser.safe_get(
                         combined_df, "numberOfEngines", None
                     )
-                    self.engineType = Parser.safe_get(combined_df, "engineType", None)
-                    self.engines = Parser.safe_get(combined_df, "engines", None)
+                    self.engineType = Parser.safe_get(
+                        combined_df, "engineType", None
+                    )
+                    self.engines = Parser.safe_get(
+                        combined_df, "engines", None
+                    )
                     self.WTC = Parser.safe_get(combined_df, "WTC", None)
                     self.mass = Parser.safe_get(combined_df, "mass", None)
 
@@ -4507,7 +5112,9 @@ class Bada3Aircraft(BADA3):
                     self.MMO = Parser.safe_get(combined_df, "MMO", None)
                     self.hmo = Parser.safe_get(combined_df, "hmo", None)
                     self.Hmax = Parser.safe_get(combined_df, "Hmax", None)
-                    self.tempGrad = Parser.safe_get(combined_df, "tempGrad", None)
+                    self.tempGrad = Parser.safe_get(
+                        combined_df, "tempGrad", None
+                    )
 
                     self.S = Parser.safe_get(combined_df, "S", None)
                     self.Clbo = Parser.safe_get(combined_df, "Clbo", None)
@@ -4517,10 +5124,18 @@ class Bada3Aircraft(BADA3):
                     self.CD2 = Parser.safe_get(combined_df, "CD2", None)
                     self.HLids = Parser.safe_get(combined_df, "HLids", None)
                     self.Ct = Parser.safe_get(combined_df, "Ct", None)
-                    self.CTdeslow = Parser.safe_get(combined_df, "CTdeslow", None)
-                    self.CTdeshigh = Parser.safe_get(combined_df, "CTdeshigh", None)
-                    self.CTdesapp = Parser.safe_get(combined_df, "CTdesapp", None)
-                    self.CTdesld = Parser.safe_get(combined_df, "CTdesld", None)
+                    self.CTdeslow = Parser.safe_get(
+                        combined_df, "CTdeslow", None
+                    )
+                    self.CTdeshigh = Parser.safe_get(
+                        combined_df, "CTdeshigh", None
+                    )
+                    self.CTdesapp = Parser.safe_get(
+                        combined_df, "CTdesapp", None
+                    )
+                    self.CTdesld = Parser.safe_get(
+                        combined_df, "CTdesld", None
+                    )
                     self.HpDes = Parser.safe_get(combined_df, "HpDes", None)
                     self.Cf = Parser.safe_get(combined_df, "Cf", None)
                     self.CfDes = Parser.safe_get(combined_df, "CfDes", None)
@@ -4534,15 +5149,21 @@ class Bada3Aircraft(BADA3):
                     self.V2 = Parser.safe_get(combined_df, "V2", None)
                     self.M = Parser.safe_get(combined_df, "M", None)
 
-                    self.GPFdata = Parser.safe_get(combined_df, "GPFdata", None)
+                    self.GPFdata = Parser.safe_get(
+                        combined_df, "GPFdata", None
+                    )
 
                     self.drone = Parser.safe_get(combined_df, "drone", None)
 
-                    self.DeltaCD = Parser.safe_get(combined_df, "DeltaCD", None)
+                    self.DeltaCD = Parser.safe_get(
+                        combined_df, "DeltaCD", None
+                    )
                     self.speedSchedule = Parser.safe_get(
                         combined_df, "speedSchedule", None
                     )
-                    self.aeroConfig = Parser.safe_get(combined_df, "aeroConfig", None)
+                    self.aeroConfig = Parser.safe_get(
+                        combined_df, "aeroConfig", None
+                    )
 
                     self.flightEnvelope = FlightEnvelope(self)
                     self.ARPM = ARPM(self)
