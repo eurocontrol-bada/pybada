@@ -27,25 +27,24 @@ class TrajectoryPrediction:
         fuelReserve=3600,
         flightPlanInitialMass=None,
     ):
-        """This function returns calculated (estimated) aircrat initial mass
-                derived from the breguet leduc formula
+        """Calculates the estimated initial aircraft mass using the Breguet Leduc formula.
 
-        :param AC: aircraft {BADA3/4/H/E}
-        :param distance: distance flown in [m]
-        :param altitude: cruising altitude in [m]
-        :param M: cruising speed in MACH [-]
-        :param payload: payload mass in [%] of maximum payload
-        :param fuelReserve: fuel reserve in [s]
-        :param flightPlanInitialMass: initial mass defined from the flight plan [kg]
+        :param AC: Aircraft object (BADA3/4/H/E).
+        :param distance: Distance to be flown in meters.
+        :param altitude: Cruising altitude in meters.
+        :param M: Mach number at cruising altitude.
+        :param payload: Percentage of the maximum payload mass (default is 60%).
+        :param fuelReserve: Fuel reserve in seconds (default is 3600s, or 1 hour).
+        :param flightPlanInitialMass: Optional initial mass from a flight plan, in kg.
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}.
         :type distance: float
         :type altitude: float
         :type M: float
         :type payload: float
         :type fuelReserve: float
-        :type flightPlanInitialMass: float
-        :returns: initial mass [kg]
-                :rtype: float
+        :type flightPlanInitialMass: float, optional
+        :returns: Estimated initial aircraft mass in kg.
+        :rtype: float
         """
 
         def initialMassCalculation(
@@ -57,6 +56,8 @@ class TrajectoryPrediction:
             fuelReserve,
             flightPlanInitialMass,
         ):
+            """Helper function to calculate the initial mass based on aircraft type and flight conditions."""
+
             DeltaTemp = 0
             [theta, delta, sigma] = atm.atmosphereProperties(
                 h=altitude, DeltaTemp=DeltaTemp
