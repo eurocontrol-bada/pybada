@@ -9,7 +9,6 @@ sys.path.append(os.path.abspath("../../src"))
 
 project = "pyBADA"
 author = "Henrich Glaser - Opitz"
-release = "0.1.0"  # Replace with your project's version
 
 # -- General configuration ---------------------------------------------------
 
