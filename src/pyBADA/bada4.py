@@ -45,6 +45,17 @@ class Parser:
 
     @staticmethod
     def list_subfolders(folderPath):
+        """
+        Lists all subfolders within a specified directory.
+
+        :param folderPath: Path to the directory where subfolders are to be listed.
+        :type folderPath: str
+        :returns: A list of subfolder names within the specified directory.
+        :rtype: list of str
+
+        This function retrieves all entries in the given directory and filters out
+        the ones that are not directories. Only the names of the subfolders are returned.
+        """
         # List all entries in the directory
         entries = os.listdir(folderPath)
 
@@ -59,12 +70,21 @@ class Parser:
 
     @staticmethod
     def readMappingFile(filePath, badaVersion):
-        """This function parses BADA4 mapping xml formatted file and stores
-        a dictionary of code names and files to be used for that specific code name
+        """
+        Parses the BADA4 mapping XML file and stores a dictionary of aircraft code names and their corresponding XML file paths.
 
-        :param filePath: path to the BADA4 mapping xml formatted file.
-        :type filePath: str.
-        :raises: IOError
+        This function processes the BADA4 aircraft model mapping XML file to create a dictionary that maps the aircraft code names
+        to the XML file paths for their corresponding BADA models. The mapping file contains information about available models
+        for the specified BADA version.
+
+        :param filePath: The path to the directory containing the BADA4 mapping XML file.
+        :param badaVersion: The BADA version (e.g., "4.3") for which the mapping file is to be parsed.
+        :type filePath: str
+        :type badaVersion: str
+        :raises IOError: If the XML file cannot be found or parsed.
+
+        :return: A dictionary with aircraft code names as keys and corresponding file names as values.
+        :rtype: dict
         """
 
         filename = os.path.join(
@@ -90,6 +110,21 @@ class Parser:
 
     @staticmethod
     def parseMappingFile(filePath, badaVersion, acName):
+        """
+        Retrieves the file name for a given aircraft name from the parsed BADA4 mapping file.
+
+        This function uses the readMappingFile method to parse the BADA4 XML mapping file and returns the file name
+        associated with the given aircraft name (acName).
+
+        :param filePath: The path to the directory containing the BADA4 mapping XML file.
+        :param badaVersion: The BADA version (e.g., "4.3") for which the mapping file is to be parsed.
+        :param acName: The aircraft code name for which the corresponding file is being requested.
+        :type filePath: str
+        :type badaVersion: str
+        :type acName: str
+        :return: The file name corresponding to the aircraft code, or None if the aircraft code is not found.
+        :rtype: str or None
+        """
 
         code_fileName = Parser.readMappingFile(filePath, badaVersion)
         if acName in code_fileName:
@@ -100,13 +135,22 @@ class Parser:
 
     @staticmethod
     def parseXML(filePath, badaVersion, acName):
-        """This function parses BADA4 xml formatted file
+        """
+        Parses the BADA4 XML file for a specific aircraft model and extracts various parameters.
 
-        :param filePath: path to the folder with BADA4 xml formatted file.
-        :param acName: name of Aircraft for BADA4 xml formatted file.
-        :type filePath: str.
-        :type acName: str.
-        :raises: IOError
+        This function parses the BADA4 aircraft XML file for a given aircraft model (acName). It retrieves
+        general information about the aircraft, engine type, aerodynamic configurations, performance parameters, and more.
+
+        :param filePath: The path to the folder containing the BADA4 XML file.
+        :param badaVersion: The version of BADA (e.g., "4.3") being used.
+        :param acName: The aircraft code name for which the XML file is being parsed.
+        :type filePath: str
+        :type badaVersion: str
+        :type acName: str
+        :raises IOError: If the XML file cannot be found or parsed.
+
+        :return: A pandas DataFrame containing the parsed data for the specified aircraft.
+        :rtype: pd.DataFrame
         """
 
         acXmlFile = (
@@ -529,13 +573,20 @@ class Parser:
 
     @staticmethod
     def parseGPF(filePath, badaVersion):
-        """This function parses BADA4 GPF xml formatted file
+        """
+        Parses the BADA4 GPF XML file and extracts key performance factors.
 
-        :param filePath: path to the BADA4 xml formatted file.
-        :param acName: name of Aircraft for BADA4 xml formatted file.
-        :type filePath: str.
-        :type acName: str.
-        :raises: IOError
+        This function processes the BADA4 GPF XML file to extract data related to various flight performance factors, such as minimum
+        climb/descent speeds, maximum altitude limits for different phases of flight, and speed schedules for climb and descent.
+
+        :param filePath: The path to the directory containing the BADA4 GPF XML file.
+        :param badaVersion: The version of BADA (e.g., "4.3") for which the GPF file is to be parsed.
+        :type filePath: str
+        :type badaVersion: str
+        :raises IOError: If the GPF XML file cannot be found or parsed.
+
+        :return: A pandas DataFrame containing the parsed GPF data.
+        :rtype: pd.DataFrame
         """
 
         filename = os.path.join(filePath, "BADA4", badaVersion, "GPF.xml")
@@ -586,8 +637,20 @@ class Parser:
 
     @staticmethod
     def combineXML_GPF(XMLDataFrame, GPFDataframe):
-        """This function combines 2 dataframes, the parsed aircraft XML file
-        and parsed GPF file
+        """
+        Combines the parsed aircraft XML DataFrame with the parsed GPF DataFrame.
+
+        This function merges two DataFrames, one containing the parsed aircraft-specific data (from the XML file)
+        and the other containing the parsed GPF data. This combination provides a unified set of aircraft performance
+        data along with general performance factors.
+
+        :param XMLDataFrame: A DataFrame containing the parsed aircraft XML data.
+        :param GPFDataframe: A DataFrame containing the parsed GPF data.
+        :type XMLDataFrame: pd.DataFrame
+        :type GPFDataframe: pd.DataFrame
+
+        :return: A combined DataFrame with both aircraft and GPF data.
+        :rtype: pd.DataFrame
         """
 
         # Combine data with GPF data (temporary solution)
@@ -603,12 +666,22 @@ class Parser:
 
     @staticmethod
     def parseAll(badaVersion, filePath=None):
-        """This function parses all BADA4 xml formatted file and stores
-        all data in the final dataframe containing all the BADA data.
+        """
+        Parses all BADA4 XML files and combines the data into a single DataFrame.
 
-        :param filePath: path to the BADAH Synonym xml formatted file.
-        :type filePath: str.
-        :raises: IOError
+        This function parses both the BADA4 aircraft XML files and the GPF (General Performance Factors) file.
+        It combines the data from both sources and creates a unified DataFrame that contains all aircraft and
+        performance-related data for the specified BADA version.
+
+        :param badaVersion: The version of BADA (e.g., "4.3") to be parsed.
+        :param filePath: The path to the folder containing the BADA4 XML files and GPF file.
+                         If None, the default path from the configuration will be used.
+        :type badaVersion: str
+        :type filePath: str, optional
+        :raises IOError: If any of the necessary XML files cannot be found or parsed.
+
+        :return: A DataFrame containing the combined data from all parsed aircraft and GPF files.
+        :rtype: pd.DataFrame
         """
 
         if filePath == None:
@@ -695,16 +768,18 @@ class Parser:
 
     @staticmethod
     def getBADAParameters(df, acName, parameters):
-        """Retrieves specified parameters for a given aircraft name from the DataFrame.
+        """
+        Retrieves specified parameters for a given aircraft name from a DataFrame.
 
-        :param df: The DataFrame containing aircraft data.
-        :param acName: The name of the aircraft to search for
-        :param parameters: A list of column names to retrieve or a single column name
-        :type df: pandas dataframe.
-        :type acName: list[string].
-        :type parameters: list[string].
-        :return: parameter values: dataframe
-        :rtype: dataframe.
+        :param df: DataFrame containing BADA aircraft data.
+        :param acName: Name of the aircraft or list of aircraft names to search for.
+        :param parameters: List of column names (or a single column name) to retrieve.
+        :type df: pd.DataFrame
+        :type acName: list or str
+        :type parameters: list or str
+        :returns: A DataFrame containing the specified parameters for the given aircraft.
+        :rtype: pd.DataFrame
+        :raises ValueError: If any of the specified columns or aircraft names are not found.
         """
 
         # Ensure parameters is a list
@@ -737,7 +812,18 @@ class Parser:
 
     @staticmethod
     def safe_get(df, column_name, default_value=None):
-        """Accessing a potentially dropped column from a dataframe"""
+        """
+        Safely retrieves a column's value from a DataFrame, returning a default value if the column does not exist.
+
+        :param df: DataFrame to retrieve the value from.
+        :param column_name: Name of the column to retrieve.
+        :param default_value: Value to return if the column does not exist. Default is None.
+        :type df: pd.DataFrame
+        :type column_name: str
+        :type default_value: any
+        :returns: The value from the specified column or the default value if the column is missing.
+        :rtype: any
+        """
 
         if column_name in df.columns:
             return df[column_name].iloc[0]
@@ -748,27 +834,38 @@ class Parser:
 class BADA4(Airplane):
     """This class implements the part of BADA4 performance model that will be used in other classes following the BADA4 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada4.Parse.
+    :param AC: Aircraft object {BADA4}.
+    :type AC: bada4Aircraft.
     """
 
     def __init__(self, AC):
+        """
+        Initializes the BADA4 class by inheriting from the parent Airplane class
+        and assigns the parsed aircraft data to the class instance.
+
+        :param AC: Aircraft object {BADA4}.
+        :type AC: bada4Aircraft.
+        """
+
         super().__init__()
         self.AC = AC
 
     def CL(self, delta, mass, M, nz=1.0):
-        """This function computes the lift coefficient
+        """
+        Computes the aircraft's lift coefficient based on the current Mach number (M),
+        normalized air pressure (delta), aircraft mass, and load factor (nz).
 
-        :param M: mach airspeed [-].
-        :param delta: normalised air pressure [-].
-        :param mass: aircraft mass [kg].
-        :param nz: load factor [-].
-        :type M: float.
-        :type delta: float.
-        :type mass: float.
-        :type nz: float.
-        :returns: Lift coefficient [-].
-        :rtype: float.
+        :param M: Mach number [-].
+        :param delta: Normalized air pressure [-].
+        :param mass: Aircraft mass [kg].
+        :param nz: Load factor [-]. Default is 1.0 (straight and level flight).
+        :type M: float
+        :type delta: float
+        :type mass: float
+        :type nz: float
+
+        :return: Lift coefficient (CL) [-].
+        :rtype: float
         """
 
         return (
@@ -780,12 +877,16 @@ class BADA4(Airplane):
         )
 
     def CLPoly(self, M):
-        """This function computes the lift coefficient polynom
+        """
+        Computes the lift coefficient polynomial for the given Mach number (M).
 
-        :param M: mach airspeed [-].
-        :type M: float.
-        :returns: Lift coefficient polynom [-].
-        :rtype: float.
+        This method uses a 5th-degree polynomial defined by the coefficients in the parsed aircraft data (self.AC.bf).
+
+        :param M: Mach number [-].
+        :type M: float
+
+        :return: Lift coefficient (polynomial approximation) [-].
+        :rtype: float
         """
 
         CLpoly = 0.0
@@ -795,16 +896,22 @@ class BADA4(Airplane):
         return CLpoly
 
     def CLmax(self, M, HLid, LG):
-        """This function computes the maximum lift coefficient in clean and non-clean configuration
+        """
+        Computes the maximum lift coefficient (CLmax) for the given Mach number (M),
+        high-lift device (HLid) position, and landing gear (LG) configuration.
+
+        If the aircraft is in a clean configuration (HLid == 0 and LG == "LGUP"),
+        the method interpolates or extrapolates the lift coefficient based on Mach number.
 
         :param M: Mach number [-].
-        :param HLid: high lift devices position [-]
-        :param LG: landing gear position, [LGUP/LGDN] [-]
-        :type M: float.
-        :type HLid: float.
-        :type LG: string.
-        :returns: maximum lift coefficient [-].
-        :rtype: float.
+        :param HLid: High-lift device position [-].
+        :param LG: Landing gear position [LGUP/LGDN] [-].
+        :type M: float
+        :type HLid: float
+        :type LG: str
+
+        :return: Maximum lift coefficient (CLmax) [-].
+        :rtype: float
         """
 
         CLmax = 0.0
@@ -843,17 +950,19 @@ class BADA4(Airplane):
         return CLmax
 
     def CF_idle(self, delta, theta, M):
-        """This function computes the idle rating model for JET and TURBOPROP engine
+        """
+        Computes the fuel flow coefficient at idle throttle for JET and TURBOPROP engines.
 
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
         :param M: Mach speed [-].
-        :type delta: float.
-        :type theta: float.
-        :type M: float.
-        :returns: idle Fuel flow coefficient [-].
+        :type delta: float
+        :type theta: float
+        :type M: float
+        :return: Idle fuel flow coefficient [-].
         :rtype: float
         """
+
         if self.AC.engineType == "JET":
             CF_idle = 0.0
             for i in range(0, 3):
@@ -890,21 +999,17 @@ class BADA4(Airplane):
         return CF_idle
 
     def CF(self, delta, theta, DeltaTemp, **kwargs):
-        """This function computes the fuel flow coefficient
+        """
+        Computes the fuel flow coefficient (CF) for JET, TURBOPROP, and PISTON engines.
 
-        :param rating: Throttle setting {MCMB,MCRZ,LIDL}
-        :param deltaT: direct throttle parameter [-]
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
-        :param M: Mach number [-].
-        :param DeltaTemp: Temperature deviation with respect to ISA [K].
-        :type rating: string
-        :type deltaT: float.
-        :type delta: float.
-        :type theta: float.
-        :type M: float.
-        :type DeltaTemp: float.
-        :returns: Fuel flow coefficient [-].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
+        :param DeltaTemp: Temperature deviation from ISA [K].
+        :param kwargs: Optional parameters including 'rating', 'deltaT', 'CT', or 'M'.
+        :type delta: float
+        :type theta: float
+        :type DeltaTemp: float
+        :return: Fuel flow coefficient [-].
         :rtype: float
         """
 
@@ -1096,23 +1201,23 @@ class BADA4(Airplane):
         return CF
 
     def CT(self, delta, **kwargs):
-        """This function computes the thrust coefficient
+        """
+        Computes the thrust coefficient (CT) based on engine type, throttle setting,
+        or engine rating. The thrust coefficient is calculated differently for JET, TURBOPROP,
+        and PISTON engines based on normalized pressure, temperature, Mach number, and other inputs.
 
-        :param rating: Throttle setting {MCMB,MTKF,MCRZ,LIDL}
-        :param deltaT: direct throttle parameter [-]
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
-        :param M: Mach number [-].
-        :param DeltaTemp: Temperature deviation with respect to ISA [K].
-        :type rating: string
-        :type deltaT: float.
-        :type delta: float.
-        :type theta: float.
-        :type M: float.
-        :type DeltaTemp: float.
-        :returns: thrust coefficient [-].
+        :param delta: Normalized pressure [-].
+        :type delta: float
+        :param kwargs: Optional parameters:
+            - 'rating': Engine rating {MCMB, MCRZ, MTKF, LIDL}.
+            - 'deltaT': Direct throttle parameter [-].
+            - 'Thrust': Direct thrust value [N].
+            - 'M': Mach number [-].
+            - 'theta': Normalized temperature [-].
+            - 'DeltaTemp': Deviation from the standard ISA temperature [K].
+        :return: Thrust coefficient (CT) [-].
         :rtype: float
-        :raise: ValueError
+        :raises: ValueError: If an invalid rating is provided.
         """
 
         if "Thrust" in kwargs:
@@ -1257,17 +1362,18 @@ class BADA4(Airplane):
         return CT
 
     def CT_LIDL(self, **kwargs):
-        """This function computes the thrust coefficient for LIDL rating
+        """
+        Computes the thrust coefficient (CT) for the LIDL (idle) rating.
 
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
         :param M: Mach number [-].
-        :param CP: power coefficient [-].
+        :param CP: Power coefficient (for PISTON engines) [-].
         :type delta: float.
         :type theta: float.
         :type M: float.
         :type CP: float.
-        :returns: LIDL thrust coefficient [-].
+        :return: Idle thrust coefficient (CT) [-].
         :rtype: float
         """
 
@@ -1332,17 +1438,18 @@ class BADA4(Airplane):
         return CT
 
     def CT_nonLIDL(self, theta, delta, M, **kwargs):
-        """This function computes the thrust coefficient for non-LIDL rating {MCMB,MCRZ}
+        """
+        Computes the thrust coefficient (CT) for non-LIDL ratings {MCMB, MCRZ}.
 
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
         :param M: Mach number [-].
-        :param CP: power coefficient [-].
+        :param CP: Power coefficient (for PISTON engines) [-].
         :type delta: float.
         :type theta: float.
         :type M: float.
         :type CP: float.
-        :returns: LIDL thrust coefficient [-].
+        :return: Thrust coefficient (CT) [-].
         :rtype: float
         """
 
@@ -1406,19 +1513,20 @@ class BADA4(Airplane):
         return CT
 
     def CPmax(self, rating, delta, theta, M):
-        """This function computes the maximum engine power coefficient for Turboprop
+        """
+        Computes the maximum engine power coefficient (CPmax) for TURBOPROP engines.
 
-        :param rating: Throttle setting {MCMB,MCRZ}
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
+        :param rating: Throttle setting {MCMB, MCRZ}.
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
         :param M: Mach number [-].
-        :type rating: str
+        :type rating: str.
         :type delta: float.
         :type theta: float.
         :type M: float.
-        :returns: Maximum engine power coefficient [-].
-        :rtype: float
-        :raise: ValueError
+        :return: Maximum engine power coefficient (CPmax) [-].
+        :rtype: float.
+        :raises: ValueError: If the rating is unknown.
         """
 
         if self.AC.engineType == "TURBOPROP":
@@ -1439,23 +1547,24 @@ class BADA4(Airplane):
         return CPmax
 
     def CP(self, **kwargs):
-        """This function computes the power coefficient
+        """
+        Computes the power coefficient (CP) for TURBOPROP and PISTON engines.
 
-        :param rating: Throttle setting {MCMB,MCRZ,LIDL}
-        :param deltaT: direct throttle parameter [-]
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
-        :param sigma: Normalised density [-].
+        :param rating: Throttle setting {MCMB, MCRZ, LIDL}.
+        :param deltaT: Direct throttle parameter [-].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
+        :param sigma: Normalized density [-] (for piston engines).
         :param M: Mach number [-].
-        :type rating: string
+        :type rating: str.
         :type deltaT: float.
         :type delta: float.
         :type theta: float.
         :type sigma: float.
         :type M: float.
-        :returns: thrust coefficient [-].
-        :rtype: float
-        :raise: ValueError
+        :return: Power coefficient (CP) [-].
+        :rtype: float.
+        :raises: ValueError if an unknown rating is provided.
         """
 
         if self.AC.engineType == "TURBOPROP":
@@ -1566,13 +1675,14 @@ class BADA4(Airplane):
         return CP
 
     def CDClean(self, CL, M):
-        """This function computes the drag coefficient in clean configuration
+        """
+        Computes the drag coefficient (CD) in a clean configuration based on the Mach number (M) and the lift coefficient (CL).
 
         :param M: Mach number [-].
         :param CL: Lift coefficient [-].
         :type M: float.
         :type CL: float.
-        :returns: Drag coefficient in clean configuration [-].
+        :return: Drag coefficient (CD) in clean configuration [-].
         :rtype: float
         """
 
@@ -1613,22 +1723,22 @@ class BADA4(Airplane):
         speedBrakes={"deployed": False, "value": 0.03},
         **kwargs,
     ):
-        """This function computes the drag coefficient
+        """
+        Computes the drag coefficient (CD) based on the Mach number (M), lift coefficient (CL), high lift devices (HLid),
+        landing gear position (LG), and speed brakes status. The drag coefficient is calculated for both clean and non-clean configurations.
 
         :param M: Mach number [-].
         :param CL: Lift coefficient [-].
-        :param config: aircraft aerodynamic configuration [TO/IC/CR/AP/LD][-]
-        :param HLid: high lift devices position [-]
-        :param LG: landing gear position, [LGUP/LGDN] [-]
-        :param speedBrakes: speed brakes used or not [-].
+        :param HLid: High lift devices position [-].
+        :param LG: Landing gear position, [LGUP/LGDN] [-].
+        :param speedBrakes: Dictionary indicating if speed brakes are deployed and their value. Default: {"deployed": False, "value": 0.03}.
         :type M: float.
         :type CL: float.
-        :type speedBrakes: boolean.
-        :type config: string.
         :type HLid: float.
         :type LG: string.
+        :type speedBrakes: dict.
         :returns: Drag coefficient [-].
-        :rtype: float
+        :rtype: float.
         """
 
         # clean configuration
@@ -1723,10 +1833,11 @@ class BADA4(Airplane):
         return CD
 
     def L(self, delta, M, CL):
-        """This function computes the aerodynamic lift
+        """
+        Computes the aerodynamic lift based on the Mach number (M), normalized air pressure (delta), and lift coefficient (CL).
 
-        :param M: Mach airspeed [-].
-        :param delta: normalised air pressure [-].
+        :param M: Mach number [-].
+        :param delta: Normalized air pressure [-].
         :param CL: Lift coefficient [-].
         :type M: float.
         :type delta: float.
@@ -1738,37 +1849,46 @@ class BADA4(Airplane):
         return 0.5 * delta * const.p_0 * const.Agamma * M * M * self.AC.S * CL
 
     def D(self, delta, M, CD):
-        """This function computes the aerodynamic drag
-
-        :param M: Mach airspeed [-].
-        :param delta: normalised air pressure [-].
-        :param CD: Drag coefficient [-].
-        :type M: float.
-        :type delta: float.
-        :type CD: float.
-        :returns: Aerodynamic drag [N].
-        :rtype: float.
         """
+        Computes the thrust based on throttle settings, normalized air pressure (delta), and other flight parameters.
 
-        return 0.5 * delta * const.p_0 * const.Agamma * M * M * self.AC.S * CD
-
-    def Thrust(self, delta, **kwargs):
-        """This function computes the maximum thrust coefficient
-
-        :param rating: Throttle setting {MCMB,MCRZ,LIDL}
-        :param deltaT: direct throttle parameter [-]
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
+        :param rating: Throttle setting {MCMB, MCRZ, LIDL}.
+        :param deltaT: Direct throttle parameter [-].
+        :param delta: Normalized air pressure [-].
+        :param theta: Normalized temperature [-].
         :param M: Mach number [-].
         :param DeltaTemp: Temperature deviation with respect to ISA [K].
-        :type rating: string
+        :type rating: string.
         :type deltaT: float.
         :type delta: float.
         :type theta: float.
         :type M: float.
         :type DeltaTemp: float.
         :returns: Thrust [N].
-        :rtype: float
+        :rtype: float.
+        """
+
+        return 0.5 * delta * const.p_0 * const.Agamma * M * M * self.AC.S * CD
+
+    def Thrust(self, delta, **kwargs):
+        """
+        Computes the maximum thrust produced by the aircraft based on throttle settings,
+        normalized air pressure (delta), and other flight parameters like Mach number and temperature deviation.
+
+        :param rating: Throttle setting {MCMB (Max Climb), MCRZ (Max Cruise), LIDL (Idle)}.
+        :param deltaT: Direct throttle parameter for intermediate throttle levels [-].
+        :param delta: Normalized air pressure relative to sea-level pressure (ISA) [-].
+        :param theta: Normalized temperature relative to sea-level temperature (ISA) [-].
+        :param M: Mach number, the ratio of the aircraft's speed to the speed of sound [-].
+        :param DeltaTemp: Temperature deviation from the International Standard Atmosphere (ISA) [K].
+        :type rating: string (optional).
+        :type deltaT: float (optional).
+        :type delta: float.
+        :type theta: float (optional).
+        :type M: float (optional).
+        :type DeltaTemp: float (optional).
+        :returns: Thrust force produced by the engine [N].
+        :rtype: float.
         """
 
         CT = self.CT(delta=delta, **kwargs)
@@ -1776,22 +1896,25 @@ class BADA4(Airplane):
         return delta * self.AC.WREF * CT
 
     def ff(self, delta, theta, DeltaTemp, **kwargs):
-        """This function computes the fuel flow
+        """
+        Computes the fuel flow (FF) of the aircraft based on engine throttle settings,
+        normalized air pressure (delta), normalized temperature (theta), and other relevant parameters.
 
-        :param rating: Throttle setting {MCMB,MCRZ,LIDL,TAXI}
-        :param deltaT: direct throttle parameter [-]
-        :param delta: Normalised pressure [-].
-        :param theta: Normalised temperature [-].
-        :param M: Mach number [-].
-        :param DeltaTemp: Temperature deviation with respect to ISA [K].
-        :type rating: string
-        :type deltaT: float.
+        :param rating: Throttle setting {MCMB (Max Climb), MCRZ (Max Cruise), LIDL (Idle), TAXI}.
+                       If 'TAXI' is selected, the taxi fuel allowance is used for ground operations.
+        :param deltaT: Direct throttle parameter for intermediate throttle levels [-].
+        :param delta: Normalized air pressure relative to sea-level pressure (ISA) [-].
+        :param theta: Normalized temperature relative to sea-level temperature (ISA) [-].
+        :param M: Mach number, the ratio of the aircraft's speed to the speed of sound [-].
+        :param DeltaTemp: Temperature deviation from the International Standard Atmosphere (ISA) [K].
+        :type rating: string (optional).
+        :type deltaT: float (optional).
         :type delta: float.
         :type theta: float.
         :type M: float.
-        :type DeltaTemp: float
-        :returns: Fuel flow [kg s^-1].
-        :rtype: float
+        :type DeltaTemp: float.
+        :returns: Fuel flow rate in kilograms per second [kg s^-1].
+        :rtype: float.
         """
 
         if "rating" in kwargs:
@@ -1825,25 +1948,27 @@ class BADA4(Airplane):
             )
 
     def ROCD(self, T, D, v, mass, ESF, h, DeltaTemp):
-        """This function computes the Rate of Climb or Descent
+        """
+        Computes the Rate of Climb or Descent (ROCD) of the aircraft based on
+        the provided thrust, drag, true airspeed, mass, and Energy Share Factor (ESF).
 
-        :param h: altitude [m].
-        :param T: aircraft thrust [N].
-        :param D: aircraft drag [N].
-        :param v: aircraft true airspeed [TAS] [m s^-1].
-        :param mass: actual aircraft mass  [kg].
-        :param ESF: energy share factor [-].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type h: float.
+        :param T: Thrust produced by the engines [N].
+        :param D: Drag acting on the aircraft [N].
+        :param v: True airspeed (TAS) of the aircraft [m/s].
+        :param mass: Current aircraft mass [kg].
+        :param ESF: Energy Share Factor, which controls the allocation of excess thrust
+                    between climb/descent and acceleration [-].
+        :param h: Altitude of the aircraft above sea level [m].
+        :param DeltaTemp: Temperature deviation from the International Standard Atmosphere (ISA) [K].
         :type T: float.
         :type D: float.
         :type v: float.
         :type mass: float.
         :type ESF: float.
-        :type theta: float
+        :type h: float.
         :type DeltaTemp: float.
-        :returns: rate of climb/descend [m/s].
-        :rtype: float
+        :returns: Rate of climb or descent (ROCD) in meters per second [m/s].
+        :rtype: float.
         """
 
         theta = atm.theta(h=h, DeltaTemp=DeltaTemp)
@@ -1856,25 +1981,29 @@ class BADA4(Airplane):
         return ROCD
 
     def controlLawThrust(self, ROCD, D, v, mass, ESF, h, DeltaTemp):
-        """This function computes the Thrust based on the TEM control Law
+        """
+        Computes the required thrust based on the TEM (Thrust-Equilibrium Method) control law.
+        This calculation takes into account the aircraft's rate of climb/descent (ROCD),
+        drag (D), true airspeed (v), and energy share factor (ESF), along with altitude and
+        temperature deviations.
 
-        :param h: altitude [m].
-        :param ROCD: rate of climb/descend [m/s].
-        :param D: aircraft drag [N].
-        :param v: aircraft true airspeed [TAS] [m s^-1].
-        :param mass: actual aircraft mass  [kg].
-        :param ESF: energy share factor [-].
-        :param DeltaTemp: deviation with respect to ISA [K]
+        :param h: Altitude of the aircraft above sea level [m].
+        :param ROCD: Rate of climb or descent of the aircraft [m/s].
+                     Positive value for climb, negative for descent.
+        :param D: Drag force acting on the aircraft [N].
+        :param v: True airspeed (TAS) of the aircraft [m/s].
+        :param mass: Current aircraft mass [kg].
+        :param ESF: Energy Share Factor, determining the fraction of excess thrust used for acceleration or climb/descent [-].
+        :param DeltaTemp: Temperature deviation from the International Standard Atmosphere (ISA) [K].
         :type h: float.
         :type ROCD: float.
         :type D: float.
         :type v: float.
         :type mass: float.
         :type ESF: float.
-        :type theta: float
         :type DeltaTemp: float.
-        :returns: thrust [N].
-        :rtype: float
+        :returns: Thrust required to maintain the specified rate of climb or descent [N].
+        :rtype: float.
         """
 
         theta = atm.theta(h=h, DeltaTemp=DeltaTemp)
@@ -1892,16 +2021,18 @@ class BADA4(Airplane):
         return thrust
 
     def propEfficiency(self, Wp, sigma, tas):
-        """This function computes the propeller efficiency of a piston or turboprop engine through the momentum theory
+        """
+        Computes the propeller efficiency of a piston or turboprop engine using momentum theory.
+        The calculation estimates the efficiency based on power, air density, and true airspeed.
 
-        :param Wp: all-engine power [W]
-        :param sigma: Normalised density [-].
-        :param tas: true airspeed TAS [m/s].
-        :type Wp: float
+        :param Wp: Total engine power output for all engines [W].
+        :param sigma: Normalized air density relative to sea-level density [-].
+        :param tas: True airspeed (TAS) of the aircraft [m/s].
+        :type Wp: float.
         :type sigma: float.
         :type tas: float.
-        :returns: Propeller efficiency [-].
-        :rtype: float
+        :returns: Propeller efficiency as a dimensionless ratio [-].
+        :rtype: float.
         """
 
         if self.AC.engineType == "TURBOPROP" or self.AC.engineType == "PISTON":
@@ -1937,20 +2068,22 @@ class FlightEnvelope(BADA4):
     """This class is a BADA4 aircraft subclass and implements the flight envelope caclulations
     following the BADA4 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada4.Parse.
+    :param AC: Aircraft object {BADA4}.
+    :type AC: bada4Aircraft.
     """
 
     def __init__(self, AC):
         super().__init__(AC)
 
     def maxM(self, LG):
-        """This function computes the maximum M speed based on kinematic limitation (KLM) model
+        """
+        Computes the maximum allowable Mach speed (Mmax) based on the kinematic limitations
+        of the aircraft and the position of the landing gear (LG).
 
-        :param LG: landing gear position, [LGUP/LGDN] [-]
-        :type LG: string.
-        :returns: maximum M speed [-].
-        :rtype: float.
+        :param LG: Landing gear position, either "LGUP" (gear up) or "LGDN" (gear down).
+        :type LG: str
+        :return: The maximum allowable Mach number (Mmax) based on the aircraft's limitations.
+        :rtype: float
         """
 
         if LG == "LGUP":
@@ -1964,14 +2097,17 @@ class FlightEnvelope(BADA4):
         return Mmax
 
     def maxCAS(self, HLid, LG):
-        """This function computes the maximum CAS speed based on kinematic limitation (KLM) model
+        """
+        Computes the maximum allowable Calibrated Airspeed (CASmax) based on the position of
+        the high-lift devices (HLid) and landing gear (LG), following the kinematic limitations
+        of the aircraft.
 
-        :param HLid: high lift devices position [-]
-        :param LG: landing gear position, [LGUP/LGDN] [-]
-        :type HLid: float.
-        :type LG: string.
-        :returns: maximum CAS speed [m s^-1].
-        :rtype: float.
+        :param HLid: Position of high-lift devices (0 for clean configuration, >0 for extended).
+        :type HLid: float
+        :param LG: Landing gear position, either "LGUP" (gear up) or "LGDN" (gear down).
+        :type LG: str
+        :return: The maximum allowable Calibrated Airspeed (CASmax) in meters per second [m/s].
+        :rtype: float
         """
 
         if HLid == 0 and LG == "LGUP":
@@ -1998,21 +2134,24 @@ class FlightEnvelope(BADA4):
         return CASmax
 
     def VMax(self, h, HLid, LG, delta, theta, mass, nz=1.0):
-        """This function computes the maximum speed
+        """
+        Computes the maximum speed (CAS)
 
-        :param HLid: high lift devices position [-]
-        :param LG: landing gear position, [LGUP/LGDN] [-]
-        :param theta: normalised air temperature [-].
-        :param delta: normalised air pressure [-].
-        :param mass: aircraft mass [kg].
-        :param nz: load factor [-].
+        :param h: Altitude in meters [m].
+        :param HLid: High-lift devices position [-].
+        :param LG: Landing gear position, either "LGUP" (gear up) or "LGDN" (gear down) [-].
+        :param theta: Normalized temperature [-].
+        :param delta: Normalized pressure [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param nz: Load factor [-], default is 1.0.
+        :type h: float.
         :type HLid: float.
-        :type LG: string.
+        :type LG: str.
         :type theta: float.
         :type delta: float.
         :type mass: float.
         :type nz: float.
-        :returns: maximum CAS speed [m s^-1].
+        :return: Maximum allowable calibrated airspeed (CAS) in meters per second [m/s].
         :rtype: float.
         """
 
@@ -2048,20 +2187,22 @@ class FlightEnvelope(BADA4):
         return VMax
 
     def Vmax_thrustLimited(self, h, mass, DeltaTemp, rating, config):
-        """This function computes the maximum CAS speed within the certified flight envelope taking into account the trust limitation.
+        """
+        Computes the maximum speed (CAS) within the certified flight envelope while accounting
+        for thrust limitations at a given altitude, temperature deviation, and configuration.
 
-        :param h: altitude [m].
-        :param mass: aircraft operating mass [kg]
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param rating: aircraft engine rating [MTKF/MCMB/MCRZ][-]
-        :param config: aircraft configuration [TO/IC/CR][-]
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param rating: Engine rating, options include "MTKF", "MCMB", "MCRZ" [-].
+        :param config: Aircraft aerodynamic configuration, such as "TO", "IC", "CR" [-].
         :type h: float.
-        :type mass: float
+        :type mass: float.
         :type DeltaTemp: float.
-        :type config: string
-        :type rating: string
-        :returns: maximum thrust lmited speed [m s^-1].
-        :rtype: float
+        :type rating: str.
+        :type config: str.
+        :return: Maximum thrust-limited calibrated airspeed (CAS) in meters per second [m/s].
+        :rtype: float.
         """
 
         [HLid, LG] = self.getAeroConfig(config=config)
@@ -2109,19 +2250,22 @@ class FlightEnvelope(BADA4):
             return max(maxCASList)
 
     def maxMbuffet(self, HLid, LG, delta, mass, nz=1.0):
-        """This function computes the maximum M speed applying buffet limitation
+        """
+        Computes the maximum allowable Mach number (M) under buffet limitations, where the lift
+        coefficient (CL) cannot exceed the maximum lift coefficient (CL_max) for the given Mach
+        number and configuration.
 
-        :param HLid: high lift devices position [-]
-        :param LG: landing gear position, [LGUP/LGDN] [-]
-        :param delta: normalised air pressure [-].
-        :param mass: aircraft mass [kg].
-        :param nz: load factor [-].
+        :param HLid: High-lift devices position [-].
+        :param LG: Landing gear position, either "LGUP" (gear up) or "LGDN" (gear down) [-].
+        :param delta: Normalized pressure [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param nz: Load factor [-], default is 1.0.
         :type HLid: float.
-        :type LG: string.
+        :type LG: str.
         :type delta: float.
         :type mass: float.
         :type nz: float.
-        :returns: maximum M speed [-].
+        :return: Maximum allowable Mach number (M) limited by buffet conditions.
         :rtype: float.
         """
 
@@ -2149,19 +2293,23 @@ class FlightEnvelope(BADA4):
             return self.AC.MMO
 
     def minMbuffet(self, HLid, LG, theta, delta, mass, nz=1.0):
-        """This function computes the minimum M speed applying buffet limitation
+        """
+        Computes the minimum Mach number (M) applying buffet limitations, where the lift coefficient (CL)
+        must not exceed the maximum lift coefficient (CL_max) for the given Mach number and aerodynamic configuration.
 
-        :param HLid: high lift devices position [-]
-        :param LG: landing gear position, [LGUP/LGDN] [-]
-        :param delta: normalised air pressure [-].
-        :param mass: aircraft mass [kg].
-        :param nz: load factor [-].
+        :param HLid: High-lift devices position [-].
+        :param LG: Landing gear position, either "LGUP" (gear up) or "LGDN" (gear down) [-].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param nz: Load factor [-], default is 1.0.
         :type HLid: float.
-        :type LG: string.
+        :type LG: str.
         :type delta: float.
+        :type theta: float.
         :type mass: float.
         :type nz: float.
-        :returns: maximum M speed [-].
+        :returns: Minimum Mach number (M) limited by buffet conditions.
         :rtype: float.
         """
 
@@ -2207,18 +2355,20 @@ class FlightEnvelope(BADA4):
                         M = M_list[idx]
 
     def VMin(self, config, theta, delta, mass):
-        """This function computes the minimum speed
+        """
+        Computes the minimum speed (CAS) for the given aerodynamic configuration, accounting for
+        stall speed and other configuration-based limitations.
 
-        :param config: aircraft configuration [CR/IC/TO/AP/LD][-]
-        :param delta: normalised air pressure [-].
-        :param mass: aircraft mass [kg].
-        :param mass: aircraft operating mass [kg]
-        :type config: string.
+        :param config: Aircraft configuration, options include "CR", "IC", "TO", "AP", "LD" [-].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :type config: str.
         :type delta: float.
-        :type theta: string.
-        :type mass: float
-        :returns: minimum CAS speed [m s^-1].
-        :rtype: float
+        :type theta: float.
+        :type mass: float.
+        :returns: Minimum calibrated airspeed (CAS) in meters per second [m/s].
+        :rtype: float.
         """
 
         aeroConf = self.getAeroConfig(config=config)
@@ -2252,26 +2402,28 @@ class FlightEnvelope(BADA4):
         return Vmin
 
     def VStall(self, mass, HLid, LG, nz=1.0, **kwargs):
-        """This function calculates the stall speed based on the aerodynamic configuration
+        """
+        Calculates the stall speed (CAS) for the given aerodynamic configuration and load factor,
+        taking into account altitude and temperature deviations from ISA.
 
-        :param HLid: high lift devices position [-]
-        :param LG: landing gear position, [LGUP/LGDN] [-]
-        :param delta: normalised air pressure [-].
-        :param theta: normalised air temperature [-].
-        :param mass: aircraft operating mass [kg]
-        :param nz: load factor [-].
-        :param h: altitude AMSL [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
+        :param HLid: High-lift devices position [-].
+        :param LG: Landing gear position, either "LGUP" (gear up) or "LGDN" (gear down) [-].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param nz: Load factor [-], default is 1.0.
+        :param h: Altitude above mean sea level (AMSL) in meters [m].
+        :param DeltaTemp: Temperature deviation from ISA in Kelvin [K].
         :type HLid: float.
-        :type LG: string.
+        :type LG: str.
         :type delta: float.
         :type theta: float.
         :type mass: float.
         :type nz: float.
-        :type h: float.
-        :type DeltaTemp: float.
-        :returns: stall CAS speed [m s^-1].
-        :rtype: float
+        :type h: float, optional.
+        :type DeltaTemp: float, optional.
+        :returns: Stall speed in calibrated airspeed (CAS) [m/s].
+        :rtype: float.
         """
 
         if "h" in kwargs:
@@ -2296,20 +2448,24 @@ class FlightEnvelope(BADA4):
         return minCAS
 
     def maxAltitude(self, HLid, LG, M, DeltaTemp, mass, nz=1.0):
-        """This function computes the maximum altitude taking into account impact of buffet
+        """
+        Computes the maximum altitude taking into account buffet limitations. The altitude is calculated
+        based on the aerodynamic configuration and the available buffet boundary conditions.
 
-        :param M: mach airspeed [-].
-        :param mass: aircraft mass [kg].
-        :param nz: load factor [-].
-        :param HLid: high lift devices position [-]
-        :param LG: landing gear position, [LGUP/LGDN] [-]
+        :param HLid: High-lift devices position [-].
+        :param LG: Landing gear position, either "LGUP" (gear up) or "LGDN" (gear down) [-].
+        :param M: Mach airspeed [-].
+        :param mass: Aircraft mass [kg].
+        :param nz: Load factor [-], default is 1.0.
+        :param DeltaTemp: Temperature deviation from ISA [K].
+        :type HLid: float.
+        :type LG: str.
         :type M: float.
         :type mass: float.
         :type nz: float.
-        :type HLid: float.
-        :type LG: string.
-        :returns: maximum altitude [m].
-        :rtype: float
+        :type DeltaTemp: float.
+        :returns: Maximum altitude [m].
+        :rtype: float.
         """
 
         if HLid > 0:
@@ -2340,21 +2496,24 @@ class FlightEnvelope(BADA4):
         return hMax
 
     def getConfig(self, phase, h, mass, v, DeltaTemp=0.0, hRWY=0.0):
-        """This function returns the aircraft aerodynamic configuration
-        based on the aircraft altitude and speed and phase of flight
+        """
+        Returns the aircraft's aerodynamic configuration based on altitude, speed, and phase of flight.
 
-        :param hRWY: runway elevation AMSL [m].
-        :param phase: aircraft phase of flight [Climb,Cruise,Descent][-].
-        :param h: altitude [m].
-        :param v: calibrated airspeed (CAS) [m s^-1].
-        :param mass: aircraft mass [kg]
-        :type hRWY: float.
-        :type phase: string.
+        :param phase: Phase of flight [Climb, Cruise, Descent] [-].
+        :param h: Altitude above mean sea level (AMSL) [m].
+        :param mass: Aircraft mass [kg].
+        :param v: Calibrated airspeed (CAS) [m/s].
+        :param DeltaTemp: Deviation from ISA temperature [K], default is 0.0.
+        :param hRWY: Runway elevation above mean sea level (AMSL) [m], default is 0.0.
+        :type phase: str.
         :type h: float.
-        :type v: float.
         :type mass: float.
-        :returns: aircraft aerodynamic configuration [TO/IC/CR/AP/LD][-].
-        :rtype: string
+        :type v: float.
+        :type DeltaTemp: float.
+        :type hRWY: float.
+        :returns: Aircraft aerodynamic configuration [TO/IC/CR/AP/LD] [-].
+        :rtype: str.
+        :raises: TypeError if unable to determine the configuration.
         """
 
         config = None
@@ -2429,13 +2588,15 @@ class FlightEnvelope(BADA4):
         return config
 
     def getAeroConfig(self, config):
-        """This function returns the aircraft aerodynamic configuration
-        based on the aerodynamic configuration ID, or None if not existent
+        """
+        Returns the aircraft aerodynamic configuration based on the provided configuration ID.
+        This includes the high-lift device (HLID) position and landing gear (LG) position.
+        If the configuration is not found, it returns None.
 
-        :param config: aircraft configuration [CR/IC/TO/AP/LD][-]
-        :type config: string
-        :returns: aircraft aerodynamic configuration combination of HLID and LG [-].
-        :rtype: [float, string]
+        :param config: Aircraft configuration (TO/IC/CR/AP/LD).
+        :type config: str
+        :returns: Aerodynamic configuration as a combination of HLID and LG.
+        :rtype: [float, str]
         """
 
         configDict = self.AC.aeroConfig.get(config)
@@ -2443,12 +2604,13 @@ class FlightEnvelope(BADA4):
         return [configDict["HLid"], configDict["LG"]]
 
     def getSpeedSchedule(self, phase):
-        """This function returns the speed schedule
-        based on the phase of flight {Climb, Cruise, Descent}
+        """
+        Returns the speed schedule based on the phase of flight (Climb, Cruise, Descent).
+        The schedule includes two CAS values (CAS1, CAS2) and a Mach number (M).
 
-        :param phase: aircraft phase of flight {Climb, Cruise, Descent}
-        :type phase: string
-        :returns: speed schedule combination of CAS1, CAS2 and M [m s^-1, m s^-1, -].
+        :param phase: Aircraft phase of flight (Climb, Cruise, Descent).
+        :type phase: str
+        :returns: Speed schedule as a combination of CAS1, CAS2 (in m/s) and Mach number (M).
         :rtype: [float, float, float]
         """
 
@@ -2463,17 +2625,19 @@ class FlightEnvelope(BADA4):
     def checkConfigurationContinuity(
         self, phase, previousConfig, currentConfig
     ):
-        """This function ensures the continuity of the configuration change,
-        so, the aerodynamic configuration does not change in the wrong direction based on the phase of the flight
+        """
+        Ensures the continuity of the aerodynamic configuration changes based on the phase of flight.
+        It prevents sudden or improper configuration transitions, ensuring the aerodynamic configuration
+        does not change in the wrong direction during Climb, Cruise, or Descent.
 
-        :param phase: aircraft phase of flight {Climb, Cruise, Descent}
-        :param previousConfig: aircraft previous aerodynamic configuration
-        :param currentConfig: aircraft current aerodynamic configuration
-        :type phase: string
-        :type previousConfig: string
-        :type currentConfig: string
-        :returns: speed new current configuration
-        :rtype: string
+        :param phase: Aircraft phase of flight (Climb, Cruise, Descent).
+        :param previousConfig: Previous aerodynamic configuration.
+        :param currentConfig: Current aerodynamic configuration.
+        :type phase: str
+        :type previousConfig: str
+        :type currentConfig: str
+        :returns: The appropriate configuration for the current flight phase.
+        :rtype: str
         """
 
         newConfig = ""
@@ -2514,8 +2678,8 @@ class ARPM(BADA4):
     """This class is a BADA4 aircraft subclass and implements the Airline Procedure Model (ARPM)
     following the BADA4 user manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada4.Parse.
+    :param AC: Aircraft object {BADA4}.
+    :type AC: bada4Aircraft.
     """
 
     def __init__(self, AC):
@@ -2537,24 +2701,47 @@ class ARPM(BADA4):
         NADP2_ALT=[1000, 3000],
         DeltaTemp=0.0,
     ):
-        """This function computes the climb speed schedule CAS speed for any given altitude
+        """
+        Computes the climb speed schedule (CAS) for the given altitude based on various procedures and aircraft parameters.
 
-        :param h: altitude [m].
-        :param mass: aircraft mass [kg].
-        :param theta: normalised air temperature [-].
-        :param delta: normalised air pressure [-].
-        :param speedSchedule_default: default speed schedule that will overwrite the BADA schedule [Vcl1, Vcl2, Mcl].
-        :param hRWY: runway elevation AMSL [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type h: float.
-        :type mass: float.
-        :type theta: float.
-        :type delta: float.
-        :type speedSchedule_default: [float, float, float].
-        :type hRWY: float.
-        :type DeltaTemp: float.
-        :returns: climb calibrated airspeed (CAS) [m s^-1] & updatedSpeed if speed has been updated.
-        :rtype: [float boolean]
+        :param theta: Normalized air temperature [-].
+        :param delta: Normalized air pressure [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param h: Altitude in meters [m].
+        :param hRWY: Runway elevation AMSL in meters [m].
+        :param speedSchedule_default: Optional, a default speed schedule that overrides the BADA schedule. It should be in the form [Vcl1, Vcl2, Mcl].
+        :param procedure: Climb procedure to be followed, e.g., 'BADA', 'NADP1', 'NADP2'. Default is 'BADA'.
+        :param config: Optional, current aircraft aerodynamic configuration (TO/IC/CR/AP/LD).
+        :param NADP1_ALT: Altitude in feet for NADP1 procedure. Default is 3000 feet.
+        :param NADP2_ALT: Altitude range in feet for NADP2 procedure. Default is [1000, 3000].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type theta: float
+        :type delta: float
+        :type mass: float
+        :type h: float
+        :type hRWY: float, optional
+        :type speedSchedule_default: list[float], optional
+        :type procedure: str
+        :type config: str, optional
+        :type NADP1_ALT: float, optional
+        :type NADP2_ALT: list[float], optional
+        :type DeltaTemp: float, optional
+        :returns: A tuple containing the climb calibrated airspeed (CAS) in meters per second [m/s] and a status flag indicating whether the calculated CAS is constrained ('C'), unconstrained ('V' or 'v'), or not altered ('').
+        :rtype: tuple[float, str]
+
+        This function computes the climb speed schedule for different phases of flight and aircraft types.
+        It supports BADA, NADP1, and NADP2 procedures for both jet and turboprop/piston/electric aircraft.
+
+        The climb schedule uses specific speed profiles depending on altitude and aircraft model. For jet engines, the speed is constrained
+        below 250 knots below 10,000 feet, and then it follows a defined speed schedule, either from BADA or NADP procedures.
+
+        Additionally, the function applies speed limits based on the aircraft's flight envelope, adjusting the calculated climb speed if necessary.
+
+        - For procedure='BADA', it uses the BADA climb speed schedule.
+        - For procedure='NADP1', it implements the Noise Abatement Departure Procedure 1.
+        - For procedure='NADP2', it implements the Noise Abatement Departure Procedure 2.
+
+        The function also ensures that the calculated CAS remains within the bounds of the aircraft's minimum and maximum speeds.
         """
 
         # aircraft AGL altitude assuming being close to the RWY [m]
@@ -2839,20 +3026,37 @@ class ARPM(BADA4):
         config=None,
         DeltaTemp=0.0,
     ):
-        """This function computes the cruise speed schedule CAS speed for any given altitude
+        """
+        Computes the cruise speed schedule (CAS) for the given altitude based on various aircraft parameters.
 
-        :param h: altitude [m].
-        :param mass: aircraft mass [kg].
-        :param theta: normalised air temperature [-].
-        :param delta: normalised air pressure [-].
-        :param speedSchedule_default: default speed schedule that will overwrite the BADA schedule [Vcr1, Vcr2, Mcr].
-        :type h: float.
-        :type mass: float.
-        :type theta: float.
-        :type delta: float.
-        :type speedSchedule_default: [float, float, float].
-        :returns: climb calibrated airspeed (CAS) [m s^-1] & updatedSpeed if speed has been updated.
-        :rtype: [float boolean]
+        :param theta: Normalized air temperature [-].
+        :param delta: Normalized air pressure [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param h: Altitude in meters [m].
+        :param hRWY: Runway elevation AMSL in meters [m].
+        :param speedSchedule_default: Optional, a default speed schedule that overrides the BADA schedule. It should be in the form [Vcr1, Vcr2, Mcr].
+        :param config: Optional, current aircraft aerodynamic configuration (TO/IC/CR/AP/LD).
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type theta: float
+        :type delta: float
+        :type mass: float
+        :type h: float
+        :type hRWY: float, optional
+        :type speedSchedule_default: list[float], optional
+        :type config: str, optional
+        :type DeltaTemp: float, optional
+        :returns: A tuple containing the cruise calibrated airspeed (CAS) in meters per second [m/s] and a status flag indicating whether the calculated CAS is constrained ('C'), unconstrained ('V' or 'v'), or not altered ('').
+        :rtype: tuple[float, str]
+
+        This function computes the cruise speed schedule for different phases of flight and aircraft types. It uses either the default
+        speed schedule or the BADA speed schedule based on the aircraft model and altitude.
+
+        The cruise speed schedule varies depending on the altitude and type of engine (JET, TURBOPROP, or PISTON).
+
+        The function also applies speed limits based on the aircraft's flight envelope, ensuring the calculated cruise speed remains within
+        the aircraft's minimum and maximum allowable speeds.
+
+        The function ensures the calculated CAS remains within the aircraft's operational speed limits, adjusting the speed if necessary.
         """
 
         phase = "Cruise"
@@ -2948,24 +3152,34 @@ class ARPM(BADA4):
         config=None,
         DeltaTemp=0.0,
     ):
-        """This function computes the descent speed schedule CAS speed for any given altitude
+        """
+        Computes the descent speed schedule (CAS) for the given altitude based on various aircraft parameters.
 
-        :param h: altitude [m].
-        :param mass: aircraft mass [kg].
-        :param theta: normalised air temperature [-].
-        :param delta: normalised air pressure [-].
-        :param speedSchedule_default: default speed schedule that will overwrite the BADA schedule [Vdes1, Vdes2, Mdes].
-        :param hRWY: runway elevation AMSL [m].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :type h: float.
-        :type mass: float.
-        :type theta: float.
-        :type delta: float.
-        :type speedSchedule_default: [float, float, float].
-        :type hRWY: float.
-        :type DeltaTemp: float.
-        :returns: climb calibrated airspeed (CAS) [m s^-1] & updatedSpeed if speed has been updated.
-        :rtype: [float, boolean]
+        :param theta: Normalized air temperature [-].
+        :param delta: Normalized air pressure [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param h: Altitude in meters [m].
+        :param hRWY: Runway elevation AMSL in meters [m].
+        :param speedSchedule_default: Optional, a default speed schedule that overrides the BADA schedule. It should be in the form [Vdes1, Vdes2, Mdes].
+        :param config: Optional, current aircraft aerodynamic configuration (TO/IC/CR/AP/LD).
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type theta: float
+        :type delta: float
+        :type mass: float
+        :type h: float
+        :type hRWY: float, optional
+        :type speedSchedule_default: list[float], optional
+        :type config: str, optional
+        :type DeltaTemp: float, optional
+        :returns: A tuple containing the descent calibrated airspeed (CAS) in meters per second [m/s] and a status flag indicating whether the calculated CAS is constrained ('C'), unconstrained ('V' or 'v'), or not altered ('').
+        :rtype: tuple[float, str]
+
+        This function computes the descent speed schedule for different phases of flight and aircraft types.
+        It uses either the default speed schedule or the BADA speed schedule based on the aircraft model and altitude.
+
+        The descent speed schedule varies depending on the altitude and type of engine (JET, TURBOPROP, or PISTON).
+
+        The function ensures the calculated CAS remains within the aircraft's operational speed limits, adjusting the speed if necessary.
         """
 
         # aircraft AGL altitude assuming being close to the RWY [m]
@@ -3113,8 +3327,8 @@ class ARPM(BADA4):
 class Optimization(BADA4):
     """This class implements the BADA4 optimization following the BADA4 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada4.Parse.
+    :param AC: Aircraft object {BADA4}.
+    :type AC: bada4Aircraft.
     """
 
     def __init__(self, AC):
@@ -3122,16 +3336,17 @@ class Optimization(BADA4):
         self.flightEnvelope = FlightEnvelope(AC)
 
     def CCI(self, theta, delta, cI):
-        """This function computes the cost index coefficient for given flight conditions
+        """
+        Computes the cost index coefficient for given flight conditions.
 
-        :param cI: cost index [kg min^-1].
-        :param delta: normalised pressure [-].
-        :param theta: normalised temperature [-].
-        :type cI: float.
-        :type delta: float.
-        :type theta: float.
-        :returns: cost index coefficient [-]
-        :rtype: float.
+        :param cI: Cost index in kilograms per minute [kg min^-1].
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
+        :type cI: float
+        :type delta: float
+        :type theta: float
+        :returns: Cost index coefficient [-].
+        :rtype: float
         """
 
         if self.AC.BADAVersion == "4.2":
@@ -3154,48 +3369,66 @@ class Optimization(BADA4):
             )
 
     def CW(self, mass, delta):
-        """This function computes the weight coefficient at a given mass and pressure
+        """
+        Computes the weight coefficient at a given mass and pressure.
 
-        :param mass: aircraft mass [kg].
-        :param delta: normalised pressure [-].
-        :type mass: float.
-        :type delta: float.
-        :returns: weight coefficient
+        :param mass: Aircraft mass in kilograms [kg].
+        :param delta: Normalized pressure [-].
+        :type mass: float
+        :type delta: float
+        :returns: Weight coefficient [-].
+        :rtype: float
+
+        The weight coefficient is used to represent the aircraft's weight relative to its maximum takeoff weight (MTOW)
+        under given atmospheric conditions.
         """
 
         return mass * const.g / (self.AC.MTOW * delta * const.g)
 
     def SR(self, M, CF):
-        """This function computes the specific range (SR) for given flight conditions
+        """
+        Computes the specific range (SR) for given flight conditions.
 
-        :param M: mach ground speed [-].
-        :param CF: fuel coefficient [-].
-        :type M: float.
-        :type CF: float.
-        :returns: specific range [NM kg^-1]
-        :rtype: float.
+        :param M: Mach ground speed [-].
+        :param CF: Fuel coefficient [-].
+        :type M: float
+        :type CF: float
+        :returns: Specific range in nautical miles per kilogram [NM kg^-1].
+        :rtype: float
+
+        Specific range is a measure of the distance that can be flown per unit of fuel mass.
+        It is calculated as the ratio of Mach number to fuel flow coefficient.
         """
 
         return M / CF
 
     def econMach(self, theta, delta, mass, DeltaTemp, cI, wS):
-        """This function computes the economic mach
-        for a given flight condition and cost index
+        """
+        Computes the economic Mach number for a given flight condition and cost index.
 
-        :param delta: normalised pressure [-].
-        :param theta: normalised temperature [-].
-        :param mass: aircraft weight [kg].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param cI: cost index [kg min^-1].
-        :param wS: longitudinal wind speed [m s^-1].
-        :type delta: float.
-        :type theta: float.
-        :type mass: float.
-        :type DeltaTemp: float.
-        :type cI: float.
-        :type wS: float.
-        :returns: Maximum Range Cruise (MRC) in M [-]
-        :rtype: float.
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param cI: Cost index in kilograms per minute [kg min^-1].
+        :param wS: Longitudinal wind speed in meters per second [m/s].
+        :type delta: float
+        :type theta: float
+        :type mass: float
+        :type DeltaTemp: float
+        :type cI: float
+        :type wS: float
+        :returns: Maximum Range Cruise (MRC) Mach number [-].
+        :rtype: float
+
+        This function calculates the economic Mach number by balancing the fuel consumption and time costs,
+        taking into account the aircraft’s flight conditions and the provided cost index (cI).
+        It iterates through possible Mach numbers within the aircraft's flight envelope (bounded by Mmin and Mmax),
+        computing the drag, thrust, and fuel flow, then selects the Mach that maximizes the cost efficiency.
+
+        - **Mmin**: Lower bound of Mach speed, limited by buffet constraints.
+        - **Mmax**: Upper bound of Mach speed, limited by buffet constraints.
+        - **SR**: Specific Range, used to calculate the most efficient cruise speed in terms of fuel consumption.
         """
 
         # clean configuration during CR
@@ -3273,20 +3506,27 @@ class Optimization(BADA4):
         # return float(econ.x)
 
     def MRC(self, theta, delta, mass, DeltaTemp, wS):
-        """This function computes the Mach reperesenting Maximum Range Cruise (MRC) for given flight conditions
+        """
+        Computes the Mach number representing Maximum Range Cruise (MRC) for the given flight conditions.
 
-        :param delta: normalised pressure [-].
-        :param theta: normalised temperature [-].
-        :param mass: aircraft weight [kg].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param wS: longitudinal wind speed [m s^-1].
-        :type delta: float.
-        :type theta: float.
-        :type mass: float.
-        :type DeltaTemp: float.
-        :type wS: float.
-        :returns: Maximum Range Cruise (MRC) in M [-]
-        :rtype: float.
+        :param theta: Normalized air temperature [-].
+        :param delta: Normalized air pressure [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param wS: Longitudinal wind speed in meters per second [m/s].
+        :type theta: float
+        :type delta: float
+        :type mass: float
+        :type DeltaTemp: float
+        :type wS: float
+        :returns: Maximum Range Cruise (MRC) Mach number [-].
+        :rtype: float
+
+        This function calculates the Mach number that corresponds to the Maximum Range Cruise (MRC),
+        which maximizes the specific range. The calculation assumes clean configuration during the cruise phase.
+        It uses the `econMach` function with a cost index (cI) of zero to find the MRC.
+
+        If the calculated MRC is invalid, it returns NaN.
         """
 
         mrcM = self.econMach(
@@ -3304,20 +3544,27 @@ class Optimization(BADA4):
         return mrcM
 
     def LRC(self, theta, delta, mass, DeltaTemp, wS):
-        """This function computes the Mach reperesenting Long Range Cruise (LRC) for given flight conditions
+        """
+        Computes the Mach number representing Long Range Cruise (LRC) for the given flight conditions.
 
-        :param delta: normalised pressure [-].
-        :param theta: normalised temperature [-].
-        :param mass: aircraft weight [kg].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param wS: longitudinal wind speed [m s^-1].
-        :type delta: float.
-        :type theta: float.
-        :type mass: float.
-        :type DeltaTemp: float.
-        :type wS: float.
-        :returns: Long Range Cruise (LRC) in M [-]
-        :rtype: float.
+        :param theta: Normalized air temperature [-].
+        :param delta: Normalized air pressure [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param wS: Longitudinal wind speed in meters per second [m/s].
+        :type theta: float
+        :type delta: float
+        :type mass: float
+        :type DeltaTemp: float
+        :type wS: float
+        :returns: Long Range Cruise (LRC) Mach number [-].
+        :rtype: float
+
+        The Long Range Cruise (LRC) is defined as the speed where fuel efficiency is 99% of the Maximum Range Cruise (MRC).
+        This function calculates the LRC based on the MRC and iterates through possible Mach numbers to find the one that
+        minimizes the difference between the specific range (SR) at LRC and 99% of the SR at MRC.
+
+        If no valid LRC is found, it returns NaN.
         """
 
         Mws = atm.tas2Mach(v=wS, theta=theta)
@@ -3412,20 +3659,28 @@ class Optimization(BADA4):
         # return minimum
 
     def MEC(self, theta, delta, mass, DeltaTemp, wS):
-        """This function computes the Mach reperesenting Maximum Endurance Cruise (MEC) for given flight conditions
+        """
+        Computes the Mach number representing Maximum Endurance Cruise (MEC) for given flight conditions.
 
-        :param delta: normalised pressure [-].
-        :param theta: normalised temperature [-].
-        :param mass: aircraft weight [kg].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param wS: longitudinal wind speed [m s^-1].
-        :type delta: float.
-        :type theta: float.
-        :type mass: float.
-        :type DeltaTemp: float.
-        :type wS: float.
-        :returns: Maximum Endurance Cruise (MEC) in M [-]
-        :rtype: float.
+        :param delta: Normalized pressure [-].
+        :param theta: Normalized temperature [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param wS: Longitudinal wind speed in meters per second [m/s].
+        :type delta: float
+        :type theta: float
+        :type mass: float
+        :type DeltaTemp: float
+        :type wS: float
+        :returns: Maximum Endurance Cruise (MEC) in Mach [-].
+        :rtype: float
+
+        The Maximum Endurance Cruise (MEC) Mach is the Mach number that minimizes the fuel consumption rate,
+        maximizing the endurance of the flight. This function iterates over a range of possible Mach numbers
+        within the flight envelope and returns the Mach number with the lowest fuel coefficient (CF).
+
+        The calculation is subject to thrust limitations, and the function ensures that the resulting Mach
+        does not exceed the maximum thrust available.
         """
 
         # clean configuration during CR
@@ -3497,22 +3752,23 @@ class Optimization(BADA4):
         # return float(mecM.x)
 
     def optAltitude(self, M, mass, DeltaTemp):
-        """This function computes optimum altitude for a given flight condition
+        """
+        Computes the optimum altitude for a given flight condition and Mach number.
 
-        :param delta: normalised pressure [-].
-        :param theta: normalised temperature [-].
-        :param mass: aircraft weight [kg].
-        :param DeltaTemp: deviation with respect to ISA [K]
-        :param cI: cost index [kg min^-1].
-        :param wS: longitudinal wind speed [m s^-1].
-        :type delta: float.
-        :type theta: float.
-        :type mass: float.
-        :type DeltaTemp: float.
-        :type cI: float.
-        :type wS: float.
-        :returns: optium altitude [ft]
-        :rtype: float.
+        :param M: Mach number [-].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type M: float
+        :type mass: float
+        :type DeltaTemp: float
+        :returns: Optimum altitude in feet [ft].
+        :rtype: float
+
+        The optimum altitude is the altitude where the aircraft achieves the maximum efficiency for a given
+        Mach number and mass, subject to thrust and buffet limitations. The function iterates over a range
+        of altitudes and returns the one with the best fuel efficiency.
+
+        The function also ensures that the optimum altitude is bounded by a minimum of 2000 feet.
         """
 
         # clean configuration during CR
@@ -3626,19 +3882,23 @@ class Optimization(BADA4):
         # return optAlt
 
     def getOPTParam(self, optParam, var_1, var_2=None):
-        """This function returns value of the OPT parameter based on the input value from OPT file
-        like LRC, MEC, MRC, ECON speed or OPTALT altitude
+        """
+        Returns the value of an optimization (OPT) parameter from a BADA4 OPT file for various flight conditions.
+        The OPT file contains values for parameters like Long Range Cruise (LRC), Maximum Endurance Cruise (MEC),
+        Maximum Range Cruise (MRC), ECON speed, or OPTALT altitude, and this function interpolates the appropriate
+        value based on input variables.
 
-        .. note::
-                array used in this fuction is expected to be sorted (design of OPT files)
+        Note:
+            The array used in this function is expected to be sorted, as per the design of OPT files.
 
-        :param optParam: name of optimization file {LRC,MEC,MRC,ECON,OPTALT}.
-        :param var_1: value of the first optimizing factor.
-        :param var_2: (optional) value of the second optimizing factor.
-        :type optParam: string.
-        :type var_1: float.
-        :type var_2: float.
-        :returns: None
+        :param optParam: Name of the optimization parameter file {LRC, MEC, MRC, ECON, OPTALT}.
+        :param var_1: First optimizing factor, typically a flight condition like mass or altitude.
+        :param var_2: (Optional) Second optimizing factor if the parameter depends on more than one factor.
+        :type optParam: str
+        :type var_1: float
+        :type var_2: float, optional
+        :returns: Interpolated optimization parameter value or NaN if not found.
+        :rtype: float
         """
 
         filename = os.path.join(
@@ -3650,18 +3910,20 @@ class Optimization(BADA4):
         )
 
         def findNearest(value, array):
-            """This function returns indices of the nearest value in the array.
-            if the value is lower/higher than lowest/highest value in array, only one idx is returned
-            otherwise if the value is somewhere in between, 2 closest (left and right) idx are returned
+            """
+            Returns the indices of the nearest value(s) in the array.
+            If the value is lower/higher than the lowest/highest value in the array, only one index is returned.
+            If the value is between two values, two closest indices (left and right) are returned.
 
-            .. note::
-                    array used in this fuction is expected to be sorted (design of OPT files)
+            Note:
+                The array is expected to be sorted.
 
-            :param value: value to which the array value will be comapred
-            :param array: list of values
-
-            :type value: float.
-            :type array: array of float.
+            :param value: Value to be compared to the array elements.
+            :param array: Sorted array of values to search.
+            :type value: float
+            :type array: list[float]
+            :returns: A list containing one or two nearest indices.
+            :rtype: list[int]
             """
 
             nearestIdx = list()
@@ -3680,10 +3942,11 @@ class Optimization(BADA4):
             return nearestIdx
 
         def parseOPT(filename):
-            """This function parses BADA4 OPT ascii formatted files
+            """
+            Parses a BADA4 OPT file and populates variables for later interpolation.
 
-            :param filename: path to the ___.OPT ascii formatted file.
-            :type filename: str.
+            :param filename: Path to the OPT file.
+            :type filename: str
             """
 
             file = open(filename, "r")
@@ -3852,8 +4115,8 @@ class Optimization(BADA4):
 class PTD(BADA4):
     """This class implements the PTD file creator for BADA4 aircraft following BADA4 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada4.Parse.
+    :param AC: Aircraft object {BADA4}.
+    :type AC: bada4Aircraft.
     """
 
     def __init__(self, AC):
@@ -3863,13 +4126,24 @@ class PTD(BADA4):
         self.ARPM = ARPM(AC)
 
     def create(self, DeltaTemp, saveToPath):
-        """This function creates the BADA4 PTD file
+        """
+        Creates the BADA4 Performance Table Data (PTD) file, calculating climb, cruise, and descent profiles
+        for different mass levels and altitudes, and saves the output to the specified path.
 
-        :param saveToPath: path to directory where PTF should be stored [-]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type saveToPath: string.
-        :type DeltaTemp: float.
-        :returns: NONE
+        :param saveToPath: Directory path where the PTD file should be stored.
+        :param DeltaTemp: Deviation from the ISA (International Standard Atmosphere) temperature in Kelvin [K].
+        :type saveToPath: str
+        :type DeltaTemp: float
+        :returns: None
+        :rtype: None
+
+        The function generates PTD files by computing the performance for three mass levels:
+        - 120% of the Operating Empty Weight (OEW),
+        - OEW plus 70% of the difference between Maximum Take-Off Weight (MTOW) and OEW,
+        - and Maximum Take-Off Weight (MTOW).
+
+        For each mass level, climb, cruise, and descent performance is calculated at various altitudes
+        (up to the maximum operating altitude or a limit of 51,000 feet). The data is then saved to a PTD file.
         """
 
         # 3 different mass levels [kg]
@@ -3925,19 +4199,21 @@ class PTD(BADA4):
         )
 
     def save2PTD(self, saveToPath, CLList, CRList, DESList, DeltaTemp):
-        """This function saves data to PTD file
+        """
+        Saves climb, cruise, and descent performance data into a PTD (Performance Table Data) file.
 
-        :param saveToPath: path to directory where PTD should be stored [-]
-        :param CLList: list of PTD data in CLIMB [-].
-        :param CRList: list of PTD data in CRUISE [-].
-        :param DESList_med: list of PTD data in DESCENT [-].
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type saveToPath: string.
-        :type CLList: list.
-        :type CRList: list.
-        :type DESList: list.
-        :type DeltaTemp: float.
-        :returns: NONE
+        :param saveToPath: Directory path where the PTD file will be stored.
+        :param CLList: List of climb performance data.
+        :param CRList: List of cruise performance data.
+        :param DESList: List of descent performance data.
+        :param DeltaTemp: Deviation from ISA (International Standard Atmosphere) temperature in Kelvin [K].
+        :type saveToPath: str
+        :type CLList: list
+        :type CRList: list
+        :type DESList: list
+        :type DeltaTemp: float
+        :returns: None
+        :rtype: None
         """
 
         def Nan2Zero(list):
@@ -4290,15 +4566,16 @@ class PTD(BADA4):
             )
 
     def PTD_climb(self, mass, altitudeList, DeltaTemp):
-        """This function calculates the BADA4 PTD data in CLIMB
+        """
+        Calculates the BADA4 PTD (Performance Table Data) for the CLIMB phase of flight.
 
-        :param mass: aircraft mass [kg]
-        :param altitudeList: aircraft altitude list [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type mass: float.
-        :type altitudeList: list of int.
-        :type DeltaTemp: float.
-        :returns: list of PTD CLIMB data [-]
+        :param mass: Aircraft mass in kilograms [kg].
+        :param altitudeList: List of aircraft altitudes in feet [ft].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type mass: float
+        :type altitudeList: list of int
+        :type DeltaTemp: float
+        :returns: List of PTD CLIMB data.
         :rtype: list
         """
 
@@ -4457,15 +4734,16 @@ class PTD(BADA4):
         return CLList
 
     def PTD_descent(self, mass, altitudeList, DeltaTemp):
-        """This function calculates the BADA4 PTD data in DESCENT
+        """
+        Calculates the BADA4 PTD (Performance Table Data) for the DESCENT phase of flight.
 
-        :param mass: aircraft mass [kg]
-        :param altitudeList: list of aircraft maximum altitude [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type mass: float.
-        :type altitudeList: list of int.
-        :type DeltaTemp: float.
-        :returns: list of PTD DESCENT data [-]
+        :param mass: Aircraft mass in kilograms [kg].
+        :param altitudeList: List of aircraft altitudes in feet [ft].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type mass: float
+        :type altitudeList: list of int
+        :type DeltaTemp: float
+        :returns: List of PTD DESCENT data.
         :rtype: list
         """
 
@@ -4659,15 +4937,16 @@ class PTD(BADA4):
         return DESList
 
     def PTD_cruise(self, mass, altitudeList, DeltaTemp):
-        """This function calculates the BADA4 PTD data in CRUISE
+        """
+        Calculates the BADA4 PTD (Performance Table Data) for the CRUISE phase of flight.
 
-        :param mass: aircraft mass [kg]
-        :param altitudeList: list of aircraft maximum altitude [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type mass: float.
-        :type altitudeList: list of int.
-        :type DeltaTemp: float.
-        :returns: list of PTD DESCENT data [-]
+        :param mass: Aircraft mass in kilograms [kg].
+        :param altitudeList: List of aircraft altitudes in feet [ft].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type mass: float
+        :type altitudeList: list of int
+        :type DeltaTemp: float
+        :returns: List of PTD CRUISE data.
         :rtype: list
         """
 
@@ -4790,8 +5069,8 @@ class PTD(BADA4):
 class PTF(BADA4):
     """This class implements the PTF file creator for BADA4 aircraft following BADA4 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada4.Parse.
+    :param AC: Aircraft object {BADA4}.
+    :type AC: bada4Aircraft.
     """
 
     def __init__(self, AC):
@@ -4801,13 +5080,15 @@ class PTF(BADA4):
         self.ARPM = ARPM(AC)
 
     def create(self, DeltaTemp, saveToPath):
-        """This function creates the BADA4 PTF file
+        """
+        Creates the BADA4 PTF and saves it to the specified directory.
 
-        :param saveToPath: path to directory where PTF should be stored [-]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type saveToPath: string.
-        :type DeltaTemp: float.
-        :returns: NONE
+        :param saveToPath: Path to the directory where the PTF should be stored.
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type saveToPath: str
+        :type DeltaTemp: float
+        :returns: None
+        :rtype: None
         """
 
         # 3 different mass levels [kg]
@@ -4863,21 +5144,27 @@ class PTF(BADA4):
         massList,
         altitudeList,
     ):
-        """This function saves data to PTF file
+        """
+        Saves the BADA4 performance data to a PTF format.
 
-        :param saveToPath: path to directory where PTF should be stored [-]
-        :param CRList: list of PTF data in CRUISE [-].
-        :param CLList: list of PTF data in CLIMB [-].
-        :param DESList: list of PTF data in DESCENT [-].
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :param massList: list of aircraft mass [kg]
-        :type saveToPath: string.
-        :type CRList: list.
-        :type CLList: list.
-        :type DESList: list.
-        :type DeltaTemp: float.
-        :type massList: list(float).
-        :returns: NONE
+        :param saveToPath: Path to the directory where the PTF should be stored.
+        :param CLList: List of PTD data for CLIMB.
+        :param CRList: List of PTD data for CRUISE.
+        :param DESList: List of PTD data for DESCENT.
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param massList: List of aircraft mass levels [kg].
+        :param altitudeList: List of altitudes [ft].
+        :type saveToPath: str
+        :type CLList: list
+        :type CRList: list
+        :type DESList: list
+        :type DeltaTemp: float
+        :type massList: list(float)
+        :returns: None
+        :rtype: None
+
+        This function formats and writes the climb, cruise, and descent data for different mass levels
+        and altitudes into a .PTF file, adhering to the BADA4 performance file format.
         """
 
         def Nan2Zero(list):
@@ -4999,15 +5286,16 @@ class PTF(BADA4):
         )
 
     def PTF_cruise(self, massList, altitudeList, DeltaTemp):
-        """This function calculates the BADA4 PTF data in CRUISE
+        """
+        Calculates the BADA4 PTF for the CRUISE phase of flight.
 
-        :param massList: list of aircraft mass [kg]
-        :param altitudeList: aircraft altitude list [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type massList: list.
-        :type altitudeList: list of int.
-        :type DeltaTemp: float.
-        :returns: list of PTF CRUISE data [-]
+        :param massList: List of aircraft mass levels in kilograms [kg].
+        :param altitudeList: List of aircraft altitudes in feet [ft].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type massList: list
+        :type altitudeList: list of int
+        :type DeltaTemp: float
+        :returns: List of PTF CRUISE data.
         :rtype: list
         """
 
@@ -5117,15 +5405,16 @@ class PTF(BADA4):
         return CRList
 
     def PTF_climb(self, massList, altitudeList, DeltaTemp):
-        """This function calculates the BADA4 PTF data in CLIMB
+        """
+        Calculates the BADA4 PTF for the CLIMB phase of flight.
 
-        :param massList: list of aircraft mass [kg]
-        :param altitudeList: aircraft altitude list [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type massList: list.
-        :type altitudeList: list of int.
-        :type DeltaTemp: float.
-        :returns: list of PTF CLIMB data [-]
+        :param massList: List of aircraft mass levels in kilograms [kg].
+        :param altitudeList: List of aircraft altitudes in feet [ft].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type massList: list
+        :type altitudeList: list of int
+        :type DeltaTemp: float
+        :returns: List of PTF CLIMB data.
         :rtype: list
         """
 
@@ -5273,15 +5562,16 @@ class PTF(BADA4):
         return CLList
 
     def PTF_descent(self, massList, altitudeList, DeltaTemp):
-        """This function calculates the BADA4 PTF data in DESCENT
+        """
+        Calculates the BADA4 PTF for the DESCENT phase of flight.
 
-        :param massList: list of aircraft mass [kg]
-        :param altitudeList: aircraft altitude list [ft]
-        :param DeltaTemp: deviation from ISA temperature [K]
-        :type massList: list.
-        :type altitudeList: list of int.
-        :type DeltaTemp: float.
-        :returns: list of PTF DESCENT data [-]
+        :param massList: List of aircraft mass levels in kilograms [kg].
+        :param altitudeList: List of aircraft altitudes in feet [ft].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :type massList: list
+        :type altitudeList: list of int
+        :type DeltaTemp: float
+        :returns: List of PTF DESCENT data.
         :rtype: list
         """
 
@@ -5465,15 +5755,42 @@ class PTF(BADA4):
 
 
 class Bada4Aircraft(BADA4):
-    """This class groups the BADA4 performance model classes.
+    """
+    This class encapsulates the BADA4 performance model for an aircraft, extending the BADA4 base class.
 
-    :param filePath: path to the BADA4 xml formatted file.
-    :param acName: ICAO aircraft designation
-    :type filePath: str.
+    :param badaVersion: The version of the BADA4 model being used.
+    :param acName: The ICAO designation or name of the aircraft.
+    :param filePath: (Optional) Path to the BADA4 XML file. If not provided, a default path is used.
+    :param allData: (Optional) Dataframe containing pre-loaded aircraft data, typically used to
+                    initialize the aircraft parameters without needing to parse XML files.
+    :type badaVersion: str
     :type acName: str
+    :type filePath: str, optional
+    :type allData: pd.DataFrame, optional
+
+    This class initializes the aircraft's performance model using data from a dataframe or by
+    reading from XML files in the BADA4 format.
     """
 
     def __init__(self, badaVersion, acName, filePath=None, allData=None):
+        """
+        Initializes the BADA4Aircraft class by loading aircraft-specific data.
+
+        - If `allData` is provided and contains the aircraft's information, it will be used to
+          initialize various parameters such as engine type, mass, thrust settings, and performance
+          data.
+        - If the aircraft is not found in `allData`, the class will search for the corresponding
+          BADA4 XML file or synonym file (if applicable) in the specified or default file path.
+        - Once the aircraft data is found, the class initializes various performance modules such
+          as the flight envelope, aerodynamic model, and performance optimizations.
+
+        :param badaVersion: Version of the BADA4 model (e.g., "4.2", "4.3").
+        :param acName: ICAO aircraft designation or model name.
+        :param filePath: (Optional) Custom file path to load the aircraft data. If not provided,
+                         a default directory is used.
+        :param allData: (Optional) Dataframe containing pre-loaded aircraft data for initialization.
+        """
+
         super().__init__(self)
 
         self.BADAFamily = BadaFamily(BADA4=True)

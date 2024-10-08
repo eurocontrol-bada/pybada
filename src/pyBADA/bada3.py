@@ -1670,8 +1670,8 @@ class Parser(object):
 class BADA3(Airplane):
     """This class implements the part of BADA3 performance model that will be used in other classes following the BADA3 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada3.Parse.
+    :param AC: Aircraft object {BADA3}.
+    :type AC: bada3Aircraft.
     """
 
     def __init__(self, AC):
@@ -2261,8 +2261,8 @@ class FlightEnvelope(BADA3):
     """This class is a BADA3 aircraft subclass and implements the flight envelope caclulations
     following the BADA3 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada3.Parse.
+    :param AC: Aircraft object {BADA3}.
+    :type AC: bada3Aircraft.
     """
 
     def __init__(self, AC):
@@ -2918,8 +2918,8 @@ class ARPM:
     """This class is a BADA3 aircraft subclass and implements the Airline Procedure Model (ARPM)
     following the BADA3 user manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada3.Parse.
+    :param AC: Aircraft object {BADA3}.
+    :type AC: bada3Aircraft.
     """
 
     def __init__(self, AC):
@@ -3634,8 +3634,8 @@ class ARPM:
 class PTD(BADA3):
     """This class implements the PTD file creator for BADA3 aircraft following BADA3 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada3.Parse.
+    :param AC: Aircraft object {BADA3}.
+    :type AC: bada3Aircraft.
     """
 
     def __init__(self, AC):
@@ -4220,8 +4220,8 @@ class PTD(BADA3):
 class PTF(BADA3):
     """This class implements the PTF file creator for BADA3 aircraft following BADA3 manual.
 
-    :param AC: parsed aircraft.
-    :type AC: bada3.Parse.
+    :param AC: Aircraft object {BADA3}.
+    :type AC: bada3Aircraft.
     """
 
     def __init__(self, AC):
