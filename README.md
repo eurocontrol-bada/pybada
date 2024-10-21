@@ -16,11 +16,11 @@ pip install pyBADA
 ## Examples
 
 -   `file_parser`: BADA file parser and retrieval of some basic BADA parameters for all BADA3/4/H
--   `BADAData`: loading complete BADA3 dataset and retrievel of a specific parameters for a specific aircraft
+-   `BADAData`: loading complete BADA3 dataset and retrieval of a specific parameters for a specific aircraft
 -   `optimum_speed_altitude`: calculation of optimum speeds and altitude for BADA4 and BADAH aircraft
--   `ac_trajectory`: simple, but complete aircraft trajectory for BADA3 and BADA4 aircraft
--   `ac_trajectory_GPS`: simple, but complete aircraft trajectory for BADA3 and BADA4 aircraft including geodesic calculations
--   `heli_trajectory`: simple, but complete helicopter trajectory for BADAH aircraft
+-   `ac_trajectory`: simple, but complete, aircraft trajectory for BADA3 and BADA4 aircraft
+-   `ac_trajectory_GPS`: simple, but complete, aircraft trajectory for BADA3 and BADA4 aircraft including geodesic calculations
+-   `heli_trajectory`: simple, but complete, helicopter trajectory for BADAH aircraft
 
 ## Development
 
