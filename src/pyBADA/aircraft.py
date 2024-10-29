@@ -21,30 +21,55 @@ def checkArgument(argument, **kwargs):
         raise TypeError("Missing " + argument + " argument")
 
 
-class BadaFamily(object):
-    """This class sets the token for the respected BADA Family."""
-
-    def __init__(self, BADA3=False, BADA4=False, BADAH=False, BADAE=False):
-        self.BADA3 = BADA3
-        self.BADA4 = BADA4
-        self.BADAH = BADAH
-        self.BADAE = BADAE
-
-
-class Airplane(object):
-    """This is a generic airplane class based on a three-degrees-of-freedom point mass model (where all the forces
-    are applied at the center of gravity).
-
-    .. note::this generic class only implements basic aircraft dynamics
-            calculations, aircraft performance and optimisation can be obtained
-            from its inherited classes
-
-    """
-
-    __metaclass__ = abc.ABCMeta
+class Bada(object):
+    """This class implements the mechanisms applicable across all BADA families."""
 
     def __init__(self):
         pass
+
+    @staticmethod
+    def getBADAParameters(df, acName, parameters):
+        """
+        Retrieves specified parameters for a given aircraft name from a DataFrame.
+
+        :param df: DataFrame containing BADA aircraft data.
+        :param acName: Name of the aircraft or list of aircraft names to search for.
+        :param parameters: List of column names (or a single column name) to retrieve.
+        :type df: pd.DataFrame
+        :type acName: list or str
+        :type parameters: list or str
+        :returns: A DataFrame containing the specified parameters for the given aircraft.
+        :rtype: pd.DataFrame
+        :raises ValueError: If any of the specified columns or aircraft names are not found.
+        """
+
+        # Ensure parameters is a list
+        if isinstance(parameters, str):
+            parameters = [parameters]
+
+        # Ensure acName is a list
+        if isinstance(acName, str):
+            acName = [acName]
+
+        # Ensure all requested parameters exist in the DataFrame
+        missing_cols = [col for col in parameters if col not in df.columns]
+        if missing_cols:
+            raise ValueError(
+                f"The following parameters are not in the DataFrame columns: {missing_cols}"
+            )
+
+        # Filter rows where 'acName' matches any of the specified aircraft names
+        filtered_df = df[df["acName"].isin(acName)]
+
+        # Check if any rows were found
+        if filtered_df.empty:
+            raise ValueError(f"No entries found for aircraft(s): {acName}.")
+        else:
+            # Select the required columns
+            result_df = filtered_df[["acName"] + parameters].reset_index(
+                drop=True
+            )
+            return result_df
 
     @staticmethod
     def loadFactor(fi):
@@ -82,6 +107,21 @@ class Airplane(object):
         return conv.rad2deg(BA)
 
     @staticmethod
+    def rateOfTurn(v, nz=1.0):
+        """
+        Computes the rate of turn based on true airspeed (TAS) and load factor.
+
+        :param v: True airspeed (TAS) in meters per second (m/s).
+        :param nz: Load factor (default is 1.0), dimensionless.
+        :type v: float
+        :type nz: float
+        :returns: Rate of turn in degrees per second (deg/s).
+        :rtype: float
+        """
+
+        return degrees((const.g / v) * sqrt(nz * nz - 1))
+
+    @staticmethod
     def rateOfTurn_bankAngle(TAS, bankAngle):
         """
         Computes the rate of turn based on true airspeed (TAS) and bank angle.
@@ -97,21 +137,6 @@ class Airplane(object):
         ROT = tan(radians(bankAngle)) * const.g / TAS
 
         return degrees(ROT)
-
-    @staticmethod
-    def rateOfTurn(v, nz=1.0):
-        """
-        Computes the rate of turn based on true airspeed (TAS) and load factor.
-
-        :param v: True airspeed (TAS) in meters per second (m/s).
-        :param nz: Load factor (default is 1.0), dimensionless.
-        :type v: float
-        :type nz: float
-        :returns: Rate of turn in degrees per second (deg/s).
-        :rtype: float
-        """
-
-        return degrees((const.g / v) * sqrt(nz * nz - 1))
 
     @staticmethod
     def turnRadius(v, nz=1.0):
@@ -159,6 +184,30 @@ class Airplane(object):
         """
 
         return tas * cos(radians(gamma)) + Ws
+
+
+class BadaFamily(object):
+    """This class sets the token for the respected BADA Family."""
+
+    def __init__(self, BADA3=False, BADA4=False, BADAH=False, BADAE=False):
+        self.BADA3 = BADA3
+        self.BADA4 = BADA4
+        self.BADAH = BADAH
+        self.BADAE = BADAE
+
+
+class Airplane(object):
+    """This is a generic airplane class based on a three-degrees-of-freedom point mass model (where all the forces
+    are applied at the center of gravity).
+
+    .. note::this generic class only implements basic aircraft dynamics
+            calculations, aircraft performance and optimisation can be obtained
+            from its inherited classes
+
+    """
+
+    def __init__(self):
+        pass
 
     @staticmethod
     def esf(**kwargs):
@@ -278,89 +327,8 @@ class Helicopter(object):
 
     """
 
-    __metaclass__ = abc.ABCMeta
-
     def __init__(self):
         pass
-
-    @staticmethod
-    def loadFactor(fi):
-        """
-        Computes the load factor from a given bank angle.
-
-        The load factor is calculated based on the cosine of the bank angle,
-        which is expressed in degrees. A small rounding operation is applied
-        to avoid precision issues with small decimal places.
-
-        :param fi: Bank angle in degrees.
-        :type fi: float
-        :returns: The load factor (dimensionless).
-        :rtype: float
-        """
-
-        return 1 / round(cos(radians(fi)), 10)
-
-    @staticmethod
-    def rateOfTurn(v, nz=1.0):
-        """
-        Computes the rate of turn based on true airspeed (TAS) and load factor.
-
-        :param v: True airspeed (TAS) in meters per second (m/s).
-        :param nz: Load factor (default is 1.0), dimensionless.
-        :type v: float
-        :type nz: float
-        :returns: Rate of turn in degrees per second (deg/s).
-        :rtype: float
-        """
-
-        return degrees((const.g / v) * sqrt(nz * nz - 1))
-
-    @staticmethod
-    def rateOfTurn_bankAngle(TAS, bankAngle):
-        """
-        Computes the rate of turn based on true airspeed (TAS) and bank angle.
-
-        :param TAS: True airspeed (TAS) in meters per second (m/s).
-        :param bankAngle: Bank angle in degrees.
-        :type TAS: float
-        :type bankAngle: float
-        :returns: Rate of turn in degrees per second (deg/s).
-        :rtype: float
-        """
-
-        ROT = tan(radians(bankAngle)) * const.g / TAS
-
-        return degrees(ROT)
-
-    @staticmethod
-    def turnRadius(v, nz=1.0):
-        """
-        Computes the turn radius based on true airspeed (TAS) and load factor.
-
-        :param v: True airspeed (TAS) in meters per second (m/s).
-        :param nz: Load factor (default is 1.0), dimensionless.
-        :type v: float
-        :type nz: float
-        :returns: Turn radius in meters.
-        :rtype: float
-        """
-
-        return (v * v / const.g) * (1 / sqrt(nz * nz - 1))
-
-    @staticmethod
-    def turnRadius_bankAngle(v, ba):
-        """
-        Computes the turn radius based on true airspeed (TAS) and bank angle.
-
-        :param v: True airspeed (TAS) in meters per second (m/s).
-        :param ba: Bank angle in degrees.
-        :type v: float
-        :type ba: float
-        :returns: Turn radius in meters.
-        :rtype: float
-        """
-
-        return (v * v / const.g) * (1 / tan(conv.deg2rad(ba)))
 
     @staticmethod
     def esf(**kwargs):
@@ -429,21 +397,3 @@ class Helicopter(object):
                 ESF = float("Nan")
 
         return ESF
-
-    @staticmethod
-    def bankAngle(rateOfTurn, v):
-        """
-        Computes the bank angle based on true airspeed (TAS) and rate of turn.
-
-        :param v: True airspeed (TAS) in meters per second (m/s).
-        :param rateOfTurn: Rate of turn in degrees per second (deg/s).
-        :type v: float
-        :type rateOfTurn: float
-        :returns: Bank angle in degrees.
-        :rtype: float
-        """
-
-        ROT = conv.deg2rad(rateOfTurn)
-
-        BA = atan((ROT * v) / const.g)
-        return conv.rad2deg(BA)

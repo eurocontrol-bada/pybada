@@ -19,7 +19,7 @@ from pyBADA import constants as const
 from pyBADA import conversions as conv
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
-from pyBADA.aircraft import Helicopter, BadaFamily
+from pyBADA.aircraft import Helicopter, BadaFamily, Bada
 
 
 def proper_round(num, dec=0):
@@ -41,31 +41,6 @@ class Parser:
 
     def __init__(self):
         pass
-
-    @staticmethod
-    def list_subfolders(folderPath):
-        """
-        Lists all subfolders within a specified directory.
-
-        :param folderPath: Path to the directory where subfolders are to be listed.
-        :type folderPath: str
-        :returns: A list of subfolder names within the specified directory.
-        :rtype: list of str
-
-        This function retrieves all entries in the given directory and filters out
-        the ones that are not directories. Only the names of the subfolders are returned.
-        """
-        # List all entries in the directory
-        entries = os.listdir(folderPath)
-
-        # Filter out entries that are directories
-        subfolders = [
-            entry
-            for entry in entries
-            if os.path.isdir(os.path.join(folderPath, entry))
-        ]
-
-        return subfolders
 
     @staticmethod
     def parseXML(filePath, badaVersion, acName):
@@ -284,7 +259,7 @@ class Parser:
 
         # get names of all the folders in the main BADA model folder to search for XML files
         folderPath = os.path.join(filePath, "BADAH", badaVersion)
-        subfolders = Parser.list_subfolders(folderPath)
+        subfolders = configuration.list_subfolders(folderPath)
 
         merged_df = pd.DataFrame()
 
@@ -312,72 +287,8 @@ class Parser:
 
         return merged_df
 
-    @staticmethod
-    def getBADAParameters(df, acName, parameters):
-        """
-        Retrieves specified parameters for a given aircraft name from a DataFrame.
 
-        :param df: DataFrame containing BADA aircraft data.
-        :param acName: Name of the aircraft or list of aircraft names to search for.
-        :param parameters: List of column names (or a single column name) to retrieve.
-        :type df: pd.DataFrame
-        :type acName: list or str
-        :type parameters: list or str
-        :returns: A DataFrame containing the specified parameters for the given aircraft.
-        :rtype: pd.DataFrame
-        :raises ValueError: If any of the specified columns or aircraft names are not found.
-        """
-
-        # Ensure parameters is a list
-        if isinstance(parameters, str):
-            parameters = [parameters]
-
-        # Ensure acName is a list
-        if isinstance(acName, str):
-            acName = [acName]
-
-        # Ensure all requested parameters exist in the DataFrame
-        missing_cols = [col for col in parameters if col not in df.columns]
-        if missing_cols:
-            raise ValueError(
-                f"The following parameters are not in the DataFrame columns: {missing_cols}"
-            )
-
-        # Filter rows where 'acName' matches any of the specified aircraft names
-        filtered_df = df[df["acName"].isin(acName)]
-
-        # Check if any rows were found
-        if filtered_df.empty:
-            raise ValueError(f"No entries found for aircraft(s): {acName}.")
-        else:
-            # Select the required columns
-            result_df = filtered_df[["acName"] + parameters].reset_index(
-                drop=True
-            )
-            return result_df
-
-    @staticmethod
-    def safe_get(df, column_name, default_value=None):
-        """
-        Safely retrieves a column's value from a DataFrame, returning a default value if the column does not exist.
-
-        :param df: DataFrame to retrieve the value from.
-        :param column_name: Name of the column to retrieve.
-        :param default_value: Value to return if the column does not exist. Default is None.
-        :type df: pd.DataFrame
-        :type column_name: str
-        :type default_value: any
-        :returns: The value from the specified column or the default value if the column is missing.
-        :rtype: any
-        """
-
-        if column_name in df.columns:
-            return df[column_name].iloc[0]
-        else:
-            return default_value
-
-
-class BADAH(Helicopter):
+class BADAH(Helicopter, Bada):
     """This class implements the part of BADAH performance model that will be used in other classes following the BADAH manual.
 
     :param AC: Aircraft object {BADAH}.
@@ -4101,28 +4012,34 @@ class BadaHAircraft(BADAH):
         if allData is not None and acName in allData["acName"].values:
             filtered_df = allData[allData["acName"] == acName]
 
-            self.model = Parser.safe_get(filtered_df, "model", None)
-            self.engineType = Parser.safe_get(filtered_df, "engineType", None)
-            self.engines = Parser.safe_get(filtered_df, "engines", None)
-            self.WTC = Parser.safe_get(filtered_df, "WTC", None)
-            self.ICAO = Parser.safe_get(filtered_df, "ICAO", None)
-            self.MR_radius = Parser.safe_get(filtered_df, "MR_radius", None)
-            self.MR_Speed = Parser.safe_get(filtered_df, "MR_Speed", None)
-            self.cpr = Parser.safe_get(filtered_df, "cpr", None)
-            self.n_eng = Parser.safe_get(filtered_df, "n_eng", None)
-            self.P0 = Parser.safe_get(filtered_df, "P0", None)
-            self.cf = Parser.safe_get(filtered_df, "cf", None)
-            self.Pmax_ = Parser.safe_get(filtered_df, "Pmax_", None)
-            self.cpa = Parser.safe_get(filtered_df, "cpa", None)
-            self.hmo = Parser.safe_get(filtered_df, "hmo", None)
-            self.vne = Parser.safe_get(filtered_df, "vne", None)
-            self.MTOW = Parser.safe_get(filtered_df, "MTOW", None)
-            self.OEW = Parser.safe_get(filtered_df, "OEW", None)
-            self.MFL = Parser.safe_get(filtered_df, "MFL", None)
-            self.MREF = Parser.safe_get(filtered_df, "MREF", None)
-            self.MPL = Parser.safe_get(filtered_df, "MPL", None)
-            self.VMO = Parser.safe_get(filtered_df, "VMO", None)
-            self.MMO = Parser.safe_get(filtered_df, "MMO", None)
+            self.model = configuration.safe_get(filtered_df, "model", None)
+            self.engineType = configuration.safe_get(
+                filtered_df, "engineType", None
+            )
+            self.engines = configuration.safe_get(filtered_df, "engines", None)
+            self.WTC = configuration.safe_get(filtered_df, "WTC", None)
+            self.ICAO = configuration.safe_get(filtered_df, "ICAO", None)
+            self.MR_radius = configuration.safe_get(
+                filtered_df, "MR_radius", None
+            )
+            self.MR_Speed = configuration.safe_get(
+                filtered_df, "MR_Speed", None
+            )
+            self.cpr = configuration.safe_get(filtered_df, "cpr", None)
+            self.n_eng = configuration.safe_get(filtered_df, "n_eng", None)
+            self.P0 = configuration.safe_get(filtered_df, "P0", None)
+            self.cf = configuration.safe_get(filtered_df, "cf", None)
+            self.Pmax_ = configuration.safe_get(filtered_df, "Pmax_", None)
+            self.cpa = configuration.safe_get(filtered_df, "cpa", None)
+            self.hmo = configuration.safe_get(filtered_df, "hmo", None)
+            self.vne = configuration.safe_get(filtered_df, "vne", None)
+            self.MTOW = configuration.safe_get(filtered_df, "MTOW", None)
+            self.OEW = configuration.safe_get(filtered_df, "OEW", None)
+            self.MFL = configuration.safe_get(filtered_df, "MFL", None)
+            self.MREF = configuration.safe_get(filtered_df, "MREF", None)
+            self.MPL = configuration.safe_get(filtered_df, "MPL", None)
+            self.VMO = configuration.safe_get(filtered_df, "VMO", None)
+            self.MMO = configuration.safe_get(filtered_df, "MMO", None)
 
             self.flightEnvelope = FlightEnvelope(self)
             self.OPT = Optimization(self)
@@ -4182,36 +4099,48 @@ class BadaHAircraft(BADAH):
 
                     self.OPTFilePath = OPTFilePath
 
-                    self.model = Parser.safe_get(ACparsed_df, "model", None)
-                    self.engineType = Parser.safe_get(
+                    self.model = configuration.safe_get(
+                        ACparsed_df, "model", None
+                    )
+                    self.engineType = configuration.safe_get(
                         ACparsed_df, "engineType", None
                     )
-                    self.engines = Parser.safe_get(
+                    self.engines = configuration.safe_get(
                         ACparsed_df, "engines", None
                     )
-                    self.WTC = Parser.safe_get(ACparsed_df, "WTC", None)
-                    self.ICAO = Parser.safe_get(ACparsed_df, "ICAO", None)
-                    self.MR_radius = Parser.safe_get(
+                    self.WTC = configuration.safe_get(ACparsed_df, "WTC", None)
+                    self.ICAO = configuration.safe_get(
+                        ACparsed_df, "ICAO", None
+                    )
+                    self.MR_radius = configuration.safe_get(
                         ACparsed_df, "MR_radius", None
                     )
-                    self.MR_Speed = Parser.safe_get(
+                    self.MR_Speed = configuration.safe_get(
                         ACparsed_df, "MR_Speed", None
                     )
-                    self.cpr = Parser.safe_get(ACparsed_df, "cpr", None)
-                    self.n_eng = Parser.safe_get(ACparsed_df, "n_eng", None)
-                    self.P0 = Parser.safe_get(ACparsed_df, "P0", None)
-                    self.cf = Parser.safe_get(ACparsed_df, "cf", None)
-                    self.Pmax_ = Parser.safe_get(ACparsed_df, "Pmax_", None)
-                    self.cpa = Parser.safe_get(ACparsed_df, "cpa", None)
-                    self.hmo = Parser.safe_get(ACparsed_df, "hmo", None)
-                    self.vne = Parser.safe_get(ACparsed_df, "vne", None)
-                    self.MTOW = Parser.safe_get(ACparsed_df, "MTOW", None)
-                    self.OEW = Parser.safe_get(ACparsed_df, "OEW", None)
-                    self.MFL = Parser.safe_get(ACparsed_df, "MFL", None)
-                    self.MREF = Parser.safe_get(ACparsed_df, "MREF", None)
-                    self.MPL = Parser.safe_get(ACparsed_df, "MPL", None)
-                    self.VMO = Parser.safe_get(ACparsed_df, "VMO", None)
-                    self.MMO = Parser.safe_get(ACparsed_df, "MMO", None)
+                    self.cpr = configuration.safe_get(ACparsed_df, "cpr", None)
+                    self.n_eng = configuration.safe_get(
+                        ACparsed_df, "n_eng", None
+                    )
+                    self.P0 = configuration.safe_get(ACparsed_df, "P0", None)
+                    self.cf = configuration.safe_get(ACparsed_df, "cf", None)
+                    self.Pmax_ = configuration.safe_get(
+                        ACparsed_df, "Pmax_", None
+                    )
+                    self.cpa = configuration.safe_get(ACparsed_df, "cpa", None)
+                    self.hmo = configuration.safe_get(ACparsed_df, "hmo", None)
+                    self.vne = configuration.safe_get(ACparsed_df, "vne", None)
+                    self.MTOW = configuration.safe_get(
+                        ACparsed_df, "MTOW", None
+                    )
+                    self.OEW = configuration.safe_get(ACparsed_df, "OEW", None)
+                    self.MFL = configuration.safe_get(ACparsed_df, "MFL", None)
+                    self.MREF = configuration.safe_get(
+                        ACparsed_df, "MREF", None
+                    )
+                    self.MPL = configuration.safe_get(ACparsed_df, "MPL", None)
+                    self.VMO = configuration.safe_get(ACparsed_df, "VMO", None)
+                    self.MMO = configuration.safe_get(ACparsed_df, "MMO", None)
 
                     self.flightEnvelope = FlightEnvelope(self)
                     self.OPT = Optimization(self)

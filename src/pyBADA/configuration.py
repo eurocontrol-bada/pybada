@@ -10,6 +10,54 @@ import os
 import importlib.resources
 
 
+@staticmethod
+def list_subfolders(folderPath):
+    """
+    Lists all subfolders within a specified directory.
+
+    :param folderPath: Path to the directory where subfolders are to be listed.
+    :type folderPath: str
+    :returns: A list of subfolder names within the specified directory.
+    :rtype: list of str
+
+    This function retrieves all entries in the given directory and filters out
+    the ones that are not directories. Only the names of the subfolders are returned.
+    """
+
+    # List all entries in the directory
+    entries = os.listdir(folderPath)
+
+    # Filter out entries that are directories
+    subfolders = [
+        entry
+        for entry in entries
+        if os.path.isdir(os.path.join(folderPath, entry))
+    ]
+
+    return subfolders
+
+
+@staticmethod
+def safe_get(df, column_name, default_value=None):
+    """
+    Safely retrieves a column's value from a DataFrame, returning a default value if the column does not exist.
+
+    :param df: DataFrame to retrieve the value from.
+    :param column_name: Name of the column to retrieve.
+    :param default_value: Value to return if the column does not exist. Default is None.
+    :type df: pd.DataFrame
+    :type column_name: str
+    :type default_value: any
+    :returns: The value from the specified column or the default value if the column is missing.
+    :rtype: any
+    """
+
+    if column_name in df.columns:
+        return df[column_name].iloc[0]
+    else:
+        return default_value
+
+
 def getVersionsList(badaFamily):
     """Retrieve a list of available BADA versions for a given BADA family.
 

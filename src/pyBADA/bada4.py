@@ -20,7 +20,7 @@ from pyBADA import constants as const
 from pyBADA import conversions as conv
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
-from pyBADA.aircraft import Airplane, BadaFamily
+from pyBADA.aircraft import Airplane, BadaFamily, Bada
 
 
 def proper_round(num, dec=0):
@@ -42,31 +42,6 @@ class Parser:
 
     def __init__(self):
         pass
-
-    @staticmethod
-    def list_subfolders(folderPath):
-        """
-        Lists all subfolders within a specified directory.
-
-        :param folderPath: Path to the directory where subfolders are to be listed.
-        :type folderPath: str
-        :returns: A list of subfolder names within the specified directory.
-        :rtype: list of str
-
-        This function retrieves all entries in the given directory and filters out
-        the ones that are not directories. Only the names of the subfolders are returned.
-        """
-        # List all entries in the directory
-        entries = os.listdir(folderPath)
-
-        # Filter out entries that are directories
-        subfolders = [
-            entry
-            for entry in entries
-            if os.path.isdir(os.path.join(folderPath, entry))
-        ]
-
-        return subfolders
 
     @staticmethod
     def readMappingFile(filePath, badaVersion):
@@ -696,7 +671,7 @@ class Parser:
         code_fileName = Parser.readMappingFile(filePath, badaVersion)
 
         # get names of all the folders in the main BADA model folder to search for XML files
-        subfolders = Parser.list_subfolders(
+        subfolders = configuration.list_subfolders(
             os.path.join(filePath, "BADA4", badaVersion)
         )
 
@@ -766,72 +741,8 @@ class Parser:
 
         return merged_final_df
 
-    @staticmethod
-    def getBADAParameters(df, acName, parameters):
-        """
-        Retrieves specified parameters for a given aircraft name from a DataFrame.
 
-        :param df: DataFrame containing BADA aircraft data.
-        :param acName: Name of the aircraft or list of aircraft names to search for.
-        :param parameters: List of column names (or a single column name) to retrieve.
-        :type df: pd.DataFrame
-        :type acName: list or str
-        :type parameters: list or str
-        :returns: A DataFrame containing the specified parameters for the given aircraft.
-        :rtype: pd.DataFrame
-        :raises ValueError: If any of the specified columns or aircraft names are not found.
-        """
-
-        # Ensure parameters is a list
-        if isinstance(parameters, str):
-            parameters = [parameters]
-
-        # Ensure acName is a list
-        if isinstance(acName, str):
-            acName = [acName]
-
-        # Ensure all requested parameters exist in the DataFrame
-        missing_cols = [col for col in parameters if col not in df.columns]
-        if missing_cols:
-            raise ValueError(
-                f"The following parameters are not in the DataFrame columns: {missing_cols}"
-            )
-
-        # Filter rows where 'acName' matches any of the specified aircraft names
-        filtered_df = df[df["acName"].isin(acName)]
-
-        # Check if any rows were found
-        if filtered_df.empty:
-            raise ValueError(f"No entries found for aircraft(s): {acName}.")
-        else:
-            # Select the required columns
-            result_df = filtered_df[["acName"] + parameters].reset_index(
-                drop=True
-            )
-            return result_df
-
-    @staticmethod
-    def safe_get(df, column_name, default_value=None):
-        """
-        Safely retrieves a column's value from a DataFrame, returning a default value if the column does not exist.
-
-        :param df: DataFrame to retrieve the value from.
-        :param column_name: Name of the column to retrieve.
-        :param default_value: Value to return if the column does not exist. Default is None.
-        :type df: pd.DataFrame
-        :type column_name: str
-        :type default_value: any
-        :returns: The value from the specified column or the default value if the column is missing.
-        :rtype: any
-        """
-
-        if column_name in df.columns:
-            return df[column_name].iloc[0]
-        else:
-            return default_value
-
-
-class BADA4(Airplane):
+class BADA4(Airplane, Bada):
     """This class implements the part of BADA4 performance model that will be used in other classes following the BADA4 manual.
 
     :param AC: Aircraft object {BADA4}.
@@ -5807,74 +5718,96 @@ class Bada4Aircraft(BADA4):
         if allData is not None and acName in allData["acName"].values:
             filtered_df = allData[allData["acName"] == acName]
 
-            self.model = Parser.safe_get(filtered_df, "model", None)
-            self.engineType = Parser.safe_get(filtered_df, "engineType", None)
-            self.engines = Parser.safe_get(filtered_df, "engines", None)
-            self.WTC = Parser.safe_get(filtered_df, "WTC", None)
-            self.ICAO = Parser.safe_get(filtered_df, "ICAO", None)
-            self.MREF = Parser.safe_get(filtered_df, "MREF", None)
-            self.WREF = Parser.safe_get(filtered_df, "WREF", None)
-            self.LHV = Parser.safe_get(filtered_df, "LHV", None)
-            self.n_eng = Parser.safe_get(filtered_df, "n_eng", None)
-            self.rho = Parser.safe_get(filtered_df, "rho", None)
-            self.TFA = Parser.safe_get(filtered_df, "TFA", None)
-            self.p_delta = Parser.safe_get(filtered_df, "p_delta", None)
-            self.p_theta = Parser.safe_get(filtered_df, "p_theta", None)
-            self.kink = Parser.safe_get(filtered_df, "kink", None)
-            self.b = Parser.safe_get(filtered_df, "b", None)
-            self.c = Parser.safe_get(filtered_df, "c", None)
-            self.max_power = Parser.safe_get(filtered_df, "max_power", None)
-            self.p = Parser.safe_get(filtered_df, "p", None)
-            self.a = Parser.safe_get(filtered_df, "a", None)
-            self.f = Parser.safe_get(filtered_df, "f", None)
-            self.ti = Parser.safe_get(filtered_df, "ti", None)
-            self.fi = Parser.safe_get(filtered_df, "fi", None)
-            self.throttle = Parser.safe_get(filtered_df, "throttle", None)
-            self.prop_dia = Parser.safe_get(filtered_df, "prop_dia", None)
-            self.max_eff = Parser.safe_get(filtered_df, "max_eff", None)
-            self.Hd_turbo = Parser.safe_get(filtered_df, "Hd_turbo", None)
-            self.CPSFC = Parser.safe_get(filtered_df, "CPSFC", None)
-            self.P = Parser.safe_get(filtered_df, "P", None)
-            self.S = Parser.safe_get(filtered_df, "S", None)
-            self.HLPosition = Parser.safe_get(filtered_df, "HLPosition", None)
-            self.configName = Parser.safe_get(filtered_df, "configName", None)
-            self.VFE = Parser.safe_get(filtered_df, "VFE", None)
-            self.d = Parser.safe_get(filtered_df, "d", None)
-            self.CL_max = Parser.safe_get(filtered_df, "CL_max", None)
-            self.bf = Parser.safe_get(filtered_df, "bf", None)
-            self.HLids = Parser.safe_get(filtered_df, "HLids", None)
-            self.CL_clean = Parser.safe_get(filtered_df, "CL_clean", None)
-            self.M_max = Parser.safe_get(filtered_df, "M_max", None)
-            self.scalar = Parser.safe_get(filtered_df, "scalar", None)
-            self.Mmin = Parser.safe_get(filtered_df, "Mmin", None)
-            self.Mmax = Parser.safe_get(filtered_df, "Mmax", None)
-            self.CL_Mach0 = Parser.safe_get(filtered_df, "CL_Mach0", None)
-            self.MTOW = Parser.safe_get(filtered_df, "MTOW", None)
-            self.OEW = Parser.safe_get(filtered_df, "OEW", None)
-            self.MFL = Parser.safe_get(filtered_df, "MFL", None)
-            self.MTW = Parser.safe_get(filtered_df, "MTW", None)
-            self.MZFW = Parser.safe_get(filtered_df, "MZFW", None)
-            self.MPL = Parser.safe_get(filtered_df, "MPL", None)
-            self.MLW = Parser.safe_get(filtered_df, "MLW", None)
-            self.hmo = Parser.safe_get(filtered_df, "hmo", None)
-            self.mfa = Parser.safe_get(filtered_df, "mfa", None)
-            self.MMO = Parser.safe_get(filtered_df, "MMO", None)
-            self.MLE = Parser.safe_get(filtered_df, "MLE", None)
-            self.VLE = Parser.safe_get(filtered_df, "VLE", None)
-            self.VMO = Parser.safe_get(filtered_df, "VMO", None)
-            self.span = Parser.safe_get(filtered_df, "span", None)
-            self.length = Parser.safe_get(filtered_df, "length", None)
-            self.aeroConfig = Parser.safe_get(filtered_df, "aeroConfig", None)
-            self.speedSchedule = Parser.safe_get(
+            self.model = configuration.safe_get(filtered_df, "model", None)
+            self.engineType = configuration.safe_get(
+                filtered_df, "engineType", None
+            )
+            self.engines = configuration.safe_get(filtered_df, "engines", None)
+            self.WTC = configuration.safe_get(filtered_df, "WTC", None)
+            self.ICAO = configuration.safe_get(filtered_df, "ICAO", None)
+            self.MREF = configuration.safe_get(filtered_df, "MREF", None)
+            self.WREF = configuration.safe_get(filtered_df, "WREF", None)
+            self.LHV = configuration.safe_get(filtered_df, "LHV", None)
+            self.n_eng = configuration.safe_get(filtered_df, "n_eng", None)
+            self.rho = configuration.safe_get(filtered_df, "rho", None)
+            self.TFA = configuration.safe_get(filtered_df, "TFA", None)
+            self.p_delta = configuration.safe_get(filtered_df, "p_delta", None)
+            self.p_theta = configuration.safe_get(filtered_df, "p_theta", None)
+            self.kink = configuration.safe_get(filtered_df, "kink", None)
+            self.b = configuration.safe_get(filtered_df, "b", None)
+            self.c = configuration.safe_get(filtered_df, "c", None)
+            self.max_power = configuration.safe_get(
+                filtered_df, "max_power", None
+            )
+            self.p = configuration.safe_get(filtered_df, "p", None)
+            self.a = configuration.safe_get(filtered_df, "a", None)
+            self.f = configuration.safe_get(filtered_df, "f", None)
+            self.ti = configuration.safe_get(filtered_df, "ti", None)
+            self.fi = configuration.safe_get(filtered_df, "fi", None)
+            self.throttle = configuration.safe_get(
+                filtered_df, "throttle", None
+            )
+            self.prop_dia = configuration.safe_get(
+                filtered_df, "prop_dia", None
+            )
+            self.max_eff = configuration.safe_get(filtered_df, "max_eff", None)
+            self.Hd_turbo = configuration.safe_get(
+                filtered_df, "Hd_turbo", None
+            )
+            self.CPSFC = configuration.safe_get(filtered_df, "CPSFC", None)
+            self.P = configuration.safe_get(filtered_df, "P", None)
+            self.S = configuration.safe_get(filtered_df, "S", None)
+            self.HLPosition = configuration.safe_get(
+                filtered_df, "HLPosition", None
+            )
+            self.configName = configuration.safe_get(
+                filtered_df, "configName", None
+            )
+            self.VFE = configuration.safe_get(filtered_df, "VFE", None)
+            self.d = configuration.safe_get(filtered_df, "d", None)
+            self.CL_max = configuration.safe_get(filtered_df, "CL_max", None)
+            self.bf = configuration.safe_get(filtered_df, "bf", None)
+            self.HLids = configuration.safe_get(filtered_df, "HLids", None)
+            self.CL_clean = configuration.safe_get(
+                filtered_df, "CL_clean", None
+            )
+            self.M_max = configuration.safe_get(filtered_df, "M_max", None)
+            self.scalar = configuration.safe_get(filtered_df, "scalar", None)
+            self.Mmin = configuration.safe_get(filtered_df, "Mmin", None)
+            self.Mmax = configuration.safe_get(filtered_df, "Mmax", None)
+            self.CL_Mach0 = configuration.safe_get(
+                filtered_df, "CL_Mach0", None
+            )
+            self.MTOW = configuration.safe_get(filtered_df, "MTOW", None)
+            self.OEW = configuration.safe_get(filtered_df, "OEW", None)
+            self.MFL = configuration.safe_get(filtered_df, "MFL", None)
+            self.MTW = configuration.safe_get(filtered_df, "MTW", None)
+            self.MZFW = configuration.safe_get(filtered_df, "MZFW", None)
+            self.MPL = configuration.safe_get(filtered_df, "MPL", None)
+            self.MLW = configuration.safe_get(filtered_df, "MLW", None)
+            self.hmo = configuration.safe_get(filtered_df, "hmo", None)
+            self.mfa = configuration.safe_get(filtered_df, "mfa", None)
+            self.MMO = configuration.safe_get(filtered_df, "MMO", None)
+            self.MLE = configuration.safe_get(filtered_df, "MLE", None)
+            self.VLE = configuration.safe_get(filtered_df, "VLE", None)
+            self.VMO = configuration.safe_get(filtered_df, "VMO", None)
+            self.span = configuration.safe_get(filtered_df, "span", None)
+            self.length = configuration.safe_get(filtered_df, "length", None)
+            self.aeroConfig = configuration.safe_get(
+                filtered_df, "aeroConfig", None
+            )
+            self.speedSchedule = configuration.safe_get(
                 filtered_df, "speedSchedule", None
             )
 
             # GPF data (temporary)
-            self.CVminTO = Parser.safe_get(filtered_df, "CVminTO", None)
-            self.CVmin = Parser.safe_get(filtered_df, "CVmin", None)
-            self.HmaxPhase = Parser.safe_get(filtered_df, "HmaxPhase", None)
-            self.V_des = Parser.safe_get(filtered_df, "V_des", None)
-            self.V_cl = Parser.safe_get(filtered_df, "V_cl", None)
+            self.CVminTO = configuration.safe_get(filtered_df, "CVminTO", None)
+            self.CVmin = configuration.safe_get(filtered_df, "CVmin", None)
+            self.HmaxPhase = configuration.safe_get(
+                filtered_df, "HmaxPhase", None
+            )
+            self.V_des = configuration.safe_get(filtered_df, "V_des", None)
+            self.V_cl = configuration.safe_get(filtered_df, "V_cl", None)
 
             self.flightEnvelope = FlightEnvelope(self)
             self.ARPM = ARPM(self)
@@ -5947,106 +5880,146 @@ class Bada4Aircraft(BADA4):
 
                     self.acName = self.SearchedACName
 
-                    self.model = Parser.safe_get(combined_df, "model", None)
-                    self.engineType = Parser.safe_get(
+                    self.model = configuration.safe_get(
+                        combined_df, "model", None
+                    )
+                    self.engineType = configuration.safe_get(
                         combined_df, "engineType", None
                     )
-                    self.engines = Parser.safe_get(
+                    self.engines = configuration.safe_get(
                         combined_df, "engines", None
                     )
-                    self.WTC = Parser.safe_get(combined_df, "WTC", None)
-                    self.ICAO = Parser.safe_get(combined_df, "ICAO", None)
-                    self.MREF = Parser.safe_get(combined_df, "MREF", None)
-                    self.WREF = Parser.safe_get(combined_df, "WREF", None)
-                    self.LHV = Parser.safe_get(combined_df, "LHV", None)
-                    self.n_eng = Parser.safe_get(combined_df, "n_eng", None)
-                    self.rho = Parser.safe_get(combined_df, "rho", None)
-                    self.TFA = Parser.safe_get(combined_df, "TFA", None)
-                    self.p_delta = Parser.safe_get(
+                    self.WTC = configuration.safe_get(combined_df, "WTC", None)
+                    self.ICAO = configuration.safe_get(
+                        combined_df, "ICAO", None
+                    )
+                    self.MREF = configuration.safe_get(
+                        combined_df, "MREF", None
+                    )
+                    self.WREF = configuration.safe_get(
+                        combined_df, "WREF", None
+                    )
+                    self.LHV = configuration.safe_get(combined_df, "LHV", None)
+                    self.n_eng = configuration.safe_get(
+                        combined_df, "n_eng", None
+                    )
+                    self.rho = configuration.safe_get(combined_df, "rho", None)
+                    self.TFA = configuration.safe_get(combined_df, "TFA", None)
+                    self.p_delta = configuration.safe_get(
                         combined_df, "p_delta", None
                     )
-                    self.p_theta = Parser.safe_get(
+                    self.p_theta = configuration.safe_get(
                         combined_df, "p_theta", None
                     )
-                    self.kink = Parser.safe_get(combined_df, "kink", None)
-                    self.b = Parser.safe_get(combined_df, "b", None)
-                    self.c = Parser.safe_get(combined_df, "c", None)
-                    self.max_power = Parser.safe_get(
+                    self.kink = configuration.safe_get(
+                        combined_df, "kink", None
+                    )
+                    self.b = configuration.safe_get(combined_df, "b", None)
+                    self.c = configuration.safe_get(combined_df, "c", None)
+                    self.max_power = configuration.safe_get(
                         combined_df, "max_power", None
                     )
-                    self.p = Parser.safe_get(combined_df, "p", None)
-                    self.a = Parser.safe_get(combined_df, "a", None)
-                    self.f = Parser.safe_get(combined_df, "f", None)
-                    self.ti = Parser.safe_get(combined_df, "ti", None)
-                    self.fi = Parser.safe_get(combined_df, "fi", None)
-                    self.throttle = Parser.safe_get(
+                    self.p = configuration.safe_get(combined_df, "p", None)
+                    self.a = configuration.safe_get(combined_df, "a", None)
+                    self.f = configuration.safe_get(combined_df, "f", None)
+                    self.ti = configuration.safe_get(combined_df, "ti", None)
+                    self.fi = configuration.safe_get(combined_df, "fi", None)
+                    self.throttle = configuration.safe_get(
                         combined_df, "throttle", None
                     )
-                    self.prop_dia = Parser.safe_get(
+                    self.prop_dia = configuration.safe_get(
                         combined_df, "prop_dia", None
                     )
-                    self.max_eff = Parser.safe_get(
+                    self.max_eff = configuration.safe_get(
                         combined_df, "max_eff", None
                     )
-                    self.Hd_turbo = Parser.safe_get(
+                    self.Hd_turbo = configuration.safe_get(
                         combined_df, "Hd_turbo", None
                     )
-                    self.CPSFC = Parser.safe_get(combined_df, "CPSFC", None)
-                    self.P = Parser.safe_get(combined_df, "P", None)
-                    self.S = Parser.safe_get(combined_df, "S", None)
-                    self.HLPosition = Parser.safe_get(
+                    self.CPSFC = configuration.safe_get(
+                        combined_df, "CPSFC", None
+                    )
+                    self.P = configuration.safe_get(combined_df, "P", None)
+                    self.S = configuration.safe_get(combined_df, "S", None)
+                    self.HLPosition = configuration.safe_get(
                         combined_df, "HLPosition", None
                     )
-                    self.configName = Parser.safe_get(
+                    self.configName = configuration.safe_get(
                         combined_df, "configName", None
                     )
-                    self.VFE = Parser.safe_get(combined_df, "VFE", None)
-                    self.d = Parser.safe_get(combined_df, "d", None)
-                    self.CL_max = Parser.safe_get(combined_df, "CL_max", None)
-                    self.bf = Parser.safe_get(combined_df, "bf", None)
-                    self.HLids = Parser.safe_get(combined_df, "HLids", None)
-                    self.CL_clean = Parser.safe_get(
+                    self.VFE = configuration.safe_get(combined_df, "VFE", None)
+                    self.d = configuration.safe_get(combined_df, "d", None)
+                    self.CL_max = configuration.safe_get(
+                        combined_df, "CL_max", None
+                    )
+                    self.bf = configuration.safe_get(combined_df, "bf", None)
+                    self.HLids = configuration.safe_get(
+                        combined_df, "HLids", None
+                    )
+                    self.CL_clean = configuration.safe_get(
                         combined_df, "CL_clean", None
                     )
-                    self.M_max = Parser.safe_get(combined_df, "M_max", None)
-                    self.scalar = Parser.safe_get(combined_df, "scalar", None)
-                    self.Mmin = Parser.safe_get(combined_df, "Mmin", None)
-                    self.Mmax = Parser.safe_get(combined_df, "Mmax", None)
-                    self.CL_Mach0 = Parser.safe_get(
+                    self.M_max = configuration.safe_get(
+                        combined_df, "M_max", None
+                    )
+                    self.scalar = configuration.safe_get(
+                        combined_df, "scalar", None
+                    )
+                    self.Mmin = configuration.safe_get(
+                        combined_df, "Mmin", None
+                    )
+                    self.Mmax = configuration.safe_get(
+                        combined_df, "Mmax", None
+                    )
+                    self.CL_Mach0 = configuration.safe_get(
                         combined_df, "CL_Mach0", None
                     )
-                    self.MTOW = Parser.safe_get(combined_df, "MTOW", None)
-                    self.OEW = Parser.safe_get(combined_df, "OEW", None)
-                    self.MFL = Parser.safe_get(combined_df, "MFL", None)
-                    self.MTW = Parser.safe_get(combined_df, "MTW", None)
-                    self.MZFW = Parser.safe_get(combined_df, "MZFW", None)
-                    self.MPL = Parser.safe_get(combined_df, "MPL", None)
-                    self.MLW = Parser.safe_get(combined_df, "MLW", None)
-                    self.hmo = Parser.safe_get(combined_df, "hmo", None)
-                    self.mfa = Parser.safe_get(combined_df, "mfa", None)
-                    self.MMO = Parser.safe_get(combined_df, "MMO", None)
-                    self.MLE = Parser.safe_get(combined_df, "MLE", None)
-                    self.VLE = Parser.safe_get(combined_df, "VLE", None)
-                    self.VMO = Parser.safe_get(combined_df, "VMO", None)
-                    self.span = Parser.safe_get(combined_df, "span", None)
-                    self.length = Parser.safe_get(combined_df, "length", None)
-                    self.aeroConfig = Parser.safe_get(
+                    self.MTOW = configuration.safe_get(
+                        combined_df, "MTOW", None
+                    )
+                    self.OEW = configuration.safe_get(combined_df, "OEW", None)
+                    self.MFL = configuration.safe_get(combined_df, "MFL", None)
+                    self.MTW = configuration.safe_get(combined_df, "MTW", None)
+                    self.MZFW = configuration.safe_get(
+                        combined_df, "MZFW", None
+                    )
+                    self.MPL = configuration.safe_get(combined_df, "MPL", None)
+                    self.MLW = configuration.safe_get(combined_df, "MLW", None)
+                    self.hmo = configuration.safe_get(combined_df, "hmo", None)
+                    self.mfa = configuration.safe_get(combined_df, "mfa", None)
+                    self.MMO = configuration.safe_get(combined_df, "MMO", None)
+                    self.MLE = configuration.safe_get(combined_df, "MLE", None)
+                    self.VLE = configuration.safe_get(combined_df, "VLE", None)
+                    self.VMO = configuration.safe_get(combined_df, "VMO", None)
+                    self.span = configuration.safe_get(
+                        combined_df, "span", None
+                    )
+                    self.length = configuration.safe_get(
+                        combined_df, "length", None
+                    )
+                    self.aeroConfig = configuration.safe_get(
                         combined_df, "aeroConfig", None
                     )
-                    self.speedSchedule = Parser.safe_get(
+                    self.speedSchedule = configuration.safe_get(
                         combined_df, "speedSchedule", None
                     )
 
                     # GPF data (temporary)
-                    self.CVminTO = Parser.safe_get(
+                    self.CVminTO = configuration.safe_get(
                         combined_df, "CVminTO", None
                     )
-                    self.CVmin = Parser.safe_get(combined_df, "CVmin", None)
-                    self.HmaxPhase = Parser.safe_get(
+                    self.CVmin = configuration.safe_get(
+                        combined_df, "CVmin", None
+                    )
+                    self.HmaxPhase = configuration.safe_get(
                         combined_df, "HmaxPhase", None
                     )
-                    self.V_des = Parser.safe_get(combined_df, "V_des", None)
-                    self.V_cl = Parser.safe_get(combined_df, "V_cl", None)
+                    self.V_des = configuration.safe_get(
+                        combined_df, "V_des", None
+                    )
+                    self.V_cl = configuration.safe_get(
+                        combined_df, "V_cl", None
+                    )
 
                     # BADA4.__init__(self, AC_parsed)
                     self.flightEnvelope = FlightEnvelope(self)
