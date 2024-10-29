@@ -80,6 +80,7 @@ def constantSpeedLevel(
     :param maxRFL: Maximum cruise altitude limit [ft]. Default is infinity.
     :param wS: Wind speed component along the longitudinal axis (positive for headwind, negative for tailwind) [kt]. Default is 0.0.
     :param turnMetrics: Dictionary containing turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is no turn (straight flight).
@@ -87,12 +88,14 @@ def constantSpeedLevel(
     :param Lat: Geographical latitude of the starting point [deg].
     :param Lon: Geographical longitude of the starting point [deg].
     :param initialHeading: Dictionary defining the initial heading and its type:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to fly along a constant heading (loxodrome). Default is None.
     :param flightPhase: Defines the phase of flight, e.g., "Cruise", "Climb", "Descent". Default is "Cruise".
     :param magneticDeclinationGrid: Optional magnetic declination grid to correct headings. Default is None.
     :param kwargs: Additional optional parameters:
+
         - mass_const: Boolean. If True, keeps the aircraft mass constant during the segment. Default is False.
         - SOC_init: Initial battery state of charge for electric aircraft [%]. Default is 100 for BADAE.
         - speedBrakes: Dictionary defining whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
@@ -103,54 +106,50 @@ def constantSpeedLevel(
         - step_length: The step length for each iteration in [NM] or [s], depending on the lengthType. Default is 100 NM for BADA3/4 and 10 NM for BADAH/BADAE.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
-        - Hp: Altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - ROCD: Rate of Climb/Descent [ft/min]
-        - ESF: Energy Share Factor[-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Trajectory slope [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle [deg]
-        - ROT: Rate of turn [deg/s]
-        - For BADAH:
-            - Preq: Required power [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Power supplied by the battery [W]
-            - SOCr: Rate of battery state of charge depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
-        - Comment: Comments for each segment
+
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
 
     This function works by iteratively calculating the flight trajectory for a given segment of the flight,
     taking into account the specified flight conditions, and updating the aircraft’s state (altitude, speed, fuel, etc.)
     at each step of the iteration. The trajectory is returned as a DataFrame containing all relevant flight parameters.
-
-    Key considerations:
-    - Magnetic declination can be corrected based on the provided grid.
-    - Supports handling turns and constant heading navigation.
-    - Step climbs are optionally allowed if enabled.
-    - Takes into account wind speed and flight phase-specific configurations.
-    - Power and fuel consumption are calculated differently for each BADA family (BADAH and BADAE handle power instead of fuel in different ways).
     """
 
     rateOfTurn = turnMetrics["rateOfTurn"]
@@ -1208,12 +1207,14 @@ def constantSpeedROCD(
     :param DeltaTemp: Deviation from standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis [kt]. Positive values for headwind, negative for tailwind. Default is 0.0.
     :param turnMetrics: Dictionary defining turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is straight flight.
     :param Lat: Geographical latitude of the starting point [deg]. Default is None.
     :param Lon: Geographical longitude of the starting point [deg]. Default is None.
     :param initialHeading: Dictionary defining the initial heading (magnetic or true) and whether to fly a constant heading:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to fly along a constant heading (loxodrome). Default is None.
@@ -1221,6 +1222,7 @@ def constantSpeedROCD(
     :param directionOfTurn: Direction of the turn {LEFT, RIGHT}. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declinations used to correct headings. Default is None.
     :param kwargs: Additional optional parameters:
+
         - Hp_step: Altitude step size [ft]. Default is 1000 for BADA3/4, 500 for BADAH/BADAE.
         - SOC_init: Initial state of charge for electric aircraft [%]. Default is 100 for BADAE.
         - speedBrakes: Dictionary specifying whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
@@ -1229,43 +1231,46 @@ def constantSpeedROCD(
         - mass_const: Boolean specifying whether to keep the mass constant during the segment. Default is False.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
-    :returns: A pandas DataFrame containing the flight trajectory, including parameters like:
-        - Hp: Altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - ROCD: Rate of Climb/Descent [ft/min]
-        - ESF: Energy Share Factor [-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Trajectory slope [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle [deg]
-        - ROT: Rate of turn [deg/s]
-        - For BADAH:
-            - Preq: Required power [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Power supplied by the battery [W]
-            - SOCr: Rate of battery state of charge depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
-        - Comment: Comments for each segment
+    :returns: A pandas DataFrame containing the flight trajectory with columns such as:
+
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
 
     Notes:
@@ -2216,12 +2221,14 @@ def constantSpeedROCD_time(
     :param DeltaTemp: Deviation from standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis [kt]. Default is 0.0.
     :param turnMetrics: Dictionary defining turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is straight flight.
     :param Lat: Geographical latitude at the start [deg]. Default is None.
     :param Lon: Geographical longitude at the start [deg]. Default is None.
     :param initialHeading: Dictionary defining the initial heading (magnetic or true) and whether to fly a constant heading:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to fly along a constant heading (loxodrome). Default is None.
@@ -2229,6 +2236,7 @@ def constantSpeedROCD_time(
     :param directionOfTurn: Direction of the turn {LEFT, RIGHT}. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declinations used to correct headings. Default is None.
     :param kwargs: Additional optional parameters:
+
         - step_length: Step size in seconds for time iteration. Default is 1 second.
         - SOC_init: Initial state of charge for electric aircraft [%]. Default is 100 for BADAE.
         - speedBrakes: Dictionary specifying whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
@@ -2237,43 +2245,46 @@ def constantSpeedROCD_time(
         - mass_const: Boolean specifying whether to keep the mass constant during the segment. Default is False.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
-    :returns: A pandas DataFrame containing the flight trajectory, including parameters like:
-        - Hp: Altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - ROCD: Rate of Climb/Descent [ft/min]
-        - ESF: Energy Share Factor [-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Trajectory slope [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle [deg]
-        - ROT: Rate of turn [deg/s]
-        - For BADAH:
-            - Preq: Required power [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Power supplied by the battery [W]
-            - SOCr: Rate of battery state of charge depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
-        - Comment: Comments for each segment.
+    :returns: A pandas DataFrame containing the flight trajectory with columns such as:
+
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
     """
 
@@ -3201,12 +3212,14 @@ def constantSpeedSlope(
     :param DeltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining the turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is straight flight.
     :param Lat: Initial latitude [deg]. Default is None.
     :param Lon: Initial longitude [deg]. Default is None.
     :param initialHeading: A dictionary defining the initial heading (magnetic or true) and whether to fly a constant heading:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to maintain a constant heading. Default is None.
@@ -3214,6 +3227,7 @@ def constantSpeedSlope(
     :param directionOfTurn: Direction of the turn {LEFT, RIGHT}. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
     :param kwargs: Additional optional parameters:
+
         - Hp_step: Step size in altitude for the iterative calculation [ft]. Default is 1000 ft for BADA3/BADA4, 500 ft for BADAH/BADAE.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
         - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
@@ -3222,43 +3236,46 @@ def constantSpeedSlope(
         - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
-    :returns: A pandas DataFrame containing flight trajectory data with the following columns:
-        - Hp: Pressure altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - ROCD: Rate of climb/descent [ft/min]
-        - ESF: Energy Share Factor [-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Flight trajectory slope (angle) [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle during the turn [deg]
-        - ROT: Rate of turn [deg/s]
-        - Comment: Comments describing the flight segment
-        - For BADAH:
-            - Preq: Required power for level flight [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Battery power [W]
-            - SOCr: Rate of battery state of charge depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
+    :returns: A pandas DataFrame containing the flight trajectory with columns such as:
+
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
     """
 
@@ -4198,12 +4215,14 @@ def constantSpeedSlope_time(
     :param DeltaTemp: Deviation from standard ISA temperature [K].
     :param wS: Longitudinal wind speed component (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining the turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is straight flight.
     :param Lat: Initial latitude [deg]. Default is None.
     :param Lon: Initial longitude [deg]. Default is None.
     :param initialHeading: A dictionary specifying the initial heading (magnetic or true) and whether to fly a constant heading:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to maintain a constant heading [True/False].
@@ -4211,6 +4230,7 @@ def constantSpeedSlope_time(
     :param directionOfTurn: Direction of turn {LEFT, RIGHT}. Default is None.
     :param magneticDeclinationGrid: Optional magnetic declination grid for correcting magnetic heading. Default is None.
     :param kwargs: Additional optional parameters:
+
         - step_length: Step length for trajectory calculation [s]. Default is 1 second.
         - Hp_step: Altitude step size for calculations [ft]. Default is 1000 ft for BADA3/BADA4, 500 ft for BADAH/BADAE.
         - SOC_init: Initial battery state of charge (for electric aircraft) [%]. Default is 100.
@@ -4220,44 +4240,46 @@ def constantSpeedSlope_time(
         - mass_const: Boolean indicating whether mass remains constant during the flight. Default is False.
         - m_iter: Number of iterations for mass integration. Default is 5.
 
-    :returns: A pandas DataFrame containing the flight trajectory data with the following columns:
-        - Hp: Pressure altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - ROCD: Rate of Climb/Descent [ft/min]
-        - ESF: Energy Share Factor [-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Trajectory slope (angle) [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle during turns [deg]
-        - ROT: Rate of turn [deg/s]
-        - Comment: Descriptive comments about the trajectory segment.
-        - For BADAH:
-            - Preq: Power required for level flight [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Battery power [W]
-            - SOCr: Battery state of charge rate of depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
+    :returns: A pandas DataFrame containing the flight trajectory with columns such as:
 
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
     """
 
@@ -5193,12 +5215,14 @@ def constantSpeedRating(
     :param DeltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining the turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is straight flight.
     :param Lat: Initial latitude [deg]. Default is None.
     :param Lon: Initial longitude [deg]. Default is None.
     :param initialHeading: A dictionary defining the initial heading (magnetic or true) and whether to fly a constant heading:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to maintain a constant heading. Default is None.
@@ -5207,6 +5231,7 @@ def constantSpeedRating(
     :param expedite: Boolean flag to expedite climb/descent. Default is False.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
     :param kwargs: Additional optional parameters:
+
         - Hp_step: Step size in altitude for the iterative calculation [ft]. Default is 1000 ft for BADA3/BADA4, 500 ft for BADAH/BADAE.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
         - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
@@ -5215,43 +5240,46 @@ def constantSpeedRating(
         - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
-    :returns: A pandas DataFrame containing flight trajectory data with the following columns:
-        - Hp: Pressure altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - ROCD: Rate of climb/descent [ft/min]
-        - ESF: Energy Share Factor [-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Flight trajectory slope (angle) [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle during the turn [deg]
-        - ROT: Rate of turn [deg/s]
-        - Comment: Comments describing the flight segment
-        - For BADAH:
-            - Preq: Required power for level flight [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Battery power [W]
-            - SOCr: Rate of battery state of charge depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
+    :returns: A pandas DataFrame containing the flight trajectory with columns such as:
+
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
     """
 
@@ -6109,12 +6137,14 @@ def constantSpeedRating_time(
     :param DeltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining the turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is straight flight.
     :param Lat: Initial latitude [deg]. Default is None.
     :param Lon: Initial longitude [deg]. Default is None.
     :param initialHeading: A dictionary defining the initial heading (magnetic or true) and whether to fly a constant heading:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to maintain a constant heading. Default is None.
@@ -6124,6 +6154,7 @@ def constantSpeedRating_time(
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
     :param initRating: Initial engine rating settings. Default is None.
     :param kwargs: Additional optional parameters:
+
         - step_length: Step size in time for the iterative calculation [s]. Default is 1 s.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
         - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
@@ -6132,43 +6163,46 @@ def constantSpeedRating_time(
         - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
-    :returns: A pandas DataFrame containing flight trajectory data with the following columns:
-        - Hp: Pressure altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - ROCD: Rate of climb/descent [ft/min]
-        - ESF: Energy Share Factor [-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Flight trajectory slope (angle) [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle during the turn [deg]
-        - ROT: Rate of turn [deg/s]
-        - Comment: Comments describing the flight segment
-        - For BADAH:
-            - Preq: Required power for level flight [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Battery power [W]
-            - SOCr: Rate of battery state of charge depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
+    :returns: A pandas DataFrame containing the flight trajectory with columns such as:
+
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
     """
 
@@ -7006,6 +7040,7 @@ def accDec(
 
     .. note::
         The control law used during the segment depends on the targets provided in the input parameter 'control':
+
         - ROCD/slope+ESF:  Law based on ROCD/slope + ESF
         - ROCD/slope+acc:  Law based on ROCD/slope + acceleration
         - ROCD/slope only: Law based on rating + ROCD/slope
@@ -7019,6 +7054,7 @@ def accDec(
     :param v_final: Final speed [kt] (CAS/TAS) or [-] MACH.
     :param phase: Vertical evolution phase {Climb, Descent, Cruise}.
     :param control: A dictionary containing the following targets:
+
         - ROCDtarget: Rate of climb/descent to be followed [ft/min].
         - slopetarget: Slope (flight path angle) to be followed [deg].
         - acctarget: Acceleration to be followed [m/s^2].
@@ -7028,61 +7064,67 @@ def accDec(
     :param DeltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is straight flight.
     :param Lat: Initial latitude [deg]. Default is None.
     :param Lon: Initial longitude [deg]. Default is None.
     :param initialHeading: A dictionary defining the initial heading (magnetic or true) and whether to fly a constant heading:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to maintain a constant heading. Default is None.
     :param reducedPower: Boolean specifying if reduced power is applied during the climb. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
     :param kwargs: Additional optional parameters:
+
         - speed_step: Speed step size for the iterative calculation [-] for M, [kt] for TAS/CAS. Default is 0.01 Mach, 5 kt for TAS/CAS.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
         - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
         - m_iter: Number of iterations for the mass integration loop. Default is 10 for BADA3/4/H, 5 for BADAE.
-    :returns: A pandas DataFrame containing flight trajectory data with the following columns:
-        - Hp: Pressure altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - acc: Acceleration rate [m/s^2]
-        - ROCD: Rate of climb/descent [ft/min]
-        - ESF: Energy Share Factor [-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Flight trajectory slope (angle) [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle during the turn [deg]
-        - ROT: Rate of turn [deg/s]
-        - Comment: Comments describing the flight segment
-        - For BADAH:
-            - Preq: Required power for level flight [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Battery power [W]
-            - SOCr: Rate of battery state of charge depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
+
+    :returns: A pandas DataFrame containing the flight trajectory with columns such as:
+
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
     """
 
@@ -8274,6 +8316,7 @@ def accDec_time(
 
     .. note::
         The control law used during the segment depends on the targets provided in the input parameter 'control':
+
         - ROCD/slope+ESF:  Law based on ROCD/slope + ESF
         - ROCD/slope+acc:  Law based on ROCD/slope + acceleration
         - ROCD/slope only: Law based on rating + ROCD/slope
@@ -8288,6 +8331,7 @@ def accDec_time(
     :param speedEvol: Evolution of speed {acc, dec} (acceleration or deceleration).
     :param phase: Vertical evolution phase {Climb, Descent, Cruise}.
     :param control: A dictionary containing the following targets:
+
         - ROCDtarget: Rate of climb/descent to be followed [ft/min].
         - slopetarget: Slope (flight path angle) to be followed [deg].
         - acctarget: Acceleration to be followed [m/s^2].
@@ -8297,61 +8341,67 @@ def accDec_time(
     :param DeltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining turn parameters:
+
         - rateOfTurn [deg/s]
         - bankAngle [deg]
         - directionOfTurn {LEFT/RIGHT}. Default is straight flight.
     :param Lat: Initial latitude [deg]. Default is None.
     :param Lon: Initial longitude [deg]. Default is None.
     :param initialHeading: A dictionary defining the initial heading (magnetic or true) and whether to fly a constant heading:
+
         - magnetic: Magnetic heading [deg].
         - true: True heading [deg].
         - constantHeading: Whether to maintain a constant heading. Default is None.
     :param reducedPower: Boolean specifying if reduced power is applied during the climb. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
     :param kwargs: Additional optional parameters:
+
         - step_length: Length of each time step in the calculation [s]. Default is 1 second.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
         - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
         - m_iter: Number of iterations for the mass integration loop. Default is 10 for BADA3/4/H, 5 for BADAE.
-    :returns: A pandas DataFrame containing flight trajectory data with the following columns:
-        - Hp: Pressure altitude [ft]
-        - TAS: True Air Speed [kt]
-        - CAS: Calibrated Air Speed [kt]
-        - GS: Ground Speed [kt]
-        - M: Mach number [-]
-        - acc: Acceleration rate [m/s^2]
-        - ROCD: Rate of climb/descent [ft/min]
-        - ESF: Energy Share Factor [-]
-        - FUEL: Fuel flow [kg/s]
-        - FUELCONSUMED: Total fuel consumed [kg]
-        - THR: Thrust force [N]
-        - DRAG: Drag force [N]
-        - time: Elapsed time [s]
-        - dist: Distance flown [NM]
-        - slope: Flight trajectory slope (angle) [deg]
-        - mass: Aircraft mass [kg]
-        - config: Aerodynamic configuration
-        - LAT: Latitude [deg]
-        - LON: Longitude [deg]
-        - HDGTrue: True heading [deg]
-        - HDGMagnetic: Magnetic heading [deg]
-        - BankAngle: Bank angle during the turn [deg]
-        - ROT: Rate of turn [deg/s]
-        - Comment: Comments describing the flight segment
-        - For BADAH:
-            - Preq: Required power for level flight [W]
-            - Peng: Generated power [W]
-            - Pav: Available power [W]
-        - For BADAE (electric aircraft):
-            - Pmec: Mechanical power [W]
-            - Pelc: Electrical power [W]
-            - Pbat: Battery power [W]
-            - SOCr: Rate of battery state of charge depletion [%/h]
-            - SOC: Battery state of charge [%]
-            - Ibat: Battery current [A]
-            - Vbat: Battery voltage [V]
-            - Vgbat: Ground battery voltage [V]
+
+    :returns: A pandas DataFrame containing the flight trajectory with columns such as:
+
+        - **Hp** - wAltitude [ft]
+        - **TAS** - True Air Speed [kt]
+        - **CAS** - Calibrated Air Speed [kt]
+        - **GS** - Ground Speed [kt]
+        - **M** - Mach number [-]
+        - **ROCD** - Rate of Climb/Descent [ft/min]
+        - **ESF** - Energy Share Factor [-]
+        - **FUEL** - Fuel flow [kg/s]
+        - **FUELCONSUMED** - Total fuel consumed [kg]
+        - **THR** - Thrust force [N]
+        - **DRAG** - Drag force [N]
+        - **time** - Elapsed time [s]
+        - **dist** - Distance flown [NM]
+        - **slope** - Trajectory slope [deg]
+        - **mass** - Aircraft mass [kg]
+        - **config** - Aerodynamic configuration
+        - **LAT** - Latitude [deg]
+        - **LON** - Longitude [deg]
+        - **HDGTrue** - True heading [deg]
+        - **HDGMagnetic** - Magnetic heading [deg]
+        - **BankAngle** - Bank angle [deg]
+        - **ROT** - Rate of turn [deg/s]
+        - **Comment** - Comments for each segment
+
+        - **For BADAH:**
+            - **Preq** - Required power [W]
+            - **Peng** - Generated power [W]
+            - **Pav** - Available power [W]
+
+        - **For BADAE (electric aircraft):**
+            - **Pmec** - Mechanical power [W]
+            - **Pelc** - Electrical power [W]
+            - **Pbat** - Power supplied by the battery [W]
+            - **SOCr** - Rate of battery state of charge depletion [%/h]
+            - **SOC** - Battery state of charge [%]
+            - **Ibat** - Battery current [A]
+            - **Vbat** - Battery voltage [V]
+            - **Vgbat** - Ground battery voltage [V]
     :rtype: pandas.DataFrame
     """
 
