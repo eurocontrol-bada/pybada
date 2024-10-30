@@ -16,7 +16,7 @@ from pyBADA.badaH import Parser as BadaHParser
 badaVersion = "DUMMY"
 
 # initialization of BADA4
-AC = Bada4Aircraft(badaVersion=badaVersion, acName="DUMMY-TWIN")
+AC = Bada4Aircraft(badaVersion=badaVersion, acName="Dummy-TWIN")
 print("BADA4 Optimum Speed and Altitude:")
 
 # BADA4
