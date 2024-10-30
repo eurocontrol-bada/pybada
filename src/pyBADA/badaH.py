@@ -1215,8 +1215,6 @@ class Optimization(BADAH):
 
         filename = os.path.join(
             self.AC.filePath,
-            self.AC.BADAFamilyName,
-            self.AC.BADAVersion,
             self.AC.acName,
             optParam + ".OPT",
         )

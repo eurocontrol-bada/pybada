@@ -3801,8 +3801,6 @@ class Optimization(BADA4):
 
         filename = os.path.join(
             self.AC.filePath,
-            "BADA4",
-            self.AC.BADAVersion,
             self.AC.acName,
             optParam + ".OPT",
         )

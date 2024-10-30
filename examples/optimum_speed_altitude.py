@@ -13,11 +13,11 @@ from pyBADA.badaH import BadaHAircraft
 from pyBADA.bada4 import Parser as Bada4Parser
 from pyBADA.badaH import Parser as BadaHParser
 
-# initialization of BADA3, BADA4 and BADAH
-# uncomment for testing different BADA family if available
 badaVersion = "DUMMY"
-AC = BadaHAircraft(badaVersion=badaVersion, acName="DUMH")
-# AC = Bada4Aircraft(badaVersion=badaVersion, acName='DUMMY-TWIN')
+
+# initialization of BADA4
+AC = Bada4Aircraft(badaVersion=badaVersion, acName="DUMMY-TWIN")
+print("BADA4 Optimum Speed and Altitude:")
 
 # BADA4
 if AC.BADAFamily.BADA4:
@@ -77,6 +77,9 @@ if AC.BADAFamily.BADA4:
     optAlt_precomputed = AC.OPT.getOPTParam("OPTALT", M, mass)
     print("optAlt_precomputed = ", optAlt_precomputed)
 
+# initialization of BADAH
+AC = BadaHAircraft(badaVersion=badaVersion, acName="DUMH")
+print("\nBADAH Optimum Speed and Altitude:")
 
 # BADAH
 if AC.BADAFamily.BADAH:
