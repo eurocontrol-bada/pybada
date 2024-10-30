@@ -44,7 +44,7 @@ class Parser:
         pass
 
     @staticmethod
-    def readMappingFile(filePath, badaVersion):
+    def readMappingFile(filePath):
         """
         Parses the BADA4 mapping XML file and stores a dictionary of aircraft code names and their corresponding XML file paths.
 
@@ -53,18 +53,14 @@ class Parser:
         for the specified BADA version.
 
         :param filePath: The path to the directory containing the BADA4 mapping XML file.
-        :param badaVersion: The BADA version (e.g., "4.3") for which the mapping file is to be parsed.
         :type filePath: str
-        :type badaVersion: str
         :raises IOError: If the XML file cannot be found or parsed.
 
         :return: A dictionary with aircraft code names as keys and corresponding file names as values.
         :rtype: dict
         """
 
-        filename = os.path.join(
-            filePath, "BADA4", badaVersion, "aircraft_model_default.xml"
-        )
+        filename = os.path.join(filePath, "aircraft_model_default.xml")
 
         code_fileName = {}
 
@@ -84,7 +80,7 @@ class Parser:
         return code_fileName
 
     @staticmethod
-    def parseMappingFile(filePath, badaVersion, acName):
+    def parseMappingFile(filePath, acName):
         """
         Retrieves the file name for a given aircraft name from the parsed BADA4 mapping file.
 
@@ -92,16 +88,14 @@ class Parser:
         associated with the given aircraft name (acName).
 
         :param filePath: The path to the directory containing the BADA4 mapping XML file.
-        :param badaVersion: The BADA version (e.g., "4.3") for which the mapping file is to be parsed.
         :param acName: The aircraft code name for which the corresponding file is being requested.
         :type filePath: str
-        :type badaVersion: str
         :type acName: str
         :return: The file name corresponding to the aircraft code, or None if the aircraft code is not found.
         :rtype: str or None
         """
 
-        code_fileName = Parser.readMappingFile(filePath, badaVersion)
+        code_fileName = Parser.readMappingFile(filePath)
         if acName in code_fileName:
             fileName = code_fileName[acName]
             return fileName
@@ -109,7 +103,7 @@ class Parser:
             return None
 
     @staticmethod
-    def parseXML(filePath, badaVersion, acName):
+    def parseXML(filePath, acName):
         """
         Parses the BADA4 XML file for a specific aircraft model and extracts various parameters.
 
@@ -117,10 +111,8 @@ class Parser:
         general information about the aircraft, engine type, aerodynamic configurations, performance parameters, and more.
 
         :param filePath: The path to the folder containing the BADA4 XML file.
-        :param badaVersion: The version of BADA (e.g., "4.3") being used.
         :param acName: The aircraft code name for which the XML file is being parsed.
         :type filePath: str
-        :type badaVersion: str
         :type acName: str
         :raises IOError: If the XML file cannot be found or parsed.
 
@@ -128,10 +120,7 @@ class Parser:
         :rtype: pd.DataFrame
         """
 
-        acXmlFile = (
-            os.path.join(filePath, "BADA4", badaVersion, acName, acName)
-            + ".xml"
-        )
+        acXmlFile = os.path.join(filePath, acName, acName) + ".xml"
 
         try:
             tree = ET.parse(acXmlFile)
@@ -547,7 +536,7 @@ class Parser:
         return df_single
 
     @staticmethod
-    def parseGPF(filePath, badaVersion):
+    def parseGPF(filePath):
         """
         Parses the BADA4 GPF XML file and extracts key performance factors.
 
@@ -555,16 +544,14 @@ class Parser:
         climb/descent speeds, maximum altitude limits for different phases of flight, and speed schedules for climb and descent.
 
         :param filePath: The path to the directory containing the BADA4 GPF XML file.
-        :param badaVersion: The version of BADA (e.g., "4.3") for which the GPF file is to be parsed.
         :type filePath: str
-        :type badaVersion: str
         :raises IOError: If the GPF XML file cannot be found or parsed.
 
         :return: A pandas DataFrame containing the parsed GPF data.
         :rtype: pd.DataFrame
         """
 
-        filename = os.path.join(filePath, "BADA4", badaVersion, "GPF.xml")
+        filename = os.path.join(filePath, "GPF.xml")
 
         tree = ET.parse(filename)
 
@@ -660,20 +647,20 @@ class Parser:
         """
 
         if filePath == None:
-            filePath = configuration.getAircraftPath()
+            filePath = configuration.getBadaVersionPath(
+                badaFamily="BADA4", badaVersion=badaVersion
+            )
         else:
             filePath = filePath
 
         # parsing GPF file
-        GPFparsedDataframe = Parser.parseGPF(filePath, badaVersion)
+        GPFparsedDataframe = Parser.parseGPF(filePath)
 
         # retrieving mapping data
-        code_fileName = Parser.readMappingFile(filePath, badaVersion)
+        code_fileName = Parser.readMappingFile(filePath)
 
         # get names of all the folders in the main BADA model folder to search for XML files
-        subfolders = configuration.list_subfolders(
-            os.path.join(filePath, "BADA4", badaVersion)
-        )
+        subfolders = configuration.list_subfolders(filePath)
 
         # Initialize an empty list to collect DataFrames
         mapping_dfs = []
@@ -684,7 +671,7 @@ class Parser:
 
                 if file in subfolders:
                     # Parse the original XML of a model
-                    df = Parser.parseXML(filePath, badaVersion, file)
+                    df = Parser.parseXML(filePath, file)
 
                     # Rename 'acName' in the DataFrame to match the code model name
                     df.at[0, "acName"] = code
@@ -710,7 +697,7 @@ class Parser:
 
         for file in subfolders:
             # Parse the original XML of a model
-            df = Parser.parseXML(filePath, badaVersion, file)
+            df = Parser.parseXML(filePath, file)
 
             # Combine data with GPF data (temporary solution)
             combined_df = pd.concat(
@@ -5710,7 +5697,9 @@ class Bada4Aircraft(BADA4):
         self.acName = acName
 
         if filePath == None:
-            self.filePath = configuration.getAircraftPath()
+            self.filePath = configuration.getBadaVersionPath(
+                badaFamily="BADA4", badaVersion=badaVersion
+            )
         else:
             self.filePath = filePath
 
@@ -5823,8 +5812,6 @@ class Bada4Aircraft(BADA4):
             # check if SYNONYM file exist - since for BADA4 this is not a standard procedure (yet)
             synonymFile = os.path.join(
                 self.filePath,
-                "BADA4",
-                badaVersion,
                 "aircraft_model_default.xml",
             )
 
@@ -5834,7 +5821,6 @@ class Bada4Aircraft(BADA4):
                 # if SYNONYM exist - look for synonym based on defined acName
                 self.SearchedACName = Parser.parseMappingFile(
                     filePath=self.filePath,
-                    badaVersion=badaVersion,
                     acName=acName,
                 )
 
@@ -5851,8 +5837,6 @@ class Bada4Aircraft(BADA4):
             acXmlFile = (
                 os.path.join(
                     self.filePath,
-                    "BADA4",
-                    badaVersion,
                     self.SearchedACName,
                     self.SearchedACName,
                 )
@@ -5867,12 +5851,9 @@ class Bada4Aircraft(BADA4):
 
                     XMLDataFrame = Parser.parseXML(
                         filePath=self.filePath,
-                        badaVersion=badaVersion,
                         acName=self.SearchedACName,
                     )
-                    GPFDataframe = Parser.parseGPF(
-                        filePath=self.filePath, badaVersion=badaVersion
-                    )
+                    GPFDataframe = Parser.parseGPF(filePath=self.filePath)
 
                     combined_df = Parser.combineXML_GPF(
                         XMLDataFrame, GPFDataframe

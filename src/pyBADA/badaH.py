@@ -43,7 +43,7 @@ class Parser:
         pass
 
     @staticmethod
-    def parseXML(filePath, badaVersion, acName):
+    def parseXML(filePath, acName):
         """
         Parses the BADAH XML file for a specific aircraft model and extracts various parameters.
 
@@ -51,10 +51,8 @@ class Parser:
         general information about the aircraft, engine type, aerodynamic configurations, performance parameters, and more.
 
         :param filePath: The path to the folder containing the BADAH XML file.
-        :param badaVersion: The version of BADA (e.g., "1.1") being used.
         :param acName: The aircraft code name for which the XML file is being parsed.
         :type filePath: str
-        :type badaVersion: str
         :type acName: str
         :raises IOError: If the XML file cannot be found or parsed.
 
@@ -62,10 +60,7 @@ class Parser:
         :rtype: pd.DataFrame
         """
 
-        acXmlFile = (
-            os.path.join(filePath, "BADAH", badaVersion, acName, acName)
-            + ".xml"
-        )
+        acXmlFile = os.path.join(filePath, acName, acName) + ".xml"
 
         try:
             tree = ET.parse(acXmlFile)
@@ -164,15 +159,13 @@ class Parser:
         return df_single
 
     @staticmethod
-    def readSynonym(filePath, badaVersion):
+    def readSynonym(filePath):
         """
         Parses the BADAH Synonym XML file and returns a dictionary mapping aircraft code names
         to their respective model files.
 
         :param filePath: Path to the directory containing the BADA4 synonym XML file.
-        :param badaVersion: The version of BADA4 being used.
         :type filePath: str
-        :type badaVersion: str
         :returns: A dictionary where the keys are aircraft codes and the values are associated file names.
         :rtype: dict
         :raises IOError: If the XML file is missing or has an invalid format.
@@ -182,7 +175,7 @@ class Parser:
         and file name data for each aircraft in the synonym list.
         """
 
-        filename = os.path.join(filePath, "BADAH", badaVersion, "SYNONYM.xml")
+        filename = os.path.join(filePath, "SYNONYM.xml")
 
         # synonym - file name pair dictionary
         synonym_fileName = {}
@@ -205,15 +198,13 @@ class Parser:
         return synonym_fileName
 
     @staticmethod
-    def parseSynonym(filePath, badaVersion, acName):
+    def parseSynonym(filePath, acName):
         """
         Retrieves the file name associated with a given aircraft code from the BADAH synonym file.
 
         :param filePath: Path to the directory containing the BADAH synonym XML file.
-        :param badaVersion: The version of BADAH being used.
         :param acName: The ICAO aircraft code or name to search for in the synonym file.
         :type filePath: str
-        :type badaVersion: str
         :type acName: str
         :returns: The associated file name if found, otherwise None.
         :rtype: str
@@ -221,7 +212,7 @@ class Parser:
         This function uses the `readSynonym` function to load the synonym dictionary and looks up the
         given aircraft code (acName) to return the associated file name. If no match is found, it returns None.
         """
-        synonym_fileName = Parser.readSynonym(filePath, badaVersion)
+        synonym_fileName = Parser.readSynonym(filePath)
 
         if acName in synonym_fileName:
             fileName = synonym_fileName[acName]
@@ -251,15 +242,16 @@ class Parser:
         """
 
         if filePath == None:
-            filePath = configuration.getAircraftPath()
+            filePath = configuration.getBadaVersionPath(
+                badaFamily="BADAH", badaVersion=badaVersion
+            )
         else:
             filePath = filePath
 
-        synonym_fileName = Parser.readSynonym(filePath, badaVersion)
+        synonym_fileName = Parser.readSynonym(filePath)
 
         # get names of all the folders in the main BADA model folder to search for XML files
-        folderPath = os.path.join(filePath, "BADAH", badaVersion)
-        subfolders = configuration.list_subfolders(folderPath)
+        subfolders = configuration.list_subfolders(filePath)
 
         merged_df = pd.DataFrame()
 
@@ -269,7 +261,7 @@ class Parser:
 
                 if file in subfolders:
                     # parse the original XML of a model
-                    df = Parser.parseXML(filePath, badaVersion, file)
+                    df = Parser.parseXML(filePath, file)
 
                     # rename acName in the data frame to match the synonym model name
                     df.at[0, "acName"] = synonym
@@ -280,7 +272,7 @@ class Parser:
         else:
             for file in subfolders:
                 # Parse the original XML of a model
-                df = Parser.parseXML(filePath, badaVersion, file)
+                df = Parser.parseXML(filePath, file)
 
                 # Merge DataFrames
                 merged_df = pd.concat([merged_df, df], ignore_index=True)
@@ -4004,7 +3996,9 @@ class BadaHAircraft(BADAH):
         self.acName = acName
 
         if filePath == None:
-            self.filePath = configuration.getAircraftPath()
+            self.filePath = configuration.getBadaVersionPath(
+                badaFamily="BADAH", badaVersion=badaVersion
+            )
         else:
             self.filePath = filePath
 
@@ -4054,15 +4048,13 @@ class BadaHAircraft(BADAH):
             self.ACinSynonymFile = False
 
             # check if SYNONYM file exist - since for BADAH this is not a standard procedure (yet)
-            synonymFile = os.path.join(
-                self.filePath, "BADAH", badaVersion, "SYNONYM.xml"
-            )
+            synonymFile = os.path.join(self.filePath, "SYNONYM.xml")
             if os.path.isfile(synonymFile):
                 self.synonymFileAvailable = True
 
                 # if SYNONYM exist - look for synonym based on defined acName
                 self.SearchedACName = Parser.parseSynonym(
-                    self.filePath, badaVersion, acName
+                    self.filePath, acName
                 )
 
                 # if cannot find - look for full name (in sub folder names) based on acName (may not be ICAO designator)
@@ -4079,22 +4071,18 @@ class BadaHAircraft(BADAH):
                 acXmlFile = (
                     os.path.join(
                         self.filePath,
-                        "BADAH",
-                        badaVersion,
                         self.SearchedACName,
                         self.SearchedACName,
                     )
                     + ".xml"
                 )
-                OPTFilePath = os.path.join(
-                    self.filePath, "BADAH", badaVersion, acName
-                )
+                OPTFilePath = os.path.join(self.filePath, acName)
 
                 if os.path.isfile(acXmlFile):
                     self.ACModelAvailable = True
 
                     ACparsed_df = Parser.parseXML(
-                        self.filePath, badaVersion, self.SearchedACName
+                        self.filePath, self.SearchedACName
                     )
 
                     self.OPTFilePath = OPTFilePath

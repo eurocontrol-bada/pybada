@@ -42,15 +42,13 @@ class Parser(object):
         pass
 
     @staticmethod
-    def parseXML(filePath, badaVersion, acName):
+    def parseXML(filePath, acName):
         """
         Parses a BADA3 XML formatted file for aircraft performance data.
 
         :param filePath: Path to the XML file containing BADA data.
-        :param badaVersion: Version of BADA to be parsed.
         :param acName: Name of the aircraft for which data is being parsed from the XML file.
         :type filePath: str
-        :type badaVersion: str
         :type acName: str
         :raises IOError: If the file cannot be found or read.
         :raises ValueError: If the BADA version is unsupported or if parsing fails.
@@ -59,10 +57,7 @@ class Parser(object):
         :rtype: pd.DataFrame
         """
 
-        filename = (
-            os.path.join(filePath, "BADA3", badaVersion, acName, acName)
-            + ".xml"
-        )
+        filename = os.path.join(filePath, acName, acName) + ".xml"
 
         try:
             tree = ET.parse(filename)
@@ -365,15 +360,13 @@ class Parser(object):
         return f, line
 
     @staticmethod
-    def parseOPF(filePath, badaVersion, acName):
+    def parseOPF(filePath, acName):
         """
         Parses a BADA3 OPF (Operational Performance File) ASCII formatted file for aircraft performance data.
 
         :param filePath: Path to the BADA3 OPF ASCII formatted file.
-        :param badaVersion: BADA version being used.
         :param acName: ICAO aircraft designation (e.g., 'A320').
         :type filePath: str
-        :type badaVersion: str
         :type acName: str
         :raises IOError: If the file cannot be opened or read.
         :returns: A pandas DataFrame containing the parsed aircraft performance data.
@@ -383,8 +376,6 @@ class Parser(object):
         filename = (
             os.path.join(
                 filePath,
-                "BADA3",
-                badaVersion,
                 acName,
             )
             + ".OPF"
@@ -598,24 +589,20 @@ class Parser(object):
         return df_single
 
     @staticmethod
-    def parseAPF(filePath, badaVersion, acName):
+    def parseAPF(filePath, acName):
         """
         Parses a BADA3 APF ASCII formatted file for aircraft performance data.
 
         :param filePath: Path to the BADA3 APF ASCII formatted file.
-        :param badaVersion: BADA version being used.
         :param acName: ICAO aircraft designation (e.g., 'A320').
         :type filePath: str
-        :type badaVersion: str
         :type acName: str
         :raises IOError: If the file cannot be opened or read.
         :returns: A pandas DataFrame containing the parsed aircraft performance data.
         :rtype: pd.DataFrame
         """
 
-        filename = (
-            os.path.join(filePath, "BADA3", badaVersion, acName) + ".APF"
-        )
+        filename = os.path.join(filePath, acName) + ".APF"
 
         dataLines = list()
         with open(filename, "r", encoding="latin-1") as f:
@@ -701,19 +688,17 @@ class Parser(object):
         return combined_df
 
     @staticmethod
-    def readSynonym(filePath, badaVersion):
+    def readSynonym(filePath):
         """
         Reads a BADA3 SYNONYM.NEW ASCII file and returns a dictionary of model-synonym pairs.
 
         :param filePath: Path to the directory containing BADA3 files.
-        :param badaVersion: BADA version being used.
         :type filePath: str
-        :type badaVersion: str
         :returns: A dictionary where the keys are aircraft models and the values are the corresponding file names.
         :rtype: dict
         """
 
-        filename = os.path.join(filePath, "BADA3", badaVersion, "SYNONYM.NEW")
+        filename = os.path.join(filePath, "SYNONYM.NEW")
 
         # synonym - file name pair dictionary
         synonym_fileName = {}
@@ -738,14 +723,12 @@ class Parser(object):
         return synonym_fileName
 
     @staticmethod
-    def readSynonymXML(filePath, badaVersion):
+    def readSynonymXML(filePath):
         """
         Reads a BADA3 SYNONYM.xml file and returns a dictionary of model-synonym pairs.
 
         :param filePath: Path to the directory containing BADA3 files.
-        :param badaVersion: BADA version being used.
         :type filePath: str
-        :type badaVersion: str
         :returns: A dictionary where the keys are aircraft models (codes) and the values are the corresponding file names.
         :rtype: dict
         :raises IOError: If the XML file is not found or cannot be read.
@@ -754,7 +737,7 @@ class Parser(object):
         If the XML file is not found or is improperly formatted, an IOError is raised.
         """
 
-        filename = os.path.join(filePath, "BADA3", badaVersion, "SYNONYM.xml")
+        filename = os.path.join(filePath, "SYNONYM.xml")
 
         # synonym - file name pair dictionary
         synonym_fileName = {}
@@ -777,15 +760,13 @@ class Parser(object):
         return synonym_fileName
 
     @staticmethod
-    def parseSynonym(filePath, badaVersion, acName):
+    def parseSynonym(filePath, acName):
         """
         Parses either the ASCII or XML synonym file and returns the file name corresponding to the aircraft.
 
         :param filePath: Path to the directory containing BADA3 files.
-        :param badaVersion: BADA version being used.
         :param acName: ICAO aircraft designation for which the file name is needed.
         :type filePath: str
-        :type badaVersion: str
         :type acName: str
         :returns: The file name corresponding to the aircraft, or None if not found.
         :rtype: str or None
@@ -795,11 +776,11 @@ class Parser(object):
         It returns the associated file name or None if the aircraft synonym is not found.
         """
 
-        synonym_fileName = Parser.readSynonym(filePath, badaVersion)
+        synonym_fileName = Parser.readSynonym(filePath)
 
         # if ASCI synonym does not exist, try XML synonym file
         if not synonym_fileName:
-            synonym_fileName = Parser.readSynonymXML(filePath, badaVersion)
+            synonym_fileName = Parser.readSynonymXML(filePath)
 
         if synonym_fileName and acName in synonym_fileName:
             fileName = synonym_fileName[acName]
@@ -808,19 +789,18 @@ class Parser(object):
             return None
 
     @staticmethod
-    def readGPF(filePath, badaVersion):
+    def readGPF(filePath):
         """
         Parses a BADA3 GPF ASCII formatted file.
 
         :param filePath: Path to the directory containing BADA3 files.
-        :param badaVersion: BADA version being used.
         :type filePath: str
         :raises IOError: If the GPF file cannot be opened or read.
         :returns: A list of dictionaries, each containing GPF parameters like engine type, flight phase, and parameter values.
         :rtype: list of dict
         """
 
-        filename = os.path.join(filePath, "BADA3", badaVersion, "BADA.GPF")
+        filename = os.path.join(filePath, "BADA.GPF")
 
         GPFparamList = list()
 
@@ -847,12 +827,11 @@ class Parser(object):
         return GPFparamList
 
     @staticmethod
-    def readGPFXML(filePath, badaVersion):
+    def readGPFXML(filePath):
         """
         Parses a BADA3 GPF XML formatted file.
 
         :param filePath: Path to the directory containing BADA3 files.
-        :param badaVersion: BADA version being used.
         :type filePath: str
         :raises IOError: If the XML file is not found or cannot be read.
         :returns: A list of dictionaries, each containing GPF parameters such as engine type, flight phase, and performance values.
@@ -863,7 +842,7 @@ class Parser(object):
         It parses the XML structure and returns a list of dictionaries representing these parameters.
         """
 
-        filename = os.path.join(filePath, "BADA3", badaVersion, "GPF.xml")
+        filename = os.path.join(filePath, "GPF.xml")
 
         GPFparamList = list()
 
@@ -1404,23 +1383,21 @@ class Parser(object):
         return GPFparamList
 
     @staticmethod
-    def parseGPF(filePath, badaVersion):
+    def parseGPF(filePath):
         """
         Parses a BADA3 (GPF) from either ASCII or XML format.
 
         :param filePath: Path to the directory containing BADA3 files.
-        :param badaVersion: BADA version being used.
         :type filePath: str
-        :type badaVersion: str
         :returns: A pandas DataFrame containing GPF data.
         :rtype: pd.DataFrame
         """
 
-        GPFdata = Parser.readGPF(filePath, badaVersion)
+        GPFdata = Parser.readGPF(filePath)
 
         # if ASCI GPF does not exist, try XML GPF file
         if not GPFdata:
-            GPFdata = Parser.readGPFXML(filePath, badaVersion)
+            GPFdata = Parser.readGPFXML(filePath)
 
         # Single row dataframe
         data = {"GPFdata": [GPFdata]}
@@ -1506,31 +1483,32 @@ class Parser(object):
         """
 
         if filePath == None:
-            filePath = configuration.getAircraftPath()
+            filePath = configuration.getBadaVersionPath(
+                badaFamily="BADA3", badaVersion=badaVersion
+            )
         else:
             filePath = filePath
 
         # parsing GPF file
-        GPFparsedDataframe = Parser.parseGPF(filePath, badaVersion)
+        GPFparsedDataframe = Parser.parseGPF(filePath)
 
         # try to get subfolders, if they exist
         # get names of all the folders in the main BADA model folder to search for XML files
-        folderPath = os.path.join(filePath, "BADA3", badaVersion)
-        subfolders = configuration.list_subfolders(folderPath)
+        subfolders = configuration.list_subfolders(filePath)
 
         if not subfolders:
             # use APF and OPF files
             merged_df = pd.DataFrame()
 
             # get synonym-filename pairs
-            synonym_fileName = Parser.readSynonym(filePath, badaVersion)
+            synonym_fileName = Parser.readSynonym(filePath)
 
             for synonym in synonym_fileName:
                 file = synonym_fileName[synonym]
 
                 # parse the original data of a model
-                OPFDataFrame = Parser.parseOPF(filePath, badaVersion, file)
-                APFDataFrame = Parser.parseAPF(filePath, badaVersion, file)
+                OPFDataFrame = Parser.parseOPF(filePath, file)
+                APFDataFrame = Parser.parseAPF(filePath, file)
 
                 df = Parser.combineOPF_APF(OPFDataFrame, APFDataFrame)
 
@@ -1552,14 +1530,14 @@ class Parser(object):
             merged_df = pd.DataFrame()
 
             # get synonym-filename pairs
-            synonym_fileName = Parser.readSynonymXML(filePath, badaVersion)
+            synonym_fileName = Parser.readSynonymXML(filePath)
 
             for synonym in synonym_fileName:
                 file = synonym_fileName[synonym]
 
                 if file in subfolders:
                     # parse the original XML of a model
-                    df = Parser.parseXML(filePath, badaVersion, file)
+                    df = Parser.parseXML(filePath, file)
 
                     # rename acName in the dateaframe to match the synonym model name
                     df.at[0, "acName"] = synonym
@@ -4737,7 +4715,9 @@ class Bada3Aircraft(BADA3):
         self.BADAVersion = badaVersion
 
         if filePath == None:
-            self.filePath = configuration.getAircraftPath()
+            self.filePath = configuration.getBadaVersionPath(
+                badaFamily="BADA3", badaVersion=badaVersion
+            )
         else:
             self.filePath = filePath
 
@@ -4830,20 +4810,17 @@ class Bada3Aircraft(BADA3):
 
         else:
             # read BADA3 GPF file
-            GPFDataFrame = Parser.parseGPF(self.filePath, badaVersion)
+            GPFDataFrame = Parser.parseGPF(self.filePath)
 
             # check if SYNONYM file exist
-            synonymFile = os.path.join(
-                self.filePath, "BADA3", badaVersion, "SYNONYM.NEW"
-            )
-            synonymFileXML = os.path.join(
-                self.filePath, "BADA3", badaVersion, "SYNONYM.xml"
-            )
+            synonymFile = os.path.join(self.filePath, "SYNONYM.NEW")
+            synonymFileXML = os.path.join(self.filePath, "SYNONYM.xml")
+
             if os.path.isfile(synonymFile) or os.path.isfile(synonymFileXML):
                 self.synonymFileAvailable = True
 
                 self.SearchedACName = Parser.parseSynonym(
-                    self.filePath, badaVersion, acName
+                    self.filePath, acName
                 )
 
                 if self.SearchedACName == None:
@@ -4864,8 +4841,6 @@ class Bada3Aircraft(BADA3):
                 OPFfile = (
                     os.path.join(
                         self.filePath,
-                        "BADA3",
-                        badaVersion,
                         self.SearchedACName,
                     )
                     + ".OPF"
@@ -4873,8 +4848,6 @@ class Bada3Aircraft(BADA3):
                 APFfile = (
                     os.path.join(
                         self.filePath,
-                        "BADA3",
-                        badaVersion,
                         self.SearchedACName,
                     )
                     + ".APF"
@@ -4888,10 +4861,10 @@ class Bada3Aircraft(BADA3):
                     self.ACModelAvailable = True
 
                     OPFDataFrame = Parser.parseOPF(
-                        self.filePath, badaVersion, self.SearchedACName
+                        self.filePath, self.SearchedACName
                     )
                     APFDataFrame = Parser.parseAPF(
-                        self.filePath, badaVersion, self.SearchedACName
+                        self.filePath, self.SearchedACName
                     )
 
                     OPF_APF_combined_df = Parser.combineOPF_APF(
@@ -5026,7 +4999,7 @@ class Bada3Aircraft(BADA3):
                     # search for xml files
 
                     XMLDataFrame = Parser.parseXML(
-                        self.filePath, badaVersion, self.SearchedACName
+                        self.filePath, self.SearchedACName
                     )
 
                     combined_df = Parser.combineACDATA_GPF(

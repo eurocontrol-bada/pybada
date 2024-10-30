@@ -15,7 +15,7 @@ allData = Bada3Parser.parseAll(badaVersion="DUMMY")
 # retrieve specific data from the whole database, including synonyms
 params = Bada.getBADAParameters(
     df=allData,
-    acName=["B737", "A1", "P38", "AT45", "DA42"],
+    acName=["A1", "P38", "AT45", "DA42", "B789", "J2H"],
     parameters=["VMO", "MMO", "MTOW", "engineType"],
 )
 print(params)
