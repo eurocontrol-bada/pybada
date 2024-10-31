@@ -46,3 +46,5 @@ modindex_common_prefix = ["pyBADA."]
 
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+
+copyright = "2024, EUROCONTROL"
