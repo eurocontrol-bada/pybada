@@ -8,6 +8,7 @@ Developped @EUROCONTROL (EIH)
 
 import os
 import importlib.resources
+import pandas as pd
 
 
 @staticmethod
