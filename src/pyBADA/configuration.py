@@ -40,7 +40,7 @@ def list_subfolders(folderPath):
 @staticmethod
 def safe_get(df, column_name, default_value=None):
     """
-    Safely retrieves a column's value from a DataFrame, returning a default value if the column does not exist.
+    Safely retrieves a column's value from a DataFrame, returning a default value if the column does not exist or if the value is NaN.
 
     :param df: DataFrame to retrieve the value from.
     :param column_name: Name of the column to retrieve.
@@ -53,7 +53,18 @@ def safe_get(df, column_name, default_value=None):
     """
 
     if column_name in df.columns:
-        return df[column_name].iloc[0]
+        value = df[column_name].iloc[0]
+
+        if isinstance(value, list):
+            if pd.isna(value).all():
+                return default_value
+            else:
+                return value
+        else:
+            if pd.isna(value):
+                return default_value
+            else:
+                return value
     else:
         return default_value
 
