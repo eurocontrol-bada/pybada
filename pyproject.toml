@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyBADA"
-version = "0.1.1"
+version = "0.1.2"
 authors = [
   { name="Henrich Glaser-Opitz", email="henrich.glaser-opitz@eurocontrol.int" }
 ]
