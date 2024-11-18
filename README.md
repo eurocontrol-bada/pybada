@@ -4,6 +4,7 @@
 <a href="https://pypi.org/project/pyBADA"><img alt="Released on PyPi" src="https://img.shields.io/pypi/v/pyBADA.svg"></a>
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python&logoColor=white)
 <a href="https://github.com/eurocontrol/pybada"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+[![Run unit tests](https://github.com/eurocontrol/pybada/actions/workflows/pytest.yml/badge.svg)](https://github.com/eurocontrol/pybada/actions/workflows/pytest.yml)
 
 The BADA aircraft performance toolbox for Python
 
@@ -12,6 +13,7 @@ To get started
 ```bash
 pip install pyBADA
 ```
+
 
 ## Examples
 
@@ -32,10 +34,18 @@ source env/bin/activate
 pip install -e .
 # Install a couple of packages for formatting, linting and building the docs
 pip install -e .[dev]
+# Run tests
+python3 -m pytest tests/
 # To build the docs
 cd docs
 make html
 ```
+
+
+## Running on unsupported environements
+
+You won't receive support for it, but you can pass the flag `--ignore-requires-python` to install pyBADA on an unsupported Python version.
+
 
 ## License
 
