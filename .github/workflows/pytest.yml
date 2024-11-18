@@ -27,4 +27,4 @@ jobs:
 
       - name: Run Pytest
         run: |
-            python pytest tests/ -s --junitxml=path
+            python -m pytest tests/ -s --junitxml=path
