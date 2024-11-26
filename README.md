@@ -6,7 +6,7 @@
 <a href="https://github.com/eurocontrol/pybada"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 [![Run unit tests](https://github.com/eurocontrol/pybada/actions/workflows/pytest.yml/badge.svg)](https://github.com/eurocontrol/pybada/actions/workflows/pytest.yml)
 
-The BADA aircraft performance toolbox for Python
+This package provides aircraft performance modelling, trajectory prediction and optimisation, and visualisation with [BADA](https://www.eurocontrol.int/model/bada) in Python.
 
 To get started
 
@@ -14,35 +14,32 @@ To get started
 pip install pyBADA
 ```
 
-
-## Examples
-
--   `file_parser`: BADA file parser and retrieval of some basic BADA parameters for all BADA3/4/H
--   `BADAData`: loading complete BADA3 dataset and retrieval of a specific parameters for a specific aircraft
--   `optimum_speed_altitude`: calculation of optimum speeds and altitude for BADA4 and BADAH aircraft
--   `ac_trajectory`: simple, but complete, aircraft trajectory for BADA3 and BADA4 aircraft
--   `ac_trajectory_GPS`: simple, but complete, aircraft trajectory for BADA3 and BADA4 aircraft including geodesic calculations
--   `heli_trajectory`: simple, but complete, helicopter trajectory for BADAH aircraft
+Examples, the user manual and the API reference can be found at the [pyBADA documentation website](https://eurocontrol.github.io/pybada/index.html).
 
 ## Development
 
 ```bash
+# Clone the repository
+git clonehttps://github.com/eurocontrol/pybada
+
 # Optionally, set up a virtual env and activate it
 python3 -m venv env
 source env/bin/activate
-# Install package in editable mode
-pip install -e .
+
+# Install package 
+pip install .
 # Install a couple of packages for formatting, linting and building the docs
-pip install -e .[dev]
-# Run tests
+pip install .[dev]
+
+# Run unit tests
 python3 -m pytest tests/
-# To build the docs
+# Build the docs
 cd docs
 make html
 ```
 
 
-## Running on unsupported environements
+### Running on unsupported environements
 
 You won't receive support for it, but you can pass the flag `--ignore-requires-python` to install pyBADA on an unsupported Python version.
 
@@ -51,4 +48,4 @@ You won't receive support for it, but you can pass the flag `--ignore-requires-p
 
 BADA and pyBADA are developed and maintained by [EUROCONTROL](https://www.eurocontrol.int/).
 
-This project is licensed under the European Union Public License v1.2 - see the [LICENSE](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) file for details.
+This project is released under the European Union Public License v1.2 - see the [LICENSE](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) file for details.
