@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Atmosphere module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 from math import sqrt, pow, exp, log

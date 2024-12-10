@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Generic flight trajectory module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 import os

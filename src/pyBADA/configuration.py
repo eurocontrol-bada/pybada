@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Common configuration module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 import os

@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Generic airplane/helicopter performance module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 import abc

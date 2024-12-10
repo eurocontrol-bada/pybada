@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Common unit conversions module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 from math import pi

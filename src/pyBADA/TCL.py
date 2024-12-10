@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Trajectory Computation Light (TCL) for BADAH/BADAE/BADA3/BADA4 aircraft performance module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 import os

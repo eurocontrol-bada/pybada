@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Generic BADA3 aircraft performance module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 from math import sqrt, isnan, asin, atan

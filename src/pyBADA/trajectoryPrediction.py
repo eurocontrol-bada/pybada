@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Basic calculations for the Trajectory Prediction (TP) using BADA
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 from pyBADA import atmosphere as atm

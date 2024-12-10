@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Generic BADAH aircraft performance module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 import xml.etree.ElementTree as ET

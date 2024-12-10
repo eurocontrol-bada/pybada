@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Common constants module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 # Gravitational acceleration

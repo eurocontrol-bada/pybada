@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-pyBADA
 Geodesic calculation module
-Developped @EUROCONTROL (EIH)
-2024
 """
 
 from math import (
