@@ -39,6 +39,10 @@ autosummary_generate = True
 templates_path = ["_templates"]
 exclude_patterns = []
 
+html_css_files = [
+    'css/custom.css',
+]
+
 # add_module_names = False
 modindex_common_prefix = ["pyBADA."]
 
