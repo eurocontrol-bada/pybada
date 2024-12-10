@@ -18,6 +18,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx.ext.autosummary",
     "sphinx_gallery.gen_gallery",
+    "sphinx_search.extension",
 ]
 
 sphinx_gallery_conf = {

@@ -37,7 +37,8 @@ dev = ["black==23.9.1",
   "folium==0.17.0",
   "pytest==8.3.3",
   "build",
-  "twine"
+  "twine",
+  "readthedocs-sphinx-search>=0.3.2"
   ]
 
 [project.urls]
