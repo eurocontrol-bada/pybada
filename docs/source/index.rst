@@ -17,7 +17,7 @@ Efficient air traffic operations rely on the capability of air traffic managemen
 
 To enable modelling and simulation of aircraft trajectories, every aircraft in operation shall have a corresponding Aircraft Performance Model (APM).
 
-This is why EUROCONTROL, in cooperation with aircraft manufacturers and operating airlines, has created and maintains an APM called BADA (Base of Aircraft Data).
+This is why  `EUROCONTROL <https://www.eurocontrol.int/>`_, in cooperation with aircraft manufacturers and operating airlines, has created and maintains an APM called `BADA (Base of Aircraft Data) <https://www.eurocontrol.int/model/bada>`_.
 
 Owning to this cooperation, BADA prevails as a unique product provided by EUROCONTROL to the aviation community worldwide
 
