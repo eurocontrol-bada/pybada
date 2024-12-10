@@ -10,6 +10,10 @@ To get started:
     pip install pybada
 
 
+You can find the source code, report issues and contribute on the `GitHub repository <https://github.com/eurocontrol/pybada>`_.
+
+This package released as open source software under the terms of the `European Union Public Licence <https://commission.europa.eu/about/departments-and-executive-agencies/digital-services/open-source-strategy-history/european-union-public-licence_en>`_.
+
 About BADA
 ==========
 
