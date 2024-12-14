@@ -20,7 +20,7 @@ Examples, the user manual and the API reference can be found at the [pyBADA docu
 
 ```bash
 # Clone the repository
-git clonehttps://github.com/eurocontrol/pybada
+git clone https://github.com/eurocontrol/pybada
 
 # Optionally, set up a virtual env and activate it
 python3 -m venv env
@@ -39,7 +39,7 @@ make html
 ```
 
 
-### Running on unsupported environements
+### Running on unsupported environments
 
 You won't receive support for it, but you can pass the flag `--ignore-requires-python` to install pyBADA on an unsupported Python version.
 
