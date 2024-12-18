@@ -36,11 +36,19 @@ badaVersion = "DUMMY"
 allData = Bada4Parser.parseAll(badaVersion=badaVersion)
 print(allData)
 
-# AC = Bada3Aircraft(badaVersion=badaVersion, acName='J2H', allData=allData)
+AC = Bada3Aircraft(badaVersion=badaVersion, acName="J2H", allData=allData)
 AC = Bada4Aircraft(
-    badaVersion=badaVersion, acName="Dummy-TWIN", allData=allData
+    badaVersion=badaVersion,
+    acName="Dummy-TWIN",
+    allData=allData,
 )
 
+# Example loading models from files on disk
+# AC = Bada4Aircraft(
+#    badaVersion=badaVersion,
+#    acName="A320-232",
+#    filePath="/home/<USER>/ec/pybada-models/models/BADA4/4.3",
+# )
 
 # create a Flight Trajectory object to store the output from TCL segment calculations
 ft = FT()
