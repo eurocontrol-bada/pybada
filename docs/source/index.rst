@@ -34,6 +34,7 @@ BADA APM is based on a kinetic approach to aircraft performance modelling. It is
    :caption: Contents:
 
    pyBADA
+   getting-started
    architecture
    userManual
    history
