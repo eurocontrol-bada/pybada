@@ -25,7 +25,7 @@ jobs:
           pip install .
           pip install .[dev]
 
-      - name: Run Pytest
+      - name: Build pyBADA and upload wheel to PyPi
         run: |
             export TWINE_USERNAME=__token__
             export TWINE_PASSWORD=${{ secrets.PYPI_API_TOKEN }}
