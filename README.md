@@ -14,7 +14,7 @@ To get started
 pip install pyBADA
 ```
 
-Examples, the user manual and the API reference can be found at the [pyBADA documentation website](https://eurocontrol.github.io/pybada/index.html).
+Examples, the user manual and the API reference can be found at the [pyBADA documentation website](https://eurocontrol-bada.github.io/pybada/index.html).
 
 ## Development
 
