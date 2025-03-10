@@ -42,7 +42,7 @@ dev = ["black==23.9.1",
   ]
 
 [project.urls]
-"Homepage" = "https://github.com/eurocontrol/pybada"
+"Homepage" = "https://github.com/eurocontrol-bada/pybada"
 
 [tool.black]
 target-version = ['py312']

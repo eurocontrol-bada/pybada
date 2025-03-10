@@ -1,10 +1,10 @@
 # pyBADA
 
-<a href="https://github.com/eurocontrol/pybada/blob/main/LICENCE.txt"><img alt="License: EUPL" src="https://img.shields.io/badge/license-EUPL-3785D1.svg"></a>
+<a href="https://github.com/eurocontrol-bada/pybada/blob/main/LICENCE.txt"><img alt="License: EUPL" src="https://img.shields.io/badge/license-EUPL-3785D1.svg"></a>
 <a href="https://pypi.org/project/pyBADA"><img alt="Released on PyPi" src="https://img.shields.io/pypi/v/pyBADA.svg"></a>
 ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python&logoColor=white)
-<a href="https://github.com/eurocontrol/pybada"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
-[![Run unit tests](https://github.com/eurocontrol/pybada/actions/workflows/pytest.yml/badge.svg)](https://github.com/eurocontrol/pybada/actions/workflows/pytest.yml)
+<a href="https://github.com/eurocontrol-bada/pybada"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+[![Run unit tests](https://github.com/eurocontrol-bada/pybada/actions/workflows/pytest.yml/badge.svg)](https://github.com/eurocontrol-bada/pybada/actions/workflows/pytest.yml)
 
 This package provides aircraft performance modelling, trajectory prediction and optimisation, and visualisation with [BADA](https://www.eurocontrol.int/model/bada) in Python.
 
@@ -20,7 +20,7 @@ Examples, the user manual and the API reference can be found at the [pyBADA docu
 
 ```bash
 # Clone the repository
-git clone https://github.com/eurocontrol/pybada
+git clone https://github.com/eurocontrol-bada/pybada
 
 # Optionally, set up a virtual env and activate it
 python3 -m venv env
