@@ -2267,7 +2267,7 @@ class FlightEnvelope(BADA3):
                     buffetLimit = self.lowSpeedBuffetLimit(
                         h=h, mass=mass, DeltaTemp=DeltaTemp, nz=nz
                     )
-                    if buffetLimit == float("Nan"):
+                    if isnan(buffetLimit):
                         Vmin = VminStall
                     else:
                         Vmin = max(

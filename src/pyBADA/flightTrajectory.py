@@ -236,17 +236,22 @@ class FlightTrajectory:
             else:
                 return self.getAllValues(AC, parameter)[-1]
 
-    def append(self, AC, flightTrajectoryToAppend):
+    def append(self, AC, flightTrajectoryToAppend, overwriteLastRow=False):
         """Appends two consecutive flight trajectories and merges them, adjusting cumulative fields such as time, distance,
         and fuel consumed. If the aircraft is not already present, the new trajectory will be added.
 
+        If overwriteLastRow is True, the last row of the existing trajectory is removed so that the first row of the
+        appended trajectory replaces it.
+
         :param AC: Aircraft object (BADA3/4/H/E) whose trajectory is being appended.
         :param flightTrajectoryToAppend: The second flight trajectory to append, in the form of a DataFrame.
+        :param overwriteLastRow: Flag to indicate whether the last row of the existing trajectory should be overwritten.
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
-        :type flightTrajectoryToAppend: dict{list[float]}
+        :type flightTrajectoryToAppend: pd.DataFrame
+        :type overwriteLastRow: bool
         """
 
-        # retrieve the original trajectory
+        # Retrieve the original trajectory
         flightTrajectory = self.getFT(AC)
 
         # Drop columns with all NaN values from both DataFrames before concatenating
@@ -263,33 +268,36 @@ class FlightTrajectory:
 
         # Handle cumulative columns (time, distance, fuelConsumed)
         cumulative_columns = ["time", "dist", "FUELCONSUMED"]
+
         if flightTrajectory is not None and not flightTrajectory.empty:
-            # For cumulative columns, add the last value of the original to the subsequent values in the appended trajectory
+            # Determine offset values from the last row of flightTrajectory
+            offset_values = {}
             for col in cumulative_columns:
                 if (
                     col in flightTrajectory.columns
                     and col in flightTrajectoryToAppend.columns
                 ):
-                    last_value = flightTrajectory[col].iloc[
-                        -1
-                    ]  # Get last value of original trajectory
+                    offset_values[col] = flightTrajectory[col].iloc[-1]
 
-                    # Ensure both columns are cast to float64 before performing the addition
-                    flightTrajectoryToAppend[col] = flightTrajectoryToAppend[
-                        col
-                    ].astype(float)
+            # If overwriteLastRow is True, remove the last row so it gets replaced by the new data.
+            if overwriteLastRow:
+                flightTrajectory = flightTrajectory.iloc[:-1]
 
-                    # Perform the cumulative addition using .loc[]
-                    flightTrajectoryToAppend.loc[:, col] = (
-                        flightTrajectoryToAppend[col] + float(last_value)
-                    )
+            # Apply the cumulative addition using the offset values
+            for col, offset in offset_values.items():
+                flightTrajectoryToAppend[col] = flightTrajectoryToAppend[
+                    col
+                ].astype(float)
+                flightTrajectoryToAppend.loc[:, col] = (
+                    flightTrajectoryToAppend[col] + float(offset)
+                )
 
-        # Concatenating the two trajectory data
+        # Concatenate the original (or modified) trajectory with the new trajectory data
         flightTrajectoryCombined = pd.concat(
             [flightTrajectory, flightTrajectoryToAppend], ignore_index=True
         )
 
-        # rewrite the original trajectory data
+        # Rewrite the original trajectory data
         self.addFT(AC, flightTrajectoryCombined)
 
     def cut(self, AC, parameter, threshold, direction="BELOW"):
@@ -320,6 +328,57 @@ class FlightTrajectory:
             ]
 
         self.addFT(AC, flightTrajectoryCut)
+
+    def removeLines(self, AC, numberOfLines=1):
+        """Removes from the aircraft's flight trajectory list X number of lines,
+
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is being modified.
+        :param numberOfLines: How many lines should be removed from teh end of the trajectory
+        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
+        :type numberOfLines: int
+        """
+
+        flightTrajectory = self.getFT(AC)
+
+        if numberOfLines <= 0:
+            return
+
+        if numberOfLines < len(flightTrajectory):
+            flightTrajectoryCut = flightTrajectory.iloc[:-numberOfLines]
+        else:
+            flightTrajectoryCut = flightTrajectory.iloc[0:0]
+
+        self.addFT(AC, flightTrajectoryCut)
+
+    def overwriteLastValue(self, AC, parameter, new_value):
+        """Overwrites the last value of a specified parameter (column) in the aircraft's flight trajectory with a new value.
+
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is being modified.
+        :param parameter: The name of the parameter (column) whose last value is to be overwritten.
+        :param new_value: The new value to assign to the last entry of the specified parameter.
+        :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
+        :type parameter: str
+        :type new_value: Depends on the data type of the column (e.g., int, float, str)
+        """
+
+        # Retrieve the current flight trajectory
+        flightTrajectory = self.getFT(AC)
+
+        # Check if the flight trajectory exists and is not empty
+        if flightTrajectory is None or flightTrajectory.empty:
+            return
+
+        # Ensure the parameter exists in the DataFrame
+        if parameter not in flightTrajectory.columns:
+            raise ValueError(
+                f"The parameter '{parameter}' is not in the flight trajectory columns."
+            )
+
+        # Overwrite the last value in the specified column
+        flightTrajectory.loc[flightTrajectory.index[-1], parameter] = new_value
+
+        # Rewrite the modified flight trajectory
+        self.addFT(AC, flightTrajectory)
 
     def save2csv(self, saveToPath, separator=","):
         """

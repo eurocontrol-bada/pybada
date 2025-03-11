@@ -93,13 +93,12 @@ def constantSpeedLevel(
     :param magneticDeclinationGrid: Optional magnetic declination grid to correct headings. Default is None.
     :param kwargs: Additional optional parameters:
 
-        - mass_const: Boolean. If True, keeps the aircraft mass constant during the segment. Default is False.
         - SOC_init: Initial battery state of charge for electric aircraft [%]. Default is 100 for BADAE.
         - speedBrakes: Dictionary defining whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum rate of climb/descent threshold to identify service ceiling [ft/min]. Default varies by aircraft type.
         - config: Default aerodynamic configuration. Values: TO, IC, CR, AP, LD.
         - HpStep: Altitude step for step climb [ft]. Default is 2000 ft.
-        - m_iter: Number of iterations for mass integration. Default is 1 for BADAE, 2 for others.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - step_length: The step length for each iteration in [NM] or [s], depending on the lengthType. Default is 100 NM for BADA3/4 and 10 NM for BADAH/BADAE.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -187,7 +186,12 @@ def constantSpeedLevel(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -1163,6 +1167,7 @@ def constantSpeedLevel(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
 
 
@@ -1225,7 +1230,7 @@ def constantSpeedROCD(
         - speedBrakes: Dictionary specifying whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum ROCD to identify the service ceiling [ft/min]. Default varies by aircraft type.
         - config: Default aerodynamic configuration. Values: TO, IC, CR, AP, LD. Default is None.
-        - mass_const: Boolean specifying whether to keep the mass constant during the segment. Default is False.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -1314,7 +1319,12 @@ def constantSpeedROCD(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -1476,6 +1486,25 @@ def constantSpeedROCD(
         )
 
         # aircraft speed
+        if calculationType == "POINT" and AC.BADAFamily.BADAH:
+            [
+                Pav_POINT,
+                Peng_POINT,
+                Preq_POINT,
+                tas_POINT,
+                ROCD_POINT,
+                ESF_POINT,
+                limitation_POINT,
+            ] = AC.ARPM.ARPMProcedure(
+                phase=phase,
+                h=H_m,
+                DeltaTemp=DeltaTemp,
+                mass=mass[-1],
+                rating="ARPM",
+            )
+            v = conv.ms2kt(tas_POINT)
+            speedType = "TAS"
+
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
@@ -2177,6 +2206,7 @@ def constantSpeedROCD(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
 
 
@@ -2239,7 +2269,7 @@ def constantSpeedROCD_time(
         - speedBrakes: Dictionary specifying whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum ROCD to identify the service ceiling [ft/min]. Default varies by aircraft type.
         - config: Default aerodynamic configuration. Values: TO, IC, CR, AP, LD. Default is None.
-        - mass_const: Boolean specifying whether to keep the mass constant during the segment. Default is False.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -2323,7 +2353,12 @@ def constantSpeedROCD_time(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -2479,6 +2514,25 @@ def constantSpeedROCD_time(
             )
 
             # aircraft speed
+            if calculationType == "POINT" and AC.BADAFamily.BADAH:
+                [
+                    Pav_POINT,
+                    Peng_POINT,
+                    Preq_POINT,
+                    tas_POINT,
+                    ROCD_POINT,
+                    ESF_POINT,
+                    limitation_POINT,
+                ] = AC.ARPM.ARPMProcedure(
+                    phase=phase,
+                    h=H_m,
+                    DeltaTemp=DeltaTemp,
+                    mass=mass[-1],
+                    rating="ARPM",
+                )
+                v = conv.ms2kt(tas_POINT)
+                speedType = "TAS"
+
             [M_i, CAS_i, TAS_i] = atm.convertSpeed(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
@@ -3169,6 +3223,7 @@ def constantSpeedROCD_time(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
 
 
@@ -3230,7 +3285,7 @@ def constantSpeedSlope(
         - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum rate of climb/descent used to determine service ceiling [ft/min]. Default varies based on aircraft type.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
-        - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -3314,7 +3369,12 @@ def constantSpeedSlope(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -3470,6 +3530,25 @@ def constantSpeedSlope(
         )
 
         # aircraft speed
+        if calculationType == "POINT" and AC.BADAFamily.BADAH:
+            [
+                Pav_POINT,
+                Peng_POINT,
+                Preq_POINT,
+                tas_POINT,
+                ROCD_POINT,
+                ESF_POINT,
+                limitation_POINT,
+            ] = AC.ARPM.ARPMProcedure(
+                phase=phase,
+                h=H_m,
+                DeltaTemp=DeltaTemp,
+                mass=mass[-1],
+                rating="ARPM",
+            )
+            v = conv.ms2kt(tas_POINT)
+            speedType = "TAS"
+
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
@@ -4175,6 +4254,7 @@ def constantSpeedSlope(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
 
 
@@ -4234,7 +4314,7 @@ def constantSpeedSlope_time(
         - config: Default aerodynamic configuration {TO, IC, CR, AP, LD}. If not provided, configuration is calculated automatically.
         - speedBrakes: Dictionary specifying if speed brakes are deployed and additional drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum Rate of Climb/Descent to determine service ceiling [ft/min]. Defaults depend on aircraft type and engine.
-        - mass_const: Boolean indicating whether mass remains constant during the flight. Default is False.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for mass integration. Default is 5.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -4318,7 +4398,12 @@ def constantSpeedSlope_time(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -4470,6 +4555,25 @@ def constantSpeedSlope_time(
             )
 
             # aircraft speed
+            if calculationType == "POINT" and AC.BADAFamily.BADAH:
+                [
+                    Pav_POINT,
+                    Peng_POINT,
+                    Preq_POINT,
+                    tas_POINT,
+                    ROCD_POINT,
+                    ESF_POINT,
+                    limitation_POINT,
+                ] = AC.ARPM.ARPMProcedure(
+                    phase=phase,
+                    h=H_m,
+                    DeltaTemp=DeltaTemp,
+                    mass=mass[-1],
+                    rating="ARPM",
+                )
+                v = conv.ms2kt(tas_POINT)
+                speedType = "TAS"
+
             [M_i, CAS_i, TAS_i] = atm.convertSpeed(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
@@ -5172,6 +5276,7 @@ def constantSpeedSlope_time(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
 
 
@@ -5234,7 +5339,7 @@ def constantSpeedRating(
         - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum rate of climb/descent used to determine service ceiling [ft/min]. Default varies based on aircraft type.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
-        - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -5318,7 +5423,12 @@ def constantSpeedRating(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -5501,6 +5611,25 @@ def constantSpeedRating(
         )
 
         # aircraft speed
+        if calculationType == "POINT" and AC.BADAFamily.BADAH:
+            [
+                Pav_POINT,
+                Peng_POINT,
+                Preq_POINT,
+                tas_POINT,
+                ROCD_POINT,
+                ESF_POINT,
+                limitation_POINT,
+            ] = AC.ARPM.ARPMProcedure(
+                phase=phase,
+                h=H_m,
+                DeltaTemp=DeltaTemp,
+                mass=mass[-1],
+                rating=rating,
+            )
+            v = conv.ms2kt(tas_POINT)
+            speedType = "TAS"
+
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
@@ -5577,9 +5706,12 @@ def constantSpeedRating(
                 M=M_i,
                 DeltaTemp=DeltaTemp,
             )  # [N]
-            CT = AC.CT(Thrust=THR_i, delta=delta)
             FUEL_i = AC.ff(
-                CT=CT, delta=delta, theta=theta, M=M_i, DeltaTemp=DeltaTemp
+                rating=rating,
+                delta=delta,
+                theta=theta,
+                M=M_i,
+                DeltaTemp=DeltaTemp,
             )
 
         # BADA3
@@ -5613,12 +5745,7 @@ def constantSpeedRating(
                 DeltaTemp=DeltaTemp,
             )
             FUEL_i = AC.ff(
-                flightPhase=phase,
-                v=TAS_i,
-                h=H_m,
-                T=THR_i,
-                config=config_i,
-                adapted=True,
+                flightPhase=phase, v=TAS_i, h=H_m, T=THR_i, config=config_i
             )
 
         if Hp_i != Hp_init:  # exclude first point: initial m already known
@@ -6092,6 +6219,7 @@ def constantSpeedRating(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
 
 
@@ -6157,7 +6285,7 @@ def constantSpeedRating_time(
         - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum rate of climb/descent to determine service ceiling [ft/min]. Default varies by aircraft type.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
-        - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for the mass integration loop. Default is 5.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -6241,7 +6369,12 @@ def constantSpeedRating_time(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -6427,6 +6560,25 @@ def constantSpeedRating_time(
             )
 
             # aircraft speed
+            if calculationType == "POINT" and AC.BADAFamily.BADAH:
+                [
+                    Pav_POINT,
+                    Peng_POINT,
+                    Preq_POINT,
+                    tas_POINT,
+                    ROCD_POINT,
+                    ESF_POINT,
+                    limitation_POINT,
+                ] = AC.ARPM.ARPMProcedure(
+                    phase=phase,
+                    h=H_m,
+                    DeltaTemp=DeltaTemp,
+                    mass=mass[-1],
+                    rating=rating,
+                )
+                v = conv.ms2kt(tas_POINT)
+                speedType = "TAS"
+
             [M_i, CAS_i, TAS_i] = atm.convertSpeed(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
@@ -6505,9 +6657,12 @@ def constantSpeedRating_time(
                     M=M_i,
                     DeltaTemp=DeltaTemp,
                 )  # [N]
-                CT = AC.CT(Thrust=THR_i, delta=delta)
                 FUEL_i = AC.ff(
-                    CT=CT, delta=delta, theta=theta, M=M_i, DeltaTemp=DeltaTemp
+                    rating=rating,
+                    delta=delta,
+                    theta=theta,
+                    M=M_i,
+                    DeltaTemp=DeltaTemp,
                 )
 
             # BADA3
@@ -6541,12 +6696,7 @@ def constantSpeedRating_time(
                     DeltaTemp=DeltaTemp,
                 )
                 FUEL_i = AC.ff(
-                    flightPhase=phase,
-                    v=TAS_i,
-                    h=H_m,
-                    T=THR_i,
-                    config=config_i,
-                    adapted=False,
+                    flightPhase=phase, v=TAS_i, h=H_m, T=THR_i, config=config_i
                 )  # MCMB(climb) or IDLE(descent)
 
             # BADAH or BADAE
@@ -7005,6 +7155,7 @@ def constantSpeedRating_time(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
 
 
@@ -7079,7 +7230,7 @@ def accDec(
         - speed_step: Speed step size for the iterative calculation [-] for M, [kt] for TAS/CAS. Default is 0.01 Mach, 5 kt for TAS/CAS.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
-        - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for the mass integration loop. Default is 10 for BADA3/4/H, 5 for BADAE.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -7163,7 +7314,12 @@ def accDec(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -8280,6 +8436,7 @@ def accDec(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
 
 
@@ -8356,7 +8513,7 @@ def accDec_time(
         - step_length: Length of each time step in the calculation [s]. Default is 1 second.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
-        - mass_const: Boolean indicating whether mass remains constant during the flight segment. Default is False.
+        - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for the mass integration loop. Default is 10 for BADA3/4/H, 5 for BADAE.
 
     :returns: A pandas DataFrame containing the flight trajectory with columns such as:
@@ -8440,7 +8597,12 @@ def accDec_time(
             raise Exception("Undefined Heading value combination")
 
     # calculation with constant mass (True) or integrated (False)
-    mass_const = kwargs.get("mass_const", False)
+    calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+    if calculationType == "INTEGRATED":
+        mass_const = False
+    if calculationType == "POINT":
+        mass_const = True
 
     # optional parameter to define initial Baterry State of Charge (SOC)
     if AC.BADAFamily.BADAE:
@@ -9551,4 +9713,5 @@ def accDec_time(
     }
 
     flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+
     return flightTrajectory
