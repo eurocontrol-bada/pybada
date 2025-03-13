@@ -13,7 +13,8 @@ from pyBADA import conversions as conv
 
 
 # calculate estimations for the fuel flow, and aircraft initial mass
-AC = Bada3Aircraft(badaVersion="3.16", acName="A320")
+AC = Bada3Aircraft(badaVersion='DUMMY', acName="J2M")
+
 
 deltaTemp = 0					# deviation from ISA temperature [K or deg C]
 M = 0.7							# Mach number [-]
@@ -60,3 +61,4 @@ initMass = TP.getInitialMass(
 print(f"cruiseFuelFlow: {cruiseFuelFlow} [kg/s]")
 print(f"breguetLeducInitialMass: {breguetLeducInitialMass} [kg]")
 print(f"initMass: {initMass} [kg]")
+
