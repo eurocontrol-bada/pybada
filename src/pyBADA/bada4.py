@@ -2116,6 +2116,9 @@ class FlightEnvelope(BADA4):
             theta=theta, delta=delta, mass=mass, HLid=HLid, LG=LG, nz=1.0
         )
 
+        if VminCertified is None or VmaxCertified is None:
+            return None
+
         maxCASList = []
         for CAS in np.linspace(
             VminCertified, VmaxCertified, num=200, endpoint=True

@@ -4133,7 +4133,9 @@ class BadaHAircraft(BADAH):
 
                 else:
                     # AC name cannot be found
-                    raise ValueError(acName + " Cannot be found")
+                    raise ValueError(
+                        acName + " Cannot be found at: " + self.filePath
+                    )
 
     def __str__(self):
         return f"(BADAH, AC_name: {self.acName}, searched_AC_name: {self.SearchedACName}, model_ICAO: {self.ICAO}, ID: {id(self.AC)})"
