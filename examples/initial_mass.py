@@ -2,7 +2,7 @@
 Initial Mass Calculation
 ========================
 
-Example of calculation of aircraft initial mass
+Example calculation of aircraft initial mass
 
 """
 
