@@ -35,7 +35,7 @@ cruiseFuelFlow = TP.cruiseFuelConsumption(
 TAS = atm.mach2Tas(Mach=M, theta=theta)
 GS = TAS
 
-# distance based initiall mass
+# distance based initial mass
 breguetLeducInitialMass = TP.breguetLeducInitialMass(
     AC=AC,
     distance=distance,
