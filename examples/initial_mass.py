@@ -15,7 +15,7 @@ from pyBADA import conversions as conv
 # calculate estimations for the fuel flow, and aircraft initial mass
 AC = Bada3Aircraft(badaVersion="3.16", acName="A320")
 
-deltaTemp = 0					# deviation from ISA temperature [K or degC]
+deltaTemp = 0					# deviation from ISA temperature [K or deg C]
 M = 0.7							# Mach number [-]
 altitude = conv.ft2m(30000)		# cruise altitude[m]
 distance = conv.nm2m(100)		# flown distance [NM]
