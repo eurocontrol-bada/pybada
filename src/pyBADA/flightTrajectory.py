@@ -240,12 +240,12 @@ class FlightTrajectory:
         """Appends two consecutive flight trajectories and merges them, adjusting cumulative fields such as time, distance,
         and fuel consumed. If the aircraft is not already present, the new trajectory will be added.
 
-        If overwriteLastRow is True, the last row of the existing trajectory is removed so that the first row of the
+        If overwriteLastRow is True, the last point of the existing trajectory is removed so that the first row of the
         appended trajectory replaces it.
 
         :param AC: Aircraft object (BADA3/4/H/E) whose trajectory is being appended.
         :param flightTrajectoryToAppend: The second flight trajectory to append, in the form of a DataFrame.
-        :param overwriteLastRow: Flag to indicate whether the last row of the existing trajectory should be overwritten.
+        :param overwriteLastRow: Flag to indicate whether the last point of the existing trajectory should be overwritten.
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
         :type flightTrajectoryToAppend: pd.DataFrame
         :type overwriteLastRow: bool
