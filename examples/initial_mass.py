@@ -57,6 +57,6 @@ initMass = TP.getInitialMass(
     deltaTemp=deltaTemp,
 )
 
-print("cruiseFuelFlow:", cruiseFuelFlow, "[kg/s]")
+print(f"cruiseFuelFlow: {cruiseFuelFlow} [kg/s]")
 print("breguetLeducInitialMass:", breguetLeducInitialMass, "[kg]")
 print("initMass:", initMass, "[kg]")
