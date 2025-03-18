@@ -32,7 +32,7 @@ def checkArgument(argument, **kwargs):
         raise TypeError("Missing " + argument + " argument")
 
 
-class Parser(object):
+class Parser:
     """This class implements the BADA3 parsing mechanism to parse APF, OPF and GPF BADA3 files."""
 
     def __init__(self):

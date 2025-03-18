@@ -140,7 +140,7 @@ class Haversine:
         return bearing
 
 
-class Vincenty(object):
+class Vincenty:
     """This class implements the vincenty calculations of geodesics on the ellipsoid-model earth
 
     .. note::
@@ -473,7 +473,7 @@ class Vincenty(object):
         return (dest[0], dest[1])
 
 
-class RhumbLine(object):
+class RhumbLine:
     """This class implements the rhumb line (loxodrome) calculations of geodesics on the ellipsoid-model earth
 
     .. note::
@@ -718,7 +718,7 @@ class RhumbLine(object):
         return decoupled_points
 
 
-class Turn(object):
+class Turn:
     """This class implements the calculations of geodesics turns"""
 
     @staticmethod
