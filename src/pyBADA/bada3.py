@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Generic BADA3 aircraft performance module
 """
