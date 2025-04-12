@@ -1,6 +1,7 @@
 name: Publish updated version of the docs
 
 on:
+  pull_request:
   push:
     branches:
       - main

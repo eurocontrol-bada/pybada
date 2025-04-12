@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 pyBADA
 Generic BADA4 aircraft performance module

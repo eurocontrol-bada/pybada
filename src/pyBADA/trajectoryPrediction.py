@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Basic calculations for the Trajectory Prediction (TP) using BADA
 """

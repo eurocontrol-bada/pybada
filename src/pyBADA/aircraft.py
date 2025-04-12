@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Generic airplane/helicopter performance module
 """
@@ -18,7 +17,7 @@ def checkArgument(argument, **kwargs):
         raise TypeError("Missing " + argument + " argument")
 
 
-class Bada(object):
+class Bada:
     """This class implements the mechanisms applicable across all BADA families."""
 
     def __init__(self):
@@ -183,7 +182,7 @@ class Bada(object):
         return tas * cos(radians(gamma)) + Ws
 
 
-class BadaFamily(object):
+class BadaFamily:
     """This class sets the token for the respected BADA Family."""
 
     def __init__(self, BADA3=False, BADA4=False, BADAH=False, BADAE=False):
@@ -193,7 +192,7 @@ class BadaFamily(object):
         self.BADAE = BADAE
 
 
-class Airplane(object):
+class Airplane:
     """This is a generic airplane class based on a three-degrees-of-freedom point mass model (where all the forces
     are applied at the center of gravity).
 
@@ -315,7 +314,7 @@ class Airplane(object):
         return ESF
 
 
-class Helicopter(object):
+class Helicopter:
     """This is a generic helicopter class based on a Total-Energy Model (TEM)
 
     .. note::this generic class only implements basic aircraft dynamics

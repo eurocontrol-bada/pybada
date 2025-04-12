@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Generic BADAH aircraft performance module
 """

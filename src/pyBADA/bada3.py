@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Generic BADA3 aircraft performance module
 """
@@ -32,7 +31,7 @@ def checkArgument(argument, **kwargs):
         raise TypeError("Missing " + argument + " argument")
 
 
-class Parser(object):
+class Parser:
     """This class implements the BADA3 parsing mechanism to parse APF, OPF and GPF BADA3 files."""
 
     def __init__(self):
@@ -290,7 +289,6 @@ class Parser(object):
             "Ct": [Ct],
             "CTdeslow": [CTdeslow],
             "CTdeshigh": [CTdeshigh],
-            "CTdeshigh": [CTdeshigh],
             "CTdesapp": [CTdesapp],
             "CTdesld": [CTdesld],
             "HpDes": [HpDes],
@@ -306,7 +304,6 @@ class Parser(object):
             "Hmax": [Hmax],
             "tempGrad": [tempGrad],
             "massGrad": [massGrad],
-            "mass": [mass],
             "MMO": [MMO],
             "VMO": [VMO],
             "MTOW": [MTOW],
@@ -316,14 +313,11 @@ class Parser(object):
             "LDL": [LDL],
             "span": [span],
             "length": [length],
-            "span": [span],
-            "length": [length],
             "aeroConfig": [aeroConfig],
             "speedSchedule": [speedSchedule],
             "V1": [V1],
             "V2": [V2],
             "M": [M],
-            "speedSchedule": [speedSchedule],
             "xmlFiles": [xmlFiles],
         }
         df_single = pd.DataFrame(data)
@@ -542,7 +536,6 @@ class Parser(object):
             "ICAO": [ICAO],
             "WTC": [WTC],
             "modificationDateOPF": [modificationDateOPF],
-            "modificationDateOPF": [modificationDateOPF],
             "S": [S],
             "MREF": [MREF],
             "mass": [mass],
@@ -557,7 +550,6 @@ class Parser(object):
             "Ct": [Ct],
             "CTdeslow": [CTdeslow],
             "CTdeshigh": [CTdeshigh],
-            "CTdeshigh": [CTdeshigh],
             "CTdesapp": [CTdesapp],
             "CTdesld": [CTdesld],
             "HpDes": [HpDes],
@@ -567,7 +559,6 @@ class Parser(object):
             "hmo": [hmo],
             "Hmax": [Hmax],
             "tempGrad": [tempGrad],
-            "mass": [mass],
             "MMO": [MMO],
             "VMO": [VMO],
             "massGrad": [massGrad],
@@ -576,8 +567,6 @@ class Parser(object):
             "MPL": [MPL],
             "TOL": [TOL],
             "LDL": [LDL],
-            "span": [span],
-            "length": [length],
             "span": [span],
             "length": [length],
         }
