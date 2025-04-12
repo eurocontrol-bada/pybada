@@ -721,9 +721,7 @@ class FlightEnvelope(BADAH):
 
             return (minCAS, maxCAS)
 
-    def bestAngleClimbSpeed(
-        self, h, mass, DeltaTemp, rating="MTKF", rateOfTurn=0
-    ):
+    def Vx(self, h, mass, DeltaTemp, rating="MTKF", rateOfTurn=0):
         """
         Computes the best angle climb speed (TAS) by finding the speed that maximizes the excess power
         per unit speed within the helicopter's performance envelope.
