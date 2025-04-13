@@ -13,7 +13,7 @@ import os
 from datetime import date
 import xml.etree.ElementTree as ET
 
-from scipy.optimize import fmin, fminbound
+from scipy.optimize import fminbound
 import pandas as pd
 
 from pyBADA import constants as const

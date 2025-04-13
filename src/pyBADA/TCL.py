@@ -3,14 +3,12 @@
 Trajectory Computation Light (TCL) for BADAH/BADAE/BADA3/BADA4 aircraft performance module
 """
 
-import os
 import numpy as np
 from pyBADA.geodesic import Vincenty as vincenty
 from pyBADA.geodesic import RhumbLine as rhumb
 from pyBADA.geodesic import Turn as turn
 
 from dataclasses import dataclass
-import importlib.util
 import itertools
 import warnings
 

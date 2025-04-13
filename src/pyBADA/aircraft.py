@@ -3,7 +3,6 @@
 Generic airplane/helicopter performance module
 """
 
-import abc
 from math import sqrt, pow, cos, radians, atan, tan, degrees
 
 from pyBADA import constants as const

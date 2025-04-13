@@ -9,8 +9,6 @@ from math import tan, pi
 from dataclasses import dataclass
 import matplotlib.pyplot as plt
 
-from pyBADA import atmosphere as atm
-from pyBADA import conversions as conv
 from pyBADA import constants as const
 from pyBADA import TCL as TCL
 from pyBADA.flightTrajectory import FlightTrajectory as FT

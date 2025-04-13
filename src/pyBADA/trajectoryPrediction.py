@@ -4,7 +4,6 @@ Basic calculations for the Trajectory Prediction (TP) using BADA
 """
 
 from pyBADA import atmosphere as atm
-from pyBADA import conversions as conv
 from math import exp
 
 
