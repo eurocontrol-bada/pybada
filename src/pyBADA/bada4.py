@@ -2347,6 +2347,63 @@ class FlightEnvelope(BADA4):
 
         return minCAS
 
+    def Vx(self, h, mass, DeltaTemp, rating, HLid, LG):
+        """
+        Computes the best angle of climb (Vx) speed.
+
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param rating: Aircraft engine rating (e.g., 'MTKF', 'MCMB', 'MCRZ').
+        :param HLid: High-lift device configuration identifier.
+        :param LG: Landing gear configuration identifier.
+        :type h: float
+        :type mass: float
+        :type DeltaTemp: float
+        :type rating: str
+        :type HLid: str
+        :type LG: str
+        :returns: Best angle of climb speed (Vx) in meters per second [m/s].
+        :rtype: float
+        """
+
+        [theta, delta, sigma] = atm.atmosphereProperties(
+            h=h, DeltaTemp=DeltaTemp
+        )
+
+        VmaxCertified = self.VMax(
+            h=h, delta=delta, theta=theta, HLid=HLid, LG=LG, mass=mass, nz=1.0
+        )
+        VminCertified = self.VStall(
+            delta=delta, theta=theta, mass=mass, HLid=HLid, LG=LG, nz=1.0
+        )
+
+        excessThrustList = []
+        VxList = []
+
+        for CAS in np.linspace(
+            VminCertified, VmaxCertified, num=200, endpoint=True
+        ):
+            M = atm.cas2Mach(cas=CAS, theta=theta, delta=delta, sigma=sigma)
+
+            maxThrust = self.Thrust(
+                rating=rating,
+                delta=delta,
+                theta=theta,
+                M=M,
+                DeltaTemp=DeltaTemp,
+            )
+            CL = self.CL(M=M, delta=delta, mass=mass, nz=1.0)
+            CD = self.CD(M=M, CL=CL, HLid=HLid, LG=LG)
+            Drag = self.D(M=M, delta=delta, CD=CD)
+
+            excessThrustList.append(maxThrust - Drag)
+            VxList.append(CAS)
+
+        idx = excessThrustList.index(max(excessThrustList))
+
+        return VxList[idx]
+
     def maxAltitude(self, HLid, LG, M, DeltaTemp, mass, nz=1.0):
         """
         Computes the maximum altitude taking into account buffet limitations. The altitude is calculated

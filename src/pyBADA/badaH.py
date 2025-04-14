@@ -683,7 +683,6 @@ class FlightEnvelope(BADAH):
         :type rateOfTurn: float
         :return: A tuple containing the minimum and maximum thrust-limited CAS speeds [m/s].
         :rtype: tuple(float, float)
-        :raises ValueError: If no valid CAS speeds are found within the power limits.
         """
 
         [theta, delta, sigma] = atm.atmosphereProperties(
@@ -721,6 +720,63 @@ class FlightEnvelope(BADAH):
             maxCAS = max(CASlist)
 
             return (minCAS, maxCAS)
+
+    def Vx(self, h, mass, DeltaTemp, rating="MTKF", rateOfTurn=0):
+        """
+        Computes the best angle climb speed (TAS) by finding the speed that maximizes the excess power
+        per unit speed within the helicopter's performance envelope.
+
+        :param h: Altitude in meters [m].
+        :param mass: Aircraft mass in kilograms [kg].
+        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature [K].
+        :param rating: Engine rating (e.g., "MTKF", "MCNT") determining the power output [-].
+        :param rateOfTurn: Rate of turn in degrees per second, which affects the bank angle [°/s].
+        :type h: float
+        :type mass: float
+        :type DeltaTemp: float
+        :type rating: str
+        :type rateOfTurn: float
+        :return: The true airspeed (TAS) corresponding to the best angle climb speed [m/s].
+        :rtype: float
+        """
+        [theta, delta, sigma] = atm.atmosphereProperties(
+            h=h, DeltaTemp=DeltaTemp
+        )
+
+        VminCertified = 0 + 5  # putting some margin to not start at 0 speed
+        VmaxCertified = self.VMax()
+
+        excessPowerList = []
+        VxList = []
+
+        for CAS in np.linspace(
+            VminCertified, VmaxCertified, num=200, endpoint=True
+        ):
+
+            TAS = atm.cas2Tas(cas=CAS, delta=delta, sigma=sigma)
+            bankAngle = self.bankAngle(rateOfTurn=rateOfTurn, v=TAS)
+            Preq = self.Preq(sigma=sigma, tas=TAS, mass=mass, phi=bankAngle)
+            Pav = self.Pav(rating=rating, theta=theta, delta=delta)
+
+            tempConst = (theta * const.temp_0 - DeltaTemp) / (
+                theta * const.temp_0
+            )
+
+            excessPowerList.append(
+                (Pav - Preq) * tempConst / TAS
+            )  # including speed and impact of the temperature deviation from ISA conditions
+            VxList.append(CAS)
+
+        VxCAS = VxList[excessPowerList.index(max(excessPowerList))]
+        [VxM, VxCAS, VxTAS] = atm.convertSpeed(
+            v=conv.ms2kt(VxCAS),
+            speedType="CAS",
+            theta=theta,
+            delta=delta,
+            sigma=sigma,
+        )
+
+        return VxTAS
 
 
 class Optimization(BADAH):
