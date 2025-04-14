@@ -9,6 +9,7 @@ between Haversine and Vincenty implementation
 
 import folium
 
+from pyBADA import conversions as conv
 from pyBADA import geodesic as geo
 
 

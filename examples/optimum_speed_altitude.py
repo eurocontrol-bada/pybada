@@ -10,6 +10,8 @@ from pyBADA import conversions as conv
 
 from pyBADA.bada4 import Bada4Aircraft
 from pyBADA.badaH import BadaHAircraft
+from pyBADA.bada4 import Parser as Bada4Parser
+from pyBADA.badaH import Parser as BadaHParser
 
 badaVersion = "DUMMY"
 

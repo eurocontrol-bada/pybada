@@ -10,6 +10,7 @@ import numpy as np
 from math import sqrt, pow, pi, cos, asin, radians, isnan
 import pandas as pd
 
+from scipy.optimize import minimize, Bounds
 
 from pyBADA import constants as const
 from pyBADA import conversions as conv

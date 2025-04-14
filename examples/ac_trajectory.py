@@ -16,6 +16,7 @@ from pyBADA.flightTrajectory import FlightTrajectory as FT
 from pyBADA.bada3 import Bada3Aircraft
 from pyBADA.bada4 import Bada4Aircraft
 from pyBADA.bada4 import Parser as Bada4Parser
+from pyBADA.bada3 import Parser as Bada3Parser
 
 
 @dataclass

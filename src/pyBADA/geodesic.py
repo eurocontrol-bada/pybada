@@ -15,8 +15,10 @@ from math import (
     pi,
     log,
     log2,
+    acos,
 )
 from pyBADA.aircraft import Airplane as airplane
+from pyBADA import conversions as conv
 from pyBADA import constants as const
 
 
