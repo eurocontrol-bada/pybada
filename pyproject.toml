@@ -27,7 +27,8 @@ license = { text = "EUPL-1.2" }
 # Some additional deps not needed to run the package but to develop on it
 # linter, formatter, to build the docs, ..
 [project.optional-dependencies]
-dev = ["black==25.1.0",
+dev = [
+  "black==25.1.0",
   "flake8==7.1.2",
   "sphinx-rtd-theme==3.0.2",
   "Sphinx==8.2.3",
@@ -38,7 +39,8 @@ dev = ["black==25.1.0",
   "pytest==8.3.5",
   "build",
   "twine",
-  "readthedocs-sphinx-search>=0.3.2"
+  "readthedocs-sphinx-search>=0.3.2",
+  "ruff==0.11.5",
   ]
 
 [project.urls]
@@ -61,6 +63,24 @@ exclude = '''
   | dist
 )/
 '''
+
+[tool.ruff]
+target-version = 'py312'
+line-length = 79
+exclude = [
+  ".git",
+  ".hg",
+  ".mypy_cache",
+  ".tox",
+  ".venv",
+  "_build",
+  "buck-out",
+  "docs",
+  "dist",
+]
+
+[tool.ruff.lint]
+select = ["F401"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyBADA"]
