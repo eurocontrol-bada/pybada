@@ -751,7 +751,6 @@ class FlightEnvelope(BADAH):
         for CAS in np.linspace(
             VminCertified, VmaxCertified, num=200, endpoint=True
         ):
-
             TAS = atm.cas2Tas(cas=CAS, delta=delta, sigma=sigma)
             bankAngle = self.bankAngle(rateOfTurn=rateOfTurn, v=TAS)
             Preq = self.Preq(sigma=sigma, tas=TAS, mass=mass, phi=bankAngle)

@@ -157,7 +157,6 @@ def getInitialMass(
     if flightPlanInitialMass is not None:
         initialMass = flightPlanInitialMass
     else:
-
         # in case of no wind, the ground speed is the same as true airspeed
         [theta, delta, sigma] = atm.atmosphereProperties(
             h=altitude, DeltaTemp=deltaTemp

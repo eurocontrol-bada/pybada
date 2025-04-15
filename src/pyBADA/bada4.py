@@ -5903,7 +5903,6 @@ class Bada4Aircraft(BADA4):
             # look for either found synonym or original full BADA4 model name designator
             if self.SearchedACName is not None:
                 if os.path.isfile(acXmlFile):
-
                     self.ACModelAvailable = True
 
                     XMLDataFrame = Parser.parseXML(

@@ -2,7 +2,7 @@
 Geodesic Calculation
 ====================
 
-Example of using the geodesic module and comparision 
+Example of using the geodesic module and comparision
 between Haversine and Vincenty implementation
 
 """

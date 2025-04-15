@@ -14,4 +14,3 @@ def test_data_load():
     )
 
     assert params.iloc[0]["VMO"] == 250.0
-

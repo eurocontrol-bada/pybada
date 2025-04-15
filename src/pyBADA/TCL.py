@@ -533,7 +533,6 @@ def constantSpeedLevel(
                     and Lon_i is not None
                     and (HDGMagnetic_i is not None or HDGTrue is not None)
                 ):
-
                     if headingToFly == "TRUE":
                         if not turnFlight:
                             if not constantHeading:
@@ -8975,7 +8974,6 @@ def accDec_time(
                     if P_i < Pmin:
                         P_i = Pmin
                         if ESFc is not None:
-
                             ROCD_i = (
                                 conv.m2ft(
                                     AC.ROCD(

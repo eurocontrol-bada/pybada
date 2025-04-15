@@ -135,7 +135,6 @@ class Parser:
             if (
                 LGDN is not None
             ):  # Landing gear NOT allowed in clean configuration
-
                 d[HLid]["LGDN"] = []
                 for i in LGDN.find("DPM").find("CD").findall("d"):
                     d[HLid]["LGDN"].append(float(i.text))
@@ -987,7 +986,6 @@ class Parser:
 
             HmaxList = {}
             for phase in root.find("HmaxList").findall("HmaxPhase"):
-
                 HmaxList[phase.find("Phase").text] = float(
                     phase.find("Hmax").text
                 )
@@ -1038,7 +1036,6 @@ class Parser:
 
             VdList = {}
             for vdphase in root.find("VdList").findall("VdPhase"):
-
                 Phase = vdphase.find("Phase")
                 name = Phase.find("name").text
                 index = int(Phase.find("index").text)
@@ -1220,7 +1217,6 @@ class Parser:
 
             VList = {}
             for vphase in root.find("VList").findall("VPhase"):
-
                 Phase = vphase.find("Phase")
                 name = Phase.find("name").text
                 index = int(Phase.find("index").text)
@@ -1614,7 +1610,6 @@ class BADA3(Airplane, Bada):
                 and self.AC.CD2[HLid_LD][LG_LD] == 0.0
                 and self.AC.DeltaCD == 0.0
             ):
-
                 CD = self.AC.CD0[HLid_CR][LG_CR] + self.AC.CD2[HLid_CR][
                     LG_CR
                 ] * (CL * CL)
@@ -1901,7 +1896,6 @@ class BADA3(Airplane, Bada):
                 and self.AC.CD2[HLid_LD][LG_LD] != 0.0
                 and self.AC.DeltaCD != 0.0
             ):
-
                 if HpDes_ < H_max_app:
                     HpDes_ = H_max_app
 
