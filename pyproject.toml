@@ -28,7 +28,6 @@ license = { text = "EUPL-1.2" }
 # linter, formatter, to build the docs, ..
 [project.optional-dependencies]
 dev = [
-  "black==25.1.0",
   "flake8==7.1.2",
   "sphinx-rtd-theme==3.0.2",
   "Sphinx==8.2.3",
@@ -46,23 +45,8 @@ dev = [
 [project.urls]
 "Homepage" = "https://github.com/eurocontrol-bada/pybada"
 
-[tool.black]
-target-version = ['py312']
-line-length = 79
-include = '\.pyi?$'
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | docs
-  | dist
-)/
-'''
+[tool.ruff.format]
+docstring-code-format = true
 
 [tool.ruff]
 target-version = 'py312'
