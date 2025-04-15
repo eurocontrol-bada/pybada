@@ -26,5 +26,10 @@ jobs:
           pip install .
           pip install .[dev]
 
-      - name: Run Ruff
+      - name: Run Ruff lint
         run: ruff check --output-format=github .
+      
+      - name: Run Ruff format
+        run: ruff format --check .
+
+        
