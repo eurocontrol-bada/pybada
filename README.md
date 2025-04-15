@@ -23,7 +23,7 @@ Examples, the user manual and the API reference can be found at the [pyBADA docu
 # Clone the repository
 git clone https://github.com/eurocontrol-bada/pybada
 
-# Optionally, set up a virtual env and activate it
+# Set up a virtual env and activate it
 python3 -m venv env
 source env/bin/activate
 
@@ -31,9 +31,18 @@ source env/bin/activate
 pip install .
 # Install a couple of packages for formatting, linting and building the docs
 pip install .[dev]
+# Install pre-commit
+pre-commit install
 
 # Run unit tests
 python3 -m pytest tests/
+
+# Format code
+ruff format
+
+# Lint code
+ruff check
+
 # Build the docs
 cd docs
 make html
@@ -47,6 +56,6 @@ You won't receive support for it, but you can pass the flag `--ignore-requires-p
 
 ## License
 
-BADA and pyBADA are developed and maintained by [EUROCONTROL](https://www.eurocontrol.int/).
+BADA and pyBADA are developed and maintained by [EUROCONTROL](https://www.eurocontrol.int/model/bada).
 
 This project is released under the European Union Public License v1.2 - see the [LICENSE](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) file for details.
