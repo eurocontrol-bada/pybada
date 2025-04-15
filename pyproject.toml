@@ -28,7 +28,6 @@ license = { text = "EUPL-1.2" }
 # linter, formatter, to build the docs, ..
 [project.optional-dependencies]
 dev = [
-  "flake8==7.1.2",
   "sphinx-rtd-theme==3.0.2",
   "Sphinx==8.2.3",
   "pre-commit==4.1.0",
