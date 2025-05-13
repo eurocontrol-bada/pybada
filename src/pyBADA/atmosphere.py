@@ -3,6 +3,7 @@ Atmosphere module
 """
 
 from math import sqrt, pow
+import numpy as np
 
 from pyBADA import constants as const
 from pyBADA import conversions as conv
