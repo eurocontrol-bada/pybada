@@ -2,7 +2,8 @@
 Atmosphere module
 """
 
-from math import sqrt, pow, exp, log
+from math import sqrt, pow
+import numpy as np
 
 from pyBADA import constants as const
 from pyBADA import conversions as conv
@@ -64,7 +65,9 @@ def delta(h, DeltaTemp):
     if h <= const.h_11:
         delta = p
     else:
-        delta = p * exp(-const.g / const.R / const.temp_11 * (h - const.h_11))
+        delta = p * np.exp(
+            -const.g / const.R / const.temp_11 * (h - const.h_11)
+        )
 
     return proper_round(delta, 10)
 
@@ -246,13 +249,13 @@ def cas2Mach(cas, theta, delta, sigma):
     return proper_round(M, 10)
 
 
-def hp(delta, QNH=101325.0):
+def pressureAltitude(pressure, QNH=101325.0):
     """
     Calculates pressure altitude based on normalized pressure and reference pressure (QNH).
 
     :param QNH: Reference pressure in Pascals (Pa), default is standard sea level pressure (101325 Pa).
-    :param delta: Normalized air pressure [-].
-    :type delta: float
+    :param pressure: air pressure (Pa)
+    :type pressure: float
     :type QNH: float
     :returns: Pressure altitude in meters (m).
 
@@ -261,16 +264,33 @@ def hp(delta, QNH=101325.0):
     Above the tropopause, it applies an exponential relationship for altitude based on pressure ratio.
     """
 
-    if delta * const.p_0 > const.p_11:
+    if pressure > const.p_11:
         hp = (const.temp_0 / const.temp_h) * (
-            1 - pow(delta * const.p_0 / QNH, const.R * const.temp_h / const.g)
+            1 - pow(pressure / QNH, const.R * const.temp_h / const.g)
         )
     else:
-        hp = const.h_11 - const.R * const.temp_11 / const.g * log(
-            delta * const.p_0 / const.p_11
+        hp = const.h_11 + const.R * const.temp_11 / const.g * np.log(
+            const.p_11 / pressure
         )
 
     return hp
+
+
+def ISATemperatureDeviation(temperature, pressureAltitude):
+    """
+    Calculates deviation from ISA temperature at a specific pressure altitude.
+
+    :param temperature: air temperature (Kelvin)
+    :param pressureAltitude: pressure altitude (m)
+    :type temperature: float
+    :type pressureAltitude: float
+    :returns: ISA temperature deviation (Kelvin).
+    """
+
+    stdTemperature = theta(h=pressureAltitude, DeltaTemp=0) * const.temp_0
+    deltaISATemp = temperature - stdTemperature
+
+    return deltaISATemp
 
 
 def crossOver(cas, Mach):
@@ -307,7 +327,7 @@ def crossOver(cas, Mach):
     theta_trans = pow(p_trans / const.p_0, (const.temp_h * const.R) / const.g)
 
     if p_trans < const.p_11:
-        crossover = const.h_11 - (const.R * const.temp_11 / const.g) * log(
+        crossover = const.h_11 - (const.R * const.temp_11 / const.g) * np.log(
             p_trans / const.p_11
         )
     else:
