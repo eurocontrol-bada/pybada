@@ -246,7 +246,7 @@ class Parser:
             DataFrame, and returns it.
         """
 
-        if filePath == None:
+        if filePath is None:
             filePath = configuration.getBadaVersionPath(
                 badaFamily="BADAH", badaVersion=badaVersion
             )
@@ -4089,7 +4089,7 @@ class BadaHAircraft(BADAH):
         self.BADAVersion = badaVersion
         self.acName = acName
 
-        if filePath == None:
+        if filePath is None:
             self.filePath = configuration.getBadaVersionPath(
                 badaFamily="BADAH", badaVersion=badaVersion
             )
@@ -4152,7 +4152,7 @@ class BadaHAircraft(BADAH):
                 )
 
                 # if cannot find - look for full name (in sub folder names) based on acName (may not be ICAO designator)
-                if self.SearchedACName == None:
+                if self.SearchedACName is None:
                     self.SearchedACName = acName
                 else:
                     self.ACinSynonymFile = True

@@ -660,7 +660,7 @@ class Parser:
         :rtype: pd.DataFrame
         """
 
-        if filePath == None:
+        if filePath is None:
             filePath = configuration.getBadaVersionPath(
                 badaFamily="BADA4", badaVersion=badaVersion
             )
@@ -5813,7 +5813,7 @@ class Bada4Aircraft(BADA4):
         self.BADAVersion = badaVersion
         self.acName = acName
 
-        if filePath == None:
+        if filePath is None:
             self.filePath = configuration.getBadaVersionPath(
                 badaFamily="BADA4", badaVersion=badaVersion
             )
@@ -5942,7 +5942,7 @@ class Bada4Aircraft(BADA4):
                 )
 
                 # if cannot find - look for full name (in sub folder names) based on acName (may not be ICAO designator)
-                if self.SearchedACName == None:
+                if self.SearchedACName is None:
                     self.SearchedACName = acName
                 else:
                     self.ACinSynonymFile = True

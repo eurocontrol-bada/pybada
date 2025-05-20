@@ -1476,7 +1476,7 @@ class Parser:
             read.
         """
 
-        if filePath == None:
+        if filePath is None:
             filePath = configuration.getBadaVersionPath(
                 badaFamily="BADA3", badaVersion=badaVersion
             )
@@ -4738,7 +4738,7 @@ class Bada3Aircraft(BADA3):
         self.BADAFamily = BadaFamily(BADA3=True)
         self.BADAVersion = badaVersion
 
-        if filePath == None:
+        if filePath is None:
             self.filePath = configuration.getBadaVersionPath(
                 badaFamily="BADA3", badaVersion=badaVersion
             )
@@ -4847,7 +4847,7 @@ class Bada3Aircraft(BADA3):
                     self.filePath, acName
                 )
 
-                if self.SearchedACName == None:
+                if self.SearchedACName is None:
                     # look for file name directly, which consists of added "_" at the end of file
                     fileName = acName
                     while len(fileName) < 6:

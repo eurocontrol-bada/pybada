@@ -171,7 +171,7 @@ def constantSpeedLevel(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
@@ -1304,7 +1304,7 @@ def constantSpeedROCD(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
@@ -2338,7 +2338,7 @@ def constantSpeedROCD_time(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
@@ -3355,7 +3355,7 @@ def constantSpeedSlope(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
@@ -4385,7 +4385,7 @@ def constantSpeedSlope_time(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
@@ -5411,7 +5411,7 @@ def constantSpeedRating(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
@@ -6357,7 +6357,7 @@ def constantSpeedRating_time(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
@@ -7302,7 +7302,7 @@ def accDec(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
@@ -8585,7 +8585,7 @@ def accDec_time(
             magneticHeading = trueHeading - magneticDeclination
         elif magneticHeading is not None and trueHeading is None:
             # fly MAGNETIC Heading
-            if constantHeading == True:
+            if constantHeading is True:
                 headingToFly = "MAGNETIC"
                 trueHeading = magneticHeading + magneticDeclination
             else:
