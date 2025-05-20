@@ -13,3 +13,15 @@
     padding-top: 2em;
     padding-bottom: 2.5em;
 }
+
+code {
+    font-size: 100%;
+}
+
+.highlight pre {
+    font-size: 14px !important;
+}
+
+.rst-content code, .rst-content tt, code {
+    font-size: 90%;
+}
