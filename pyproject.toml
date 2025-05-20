@@ -63,7 +63,8 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["F401"]
+select = ["E", "F401"]
+ignore = ["E501"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/pyBADA"]
