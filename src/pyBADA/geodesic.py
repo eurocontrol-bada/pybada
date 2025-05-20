@@ -20,7 +20,8 @@ from pyBADA import constants as const
 
 
 class Haversine:
-    """This class implements the geodesic calculations on sherical earth (ignoring ellipsoidal effects).
+    """This class implements the geodesic calculations on sherical earth
+    (ignoring ellipsoidal effects).
 
     .. note::
             https://www.movable-type.co.uk/scripts/latlong.html
@@ -31,10 +32,12 @@ class Haversine:
 
     @staticmethod
     def distance(LAT_init, LON_init, LAT_final, LON_final):
-        """Calculate the great-circle distance between two points on the Earth's surface using the haversine formula.
+        """Calculate the great-circle distance between two points on the
+        Earth's surface using the haversine formula.
 
-        The great-circle distance is the shortest distance between two points over the Earth's surface,
-        ignoring elevation changes (i.e., hills or mountains).
+        The great-circle distance is the shortest distance between two points
+        over the Earth's surface, ignoring elevation changes (i.e., hills or
+        mountains).
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
@@ -65,12 +68,15 @@ class Haversine:
 
     @staticmethod
     def destinationPoint(LAT_init, LON_init, distance, bearing):
-        """Calculate the destination point given an initial point, distance, and bearing.
+        """Calculate the destination point given an initial point, distance,
+        and bearing.
 
-        Given an initial latitude and longitude, this function calculates the destination point
-        after traveling the specified distance along the given initial bearing (direction).
+        Given an initial latitude and longitude, this function calculates the
+        destination point after traveling the specified distance along the
+        given initial bearing (direction).
 
-        Note that the bearing may vary along the path, but this calculation assumes a constant bearing.
+        Note that the bearing may vary along the path, but this calculation
+        assumes a constant bearing.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
@@ -80,7 +86,8 @@ class Haversine:
         :type LON_init: float
         :type distance: float
         :type bearing: float
-        :returns: Tuple containing the destination latitude and longitude in degrees.
+        :returns: Tuple containing the destination latitude and longitude in
+            degrees.
         :rtype: (float, float)
         """
 
@@ -105,10 +112,12 @@ class Haversine:
 
     @staticmethod
     def bearing(LAT_init, LON_init, LAT_final, LON_final):
-        """Calculate the initial bearing between two points along a great-circle path.
+        """Calculate the initial bearing between two points along a great-
+        circle path.
 
-        The initial bearing (forward azimuth) is the direction one would need to travel
-        in a straight line along the great-circle arc from the start point to the end point.
+        The initial bearing (forward azimuth) is the direction one would need
+        to travel in a straight line along the great-circle arc from the start
+        point to the end point.
 
         This bearing is measured clockwise from true north.
 
@@ -138,19 +147,20 @@ class Haversine:
 
 
 class Vincenty:
-    """This class implements the vincenty calculations of geodesics on the ellipsoid-model earth
+    """This class implements the vincenty calculations of geodesics on the
+    ellipsoid-model earth.
 
     .. note::
             https://www.movable-type.co.uk/scripts/latlong-vincenty.html
-
     """
 
     @staticmethod
     def distance_bearing(LAT_init, LON_init, LAT_final, LON_final):
-        """Calculate the geodesic distance, initial bearing, and final bearing between two points on the Earth's surface.
+        """Calculate the geodesic distance, initial bearing, and final bearing
+        between two points on the Earth's surface.
 
-        This method uses the Vincenty formula to account for the Earth's ellipsoidal shape, providing accurate
-        calculations for long distances.
+        This method uses the Vincenty formula to account for the Earth's
+        ellipsoidal shape, providing accurate calculations for long distances.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
@@ -160,7 +170,8 @@ class Vincenty:
         :type LON_init: float
         :type LAT_final: float
         :type LON_final: float
-        :returns: Tuple containing distance in meters, initial bearing in degrees, and final bearing in degrees.
+        :returns: Tuple containing distance in meters, initial bearing in
+            degrees, and final bearing in degrees.
         :rtype: (float, float, float)
         """
 
@@ -274,10 +285,12 @@ class Vincenty:
 
     @staticmethod
     def distance(LAT_init, LON_init, LAT_final, LON_final):
-        """Calculate the geodesic distance between two latitude/longitude points on the Earth's surface.
+        """Calculate the geodesic distance between two latitude/longitude
+        points on the Earth's surface.
 
-        This method uses an accurate ellipsoidal model (Vincenty's formula) for calculating the distance,
-        which is particularly useful for long distances across the globe.
+        This method uses an accurate ellipsoidal model (Vincenty's formula)
+        for calculating the distance, which is particularly useful for long
+        distances across the globe.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
@@ -298,10 +311,12 @@ class Vincenty:
 
     @staticmethod
     def bearing_initial(LAT_init, LON_init, LAT_final, LON_final):
-        """Calculate the initial bearing (forward azimuth) from the initial point to the final point.
+        """Calculate the initial bearing (forward azimuth) from the initial
+        point to the final point.
 
-        This function returns the initial bearing that, if followed in a straight line along a great-circle path,
-        will take you from the start point to the end point.
+        This function returns the initial bearing that, if followed in a
+        straight line along a great-circle path, will take you from the start
+        point to the end point.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
@@ -322,10 +337,12 @@ class Vincenty:
 
     @staticmethod
     def bearing_final(LAT_init, LON_init, LAT_final, LON_final):
-        """Calculate the final bearing (reverse azimuth) from the final point to the initial point.
+        """Calculate the final bearing (reverse azimuth) from the final point
+        to the initial point.
 
-        This function calculates the final bearing at the destination point, which is the direction one
-        would need to take to return to the initial point along the great-circle path.
+        This function calculates the final bearing at the destination point,
+        which is the direction one would need to take to return to the initial
+        point along the great-circle path.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
@@ -346,7 +363,8 @@ class Vincenty:
 
     @staticmethod
     def destinationPoint_finalBearing(LAT_init, LON_init, distance, bearing):
-        """Calculate the destination point and final bearing given an initial point, distance, and bearing.
+        """Calculate the destination point and final bearing given an initial
+        point, distance, and bearing.
 
         This method calculates the latitude and longitude of the destination point after traveling a specified
         distance along the given bearing from the starting point. It also returns the final bearing at the
@@ -446,20 +464,24 @@ class Vincenty:
 
     @staticmethod
     def destinationPoint(LAT_init, LON_init, distance, bearing):
-        """Calculate the destination point after traveling a specified distance on a given bearing.
+        """Calculate the destination point after traveling a specified
+        distance on a given bearing.
 
-        This method returns the latitude and longitude of the destination point after traveling the given
-        distance on the specified initial bearing, following a great-circle path.
+        This method returns the latitude and longitude of the destination
+        point after traveling the given distance on the specified initial
+        bearing, following a great-circle path.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
-        :param distance: Distance to be traveled from the initial point in meters.
+        :param distance: Distance to be traveled from the initial point in
+            meters.
         :param bearing: Initial bearing (direction) in degrees.
         :type LAT_init: float
         :type LON_init: float
         :type distance: float
         :type bearing: float
-        :returns: Tuple containing the destination latitude and longitude in degrees.
+        :returns: Tuple containing the destination latitude and longitude in
+            degrees.
         :rtype: (float, float)
         """
 
@@ -471,21 +493,21 @@ class Vincenty:
 
 
 class RhumbLine:
-    """This class implements the rhumb line (loxodrome) calculations of geodesics on the ellipsoid-model earth
+    """This class implements the rhumb line (loxodrome) calculations of
+    geodesics on the ellipsoid-model earth.
 
     .. note::
             https://github.com/SpyrosMouselinos/distancly/blob/master/distancly/rhumbline.py
-
     """
 
     @staticmethod
     def simple_project(latitiude: float) -> float:
-        """
-        Applies a projection to the latitude for use in rhumbline calculations.
+        """Applies a projection to the latitude for use in rhumbline
+        calculations.
 
-        The projection is based on the Mercator projection, where latitudes are projected
-        to account for the curvature of the Earth. This formula ensures that the calculations
-        along the rhumbline are accurate.
+        The projection is based on the Mercator projection, where latitudes
+        are projected to account for the curvature of the Earth. This formula
+        ensures that the calculations along the rhumbline are accurate.
 
         :param latitiude: Latitude in radians.
         :return: The projected latitude in radians.
@@ -495,13 +517,15 @@ class RhumbLine:
 
     @staticmethod
     def distance(LAT_init, LON_init, LAT_final, LON_final) -> float:
-        """
-        Calculates the rhumbline distance between two geographical points in meters.
+        """Calculates the rhumbline distance between two geographical points
+        in meters.
 
-        The rhumbline is a path of constant bearing that crosses all meridians at the same angle,
-        unlike a great-circle route which is the shortest distance between two points on the Earth's surface.
+        The rhumbline is a path of constant bearing that crosses all meridians
+        at the same angle, unlike a great-circle route which is the shortest
+        distance between two points on the Earth's surface.
 
-        This method adjusts for longitudes that span more than half of the globe.
+        This method adjusts for longitudes that span more than half of the
+        globe.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
@@ -541,11 +565,12 @@ class RhumbLine:
 
     @staticmethod
     def bearing(LAT_init, LON_init, LAT_final, LON_final) -> float:
-        """
-        Calculates the rhumbline bearing from the initial point to the final point.
+        """Calculates the rhumbline bearing from the initial point to the
+        final point.
 
-        This returns the constant bearing (direction) required to travel along a rhumbline
-        between the two points. The bearing is adjusted for longitudes that cross the 180-degree meridian.
+        This returns the constant bearing (direction) required to travel along
+        a rhumbline between the two points. The bearing is adjusted for
+        longitudes that cross the 180-degree meridian.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
@@ -575,17 +600,20 @@ class RhumbLine:
 
     @staticmethod
     def destinationPoint(LAT_init, LON_init, bearing, distance) -> tuple:
-        """
-        Calculates the destination point given an initial point, a bearing, and a distance traveled.
+        """Calculates the destination point given an initial point, a bearing,
+        and a distance traveled.
 
-        This method computes the final latitude and longitude after traveling along a rhumbline
-        for a given distance in meters from the initial point at a constant bearing.
+        This method computes the final latitude and longitude after traveling
+        along a rhumbline for a given distance in meters from the initial
+        point at a constant bearing.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
         :param bearing: The constant bearing in degrees.
-        :param distance: The distance to travel from the initial point in meters.
-        :return: A tuple containing the destination latitude and longitude in degrees.
+        :param distance: The distance to travel from the initial point in
+            meters.
+        :return: A tuple containing the destination latitude and longitude in
+            degrees.
         """
 
         lat_a = radians(LAT_init)
@@ -623,17 +651,19 @@ class RhumbLine:
     def loxodromic_mid_point(
         LAT_init, LON_init, LAT_final, LON_final
     ) -> tuple:
-        """
-        Calculates the midpoint along a rhumbline between two geographical points.
+        """Calculates the midpoint along a rhumbline between two geographical
+        points.
 
-        The midpoint is calculated using the rhumbline path between the initial and final points.
-        This takes into account the Earth's curvature by projecting the latitudes.
+        The midpoint is calculated using the rhumbline path between the
+        initial and final points. This takes into account the Earth's
+        curvature by projecting the latitudes.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
         :param LAT_final: Final latitude in degrees.
         :param LON_final: Final longitude in degrees.
-        :return: A tuple representing the midpoint's latitude and longitude in degrees.
+        :return: A tuple representing the midpoint's latitude and longitude in
+            degrees.
         """
 
         lat_a = radians(LAT_init)
@@ -667,18 +697,21 @@ class RhumbLine:
     def loxodromic_power_interpolation(
         LAT_init, LON_init, LAT_final, LON_final, n_points: int
     ) -> list:
-        """
-        Generates a specified number of points between two geographical locations along a rhumbline path.
+        """Generates a specified number of points between two geographical
+        locations along a rhumbline path.
 
-        This method recursively calculates intermediate points between two points on the Earth's surface,
-        following a constant bearing rhumbline path. The number of points should be a power of 2 minus 1.
+        This method recursively calculates intermediate points between two
+        points on the Earth's surface, following a constant bearing rhumbline
+        path. The number of points should be a power of 2 minus 1.
 
         :param LAT_init: Initial latitude in degrees.
         :param LON_init: Initial longitude in degrees.
         :param LAT_final: Final latitude in degrees.
         :param LON_final: Final longitude in degrees.
-        :param n_points: Number of intermediate points to generate. Must be a power of 2 minus 1.
-        :return: A list of tuples, where each tuple represents an interpolated point's latitude and longitude in degrees.
+        :param n_points: Number of intermediate points to generate. Must be a
+            power of 2 minus 1.
+        :return: A list of tuples, where each tuple represents an interpolated
+            point's latitude and longitude in degrees.
         """
 
         n_points = int(n_points)
@@ -716,7 +749,7 @@ class RhumbLine:
 
 
 class Turn:
-    """This class implements the calculations of geodesics turns"""
+    """This class implements the calculations of geodesics turns."""
 
     @staticmethod
     def destinationPoint_finalBearing(
@@ -729,11 +762,14 @@ class Turn:
         directionOfTurn,
         centerPoint=None,
     ):
-        """Calculates the destination point and final bearing after traveling for a given time with a specified turn.
+        """Calculates the destination point and final bearing after traveling
+        for a given time with a specified turn.
 
-        This function computes the aircraft's final position and bearing after making a turn at a specified rate
-        of turn, direction, and true airspeed (TAS). If TAS is zero, the aircraft rotates in place. The calculation
-        accounts for turning radius and bank angle.
+        This function computes the aircraft's final position and bearing
+        after making a turn at a specified rate of turn, direction, and
+        true airspeed (TAS). If TAS is zero, the aircraft rotates in
+        place. The calculation accounts for turning radius and bank
+        angle.
 
         :param LAT_init: Initial latitude [deg].
         :param LON_init: Initial longitude [deg].
@@ -742,7 +778,8 @@ class Turn:
         :param TAS: True Airspeed (TAS) [m/s].
         :param rateOfTurn: Rate of turn [deg/s].
         :param directionOfTurn: Direction of turn ('LEFT' or 'RIGHT').
-        :param centerPoint: Optional latitude and longitude of the rotation center (defaults to None) [deg, deg].
+        :param centerPoint: Optional latitude and longitude of the
+            rotation center (defaults to None) [deg, deg].
         :type LAT_init: float.
         :type LON_init: float.
         :type timeOfTurn: float.
@@ -751,7 +788,8 @@ class Turn:
         :type rateOfTurn: float.
         :type directionOfTurn: str.
         :type centerPoint: tuple(float, float).
-        :returns: Destination point's latitude, longitude, and final bearing [deg, deg, deg].
+        :returns: Destination point's latitude, longitude, and final
+            bearing [deg, deg, deg].
         :rtype: tuple(float, float, float).
         """
 
@@ -823,10 +861,12 @@ class Turn:
 
     @staticmethod
     def distance(rateOfTurn, TAS, timeOfTurn):
-        """Calculates the distance traveled during a turn based on the rate of turn, true airspeed, and time.
+        """Calculates the distance traveled during a turn based on the rate of
+        turn, true airspeed, and time.
 
-        This function computes the total distance traveled during a constant turn, based on the aircraft's rate
-        of turn, true airspeed, and the duration of the turn.
+        This function computes the total distance traveled during a constant
+        turn, based on the aircraft's rate of turn, true airspeed, and the
+        duration of the turn.
 
         :param rateOfTurn: Rate of turn [deg/s].
         :param TAS: True Airspeed (TAS) [m/s].

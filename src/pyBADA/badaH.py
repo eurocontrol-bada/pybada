@@ -32,26 +32,30 @@ def checkArgument(argument, **kwargs):
 
 
 class Parser:
-    """This class implements the BADAH parsing mechanism to parse xml BADAH files."""
+    """This class implements the BADAH parsing mechanism to parse xml BADAH
+    files."""
 
     def __init__(self):
         pass
 
     @staticmethod
     def parseXML(filePath, acName):
-        """
-        Parses the BADAH XML file for a specific aircraft model and extracts various parameters.
+        """Parses the BADAH XML file for a specific aircraft model and
+        extracts various parameters.
 
-        This function parses the BADAH aircraft XML file for a given aircraft model (acName). It retrieves
-        general information about the aircraft, engine type, aerodynamic configurations, performance parameters, and more.
+        This function parses the BADAH aircraft XML file for a given aircraft
+        model (acName). It retrieves general information about the aircraft,
+        engine type, aerodynamic configurations, performance parameters, and
+        more.
 
         :param filePath: The path to the folder containing the BADAH XML file.
-        :param acName: The aircraft code name for which the XML file is being parsed.
+        :param acName: The aircraft code name for which the XML file is being
+            parsed.
         :type filePath: str
         :type acName: str
         :raises IOError: If the XML file cannot be found or parsed.
-
-        :return: A pandas DataFrame containing the parsed data for the specified aircraft.
+        :return: A pandas DataFrame containing the parsed data for the
+            specified aircraft.
         :rtype: pd.DataFrame
         """
 
@@ -155,19 +159,20 @@ class Parser:
 
     @staticmethod
     def readSynonym(filePath):
-        """
-        Parses the BADAH Synonym XML file and returns a dictionary mapping aircraft code names
-        to their respective model files.
+        """Parses the BADAH Synonym XML file and returns a dictionary mapping
+        aircraft code names to their respective model files.
 
-        :param filePath: Path to the directory containing the BADA4 synonym XML file.
+        :param filePath: Path to the directory containing the BADA4 synonym
+            XML file.
         :type filePath: str
-        :returns: A dictionary where the keys are aircraft codes and the values are associated file names.
+        :returns: A dictionary where the keys are aircraft codes and the
+            values are associated file names.
         :rtype: dict
         :raises IOError: If the XML file is missing or has an invalid format.
-
-        This function attempts to read the synonym XML file, parse its contents, and store the
-        mappings in a dictionary. The file contains aircraft code, manufacturer, ICAO designation,
-        and file name data for each aircraft in the synonym list.
+            This function attempts to read the synonym XML file, parse its
+            contents, and store the mappings in a dictionary. The file
+            contains aircraft code, manufacturer, ICAO designation, and file
+            name data for each aircraft in the synonym list.
         """
 
         filename = os.path.join(filePath, "SYNONYM.xml")
@@ -194,8 +199,8 @@ class Parser:
 
     @staticmethod
     def parseSynonym(filePath, acName):
-        """
-        Retrieves the file name associated with a given aircraft code from the BADAH synonym file.
+        """Retrieves the file name associated with a given aircraft code from
+        the BADAH synonym file.
 
         :param filePath: Path to the directory containing the BADAH synonym XML file.
         :param acName: The ICAO aircraft code or name to search for in the synonym file.
@@ -217,23 +222,28 @@ class Parser:
 
     @staticmethod
     def parseAll(badaVersion, filePath=None):
-        """
-        Parses all BADAH XML-formatted files and compiles the data into a single DataFrame.
+        """Parses all BADAH XML-formatted files and compiles the data into a
+        single DataFrame.
 
-        This function reads the BADAH aircraft performance model data by parsing the XML files for each aircraft
-        model found in the specified directory. If the synonym XML file is present, it maps synonyms (alternative
-        names for aircraft) to their respective model files and includes them in the output DataFrame.
+        This function reads the BADAH aircraft performance model data by
+        parsing the XML files for each aircraft model found in the specified
+        directory. If the synonym XML file is present, it maps synonyms
+        (alternative names for aircraft) to their respective model files and
+        includes them in the output DataFrame.
 
         :param badaVersion: The version of BADAH being used (e.g., '1.1').
-        :param filePath: Optional path to the directory containing the BADAH files. If not provided, it uses the default path.
+        :param filePath: Optional path to the directory containing the BADAH
+            files. If not provided, it uses the default path.
         :type badaVersion: str
         :type filePath: str, optional
-        :returns: A pandas DataFrame containing all parsed BADAH model data, including any synonyms found.
+        :returns: A pandas DataFrame containing all parsed BADAH model data,
+            including any synonyms found.
         :rtype: pd.DataFrame
-        :raises IOError: If an error occurs while reading or parsing the XML files.
-
-        This function first checks if a synonym XML file exists to map synonyms to model files. Then, it parses
-        all XML files in the directory and its subfolders, merges the parsed data into a final DataFrame, and returns it.
+        :raises IOError: If an error occurs while reading or parsing the XML
+            files. This function first checks if a synonym XML file exists to
+            map synonyms to model files. Then, it parses all XML files in the
+            directory and its subfolders, merges the parsed data into a final
+            DataFrame, and returns it.
         """
 
         if filePath == None:
@@ -276,7 +286,8 @@ class Parser:
 
 
 class BADAH(Helicopter, Bada):
-    """This class implements the part of BADAH performance model that will be used in other classes following the BADAH manual.
+    """This class implements the part of BADAH performance model that will be
+    used in other classes following the BADAH manual.
 
     :param AC: Aircraft object {BADAH}.
     :type AC: badaHAircraft.
@@ -287,11 +298,12 @@ class BADAH(Helicopter, Bada):
         self.AC = AC
 
     def mu(self, tas):
-        """
-        Computes the advance ratio (mu) for the aircraft based on true airspeed (TAS) and rotor speed.
+        """Computes the advance ratio (mu) for the aircraft based on true
+        airspeed (TAS) and rotor speed.
 
-        The advance ratio is a non-dimensional parameter that relates the forward speed of the aircraft
-        to the rotational speed of its main rotor.
+        The advance ratio is a non-dimensional parameter that relates the
+        forward speed of the aircraft to the rotational speed of its main
+        rotor.
 
         :param tas: True airspeed (TAS) in meters per second [m/s].
         :type tas: float
@@ -305,11 +317,11 @@ class BADAH(Helicopter, Bada):
         return mu
 
     def CT(self, mass, rho, phi):
-        """
-        Computes the thrust coefficient (CT) for the aircraft.
+        """Computes the thrust coefficient (CT) for the aircraft.
 
-        The thrust coefficient is a dimensionless quantity that represents the thrust produced by the
-        aircraft's rotor in relation to the air density, rotor radius, and rotor speed.
+        The thrust coefficient is a dimensionless quantity that represents the
+        thrust produced by the aircraft's rotor in relation to the air
+        density, rotor radius, and rotor speed.
 
         :param mass: Aircraft mass in kilograms [kg].
         :param rho: Air density in kilograms per cubic meter [kg/m³].
@@ -332,11 +344,12 @@ class BADAH(Helicopter, Bada):
         return CT
 
     def CPreq(self, mu, CT):
-        """
-        Computes the power required coefficient (CPreq) based on the advance ratio (mu) and thrust coefficient (CT).
+        """Computes the power required coefficient (CPreq) based on the
+        advance ratio (mu) and thrust coefficient (CT).
 
-        The power required coefficient relates to the total power required to maintain flight,
-        factoring in the aerodynamic performance of the rotor in different operating regimes.
+        The power required coefficient relates to the total power required to
+        maintain flight, factoring in the aerodynamic performance of the rotor
+        in different operating regimes.
 
         :param mu: Advance ratio [-].
         :param CT: Thrust coefficient [-].
@@ -359,14 +372,16 @@ class BADAH(Helicopter, Bada):
         return CPreq
 
     def Preq(self, sigma, tas, mass, phi=0.0):
-        """
-        Computes the power required for the aircraft to maintain flight based on various factors
-        such as air density, true airspeed (TAS), aircraft mass, and bank angle.
+        """Computes the power required for the aircraft to maintain flight
+        based on various factors such as air density, true airspeed (TAS),
+        aircraft mass, and bank angle.
 
-        :param sigma: Normalized air density [-], which is the ratio of the current air density to sea level air density.
+        :param sigma: Normalized air density [-], which is the ratio of the
+            current air density to sea level air density.
         :param tas: True airspeed (TAS) in meters per second [m/s].
         :param mass: Aircraft mass in kilograms [kg].
-        :param phi: Bank angle in degrees [deg], default is 0 for straight flight.
+        :param phi: Bank angle in degrees [deg], default is 0 for straight
+            flight.
         :type sigma: float
         :type tas: float
         :type mass: float
@@ -394,15 +409,16 @@ class BADAH(Helicopter, Bada):
         return Preq
 
     def Peng_target(self, ROCD, mass, Preq, ESF, temp, DeltaTemp):
-        """
-        Computes the target engine power required to achieve a specific rate of climb or descent.
+        """Computes the target engine power required to achieve a specific
+        rate of climb or descent.
 
         :param ROCD: Rate of climb or descent in meters per second [m/s].
         :param mass: Aircraft mass in kilograms [kg].
         :param Preq: Power required in watts [W].
         :param ESF: Energy share factor, a dimensionless factor [-].
         :param temp: Atmospheric temperature in kelvins [K].
-        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature in kelvins [K].
+        :param DeltaTemp: Deviation from the International Standard Atmosphere
+            (ISA) temperature in kelvins [K].
         :type ROCD: float
         :type mass: float
         :type Preq: float
@@ -419,9 +435,9 @@ class BADAH(Helicopter, Bada):
         return Peng_target
 
     def CPav(self, rating, delta, theta):
-        """
-        Computes the power available coefficient (CPav) based on engine type, throttle rating,
-        normalized air pressure (delta), and normalized temperature (theta).
+        """Computes the power available coefficient (CPav) based on engine
+        type, throttle rating, normalized air pressure (delta), and normalized
+        temperature (theta).
 
         :param rating: Engine throttle setting, e.g., {MTKF, MCNT}.
         :param delta: Normalized air pressure [-].
@@ -483,14 +499,15 @@ class BADAH(Helicopter, Bada):
         return CPav
 
     def Pmax(self, rating):
-        """
-        Computes the maximum power available for all engines at a given throttle setting.
+        """Computes the maximum power available for all engines at a given
+        throttle setting.
 
         :param rating: Throttle setting, e.g., {MTKF, MCNT}.
         :type rating: str
         :return: Maximum all-engine power in watts [W].
         :rtype: float
-        :raises ValueError: If the specified throttle setting is not recognized.
+        :raises ValueError: If the specified throttle setting is not
+            recognized.
         """
 
         if rating not in self.AC.Pmax_.keys():
@@ -498,19 +515,21 @@ class BADAH(Helicopter, Bada):
         return self.AC.Pmax_[rating]
 
     def Pav(self, rating, delta, theta):
-        """
-        Computes the power available at the given throttle setting, based on normalized pressure
-        and temperature.
+        """Computes the power available at the given throttle setting, based
+        on normalized pressure and temperature.
 
         :param rating: Throttle setting, e.g., {MTKF, MCNT}.
-        :param delta: Normalized pressure [-], ratio of actual pressure to standard sea level pressure.
-        :param theta: Normalized temperature [-], ratio of actual temperature to standard sea level temperature.
+        :param delta: Normalized pressure [-], ratio of actual pressure to
+            standard sea level pressure.
+        :param theta: Normalized temperature [-], ratio of actual temperature
+            to standard sea level temperature.
         :type rating: str
         :type delta: float
         :type theta: float
         :return: Available power in watts [W].
         :rtype: float
-        :raises ValueError: If the specified throttle setting is not recognized.
+        :raises ValueError: If the specified throttle setting is not
+            recognized.
         """
 
         Pmax = self.Pmax(rating=rating)
@@ -529,8 +548,8 @@ class BADAH(Helicopter, Bada):
         return Pav
 
     def Q(self, Peng):
-        """
-        Computes the torque value as a percentage of the reference torque (P0).
+        """Computes the torque value as a percentage of the reference torque
+        (P0).
 
         :param Peng: All-engine power in watts [W].
         :type Peng: float
@@ -543,8 +562,8 @@ class BADAH(Helicopter, Bada):
         return Q
 
     def CP(self, Peng):
-        """
-        Computes the engine power coefficient (CP) based on the given all-engine power.
+        """Computes the engine power coefficient (CP) based on the given all-
+        engine power.
 
         :param Peng: All-engine power in watts [W].
         :type Peng: float
@@ -562,11 +581,13 @@ class BADAH(Helicopter, Bada):
         return CP
 
     def ff(self, delta, CP):
-        """
-        Computes the fuel flow rate based on normalized pressure and power coefficient.
+        """Computes the fuel flow rate based on normalized pressure and power
+        coefficient.
 
-        :param delta: Normalized pressure [-], which is the ratio of actual air pressure to standard sea-level pressure.
-        :param CP: Power coefficient [-], representing the power output in relation to the engine's maximum power.
+        :param delta: Normalized pressure [-], which is the ratio of actual
+            air pressure to standard sea-level pressure.
+        :param CP: Power coefficient [-], representing the power output in
+            relation to the engine's maximum power.
         :type delta: float
         :type CP: float
         :return: Fuel flow rate in kilograms per second [kg/s].
@@ -600,15 +621,17 @@ class BADAH(Helicopter, Bada):
         return ff / 3600
 
     def ROCD(self, Peng, Preq, mass, ESF, theta, DeltaTemp):
-        """
-        Computes the Rate of Climb or Descent (ROCD) for an aircraft.
+        """Computes the Rate of Climb or Descent (ROCD) for an aircraft.
 
         :param Peng: All-engine power available [W].
         :param Preq: Power required for steady flight [W].
         :param mass: Aircraft's current mass [kg].
-        :param ESF: Energy share factor [-], a multiplier used to adjust power distribution in different flight phases.
-        :param theta: Normalized temperature [-], ratio of actual temperature to standard sea-level temperature.
-        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature [K].
+        :param ESF: Energy share factor [-], a multiplier used to adjust power
+            distribution in different flight phases.
+        :param theta: Normalized temperature [-], ratio of actual temperature
+            to standard sea-level temperature.
+        :param DeltaTemp: Deviation from the International Standard Atmosphere
+            (ISA) temperature [K].
         :type Peng: float
         :type Preq: float
         :type mass: float
@@ -631,8 +654,8 @@ class BADAH(Helicopter, Bada):
 
 
 class FlightEnvelope(BADAH):
-    """This class is a BADAH aircraft subclass and implements the flight envelope caclulations
-    following the BADAH manual.
+    """This class is a BADAH aircraft subclass and implements the flight
+    envelope caclulations following the BADAH manual.
 
     :param AC: Aircraft object {BADAH}.
     :type AC: badaHAircraft.
@@ -642,8 +665,7 @@ class FlightEnvelope(BADAH):
         super().__init__(AC)
 
     def maxAltitude(self):
-        """
-        Computes the maximum operational altitude for the aircraft.
+        """Computes the maximum operational altitude for the aircraft.
 
         :return: Maximum altitude in meters [m].
         :rtype: float.
@@ -653,8 +675,8 @@ class FlightEnvelope(BADAH):
         return hMax
 
     def VMax(self):
-        """
-        Computes the maximum speed in Calibrated Airspeed (CAS) as limited by the flight envelope.
+        """Computes the maximum speed in Calibrated Airspeed (CAS) as limited
+        by the flight envelope.
 
         :return: Maximum CAS speed in meters per second [m/s].
         :rtype: float.
@@ -666,21 +688,24 @@ class FlightEnvelope(BADAH):
     def speedEnvelope_powerLimited(
         self, h, mass, DeltaTemp, rating="MCNT", rateOfTurn=0
     ):
-        """
-        Computes the maximum and minimum speeds (CAS) within the certified flight envelope,
-        taking into account engine thrust limitations.
+        """Computes the maximum and minimum speeds (CAS) within the certified
+        flight envelope, taking into account engine thrust limitations.
 
         :param h: Altitude in meters [m].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature [K].
-        :param rating: Engine rating (e.g., "MTKF", "MCNT") determining the power output [-].
-        :param rateOfTurn: Rate of turn in degrees per second, which affects bank angle [°/s].
+        :param DeltaTemp: Deviation from the International Standard Atmosphere
+            (ISA) temperature [K].
+        :param rating: Engine rating (e.g., "MTKF", "MCNT") determining the
+            power output [-].
+        :param rateOfTurn: Rate of turn in degrees per second, which affects
+            bank angle [°/s].
         :type h: float
         :type mass: float
         :type DeltaTemp: float
         :type rating: str
         :type rateOfTurn: float
-        :return: A tuple containing the minimum and maximum thrust-limited CAS speeds [m/s].
+        :return: A tuple containing the minimum and maximum thrust- limited
+            CAS speeds [m/s].
         :rtype: tuple(float, float)
         """
 
@@ -721,21 +746,25 @@ class FlightEnvelope(BADAH):
             return (minCAS, maxCAS)
 
     def Vx(self, h, mass, DeltaTemp, rating="MTKF", rateOfTurn=0):
-        """
-        Computes the best angle climb speed (TAS) by finding the speed that maximizes the excess power
-        per unit speed within the helicopter's performance envelope.
+        """Computes the best angle climb speed (TAS) by finding the speed that
+        maximizes the excess power per unit speed within the helicopter's
+        performance envelope.
 
         :param h: Altitude in meters [m].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature [K].
-        :param rating: Engine rating (e.g., "MTKF", "MCNT") determining the power output [-].
-        :param rateOfTurn: Rate of turn in degrees per second, which affects the bank angle [°/s].
+        :param DeltaTemp: Deviation from the International Standard Atmosphere
+            (ISA) temperature [K].
+        :param rating: Engine rating (e.g., "MTKF", "MCNT") determining the
+            power output [-].
+        :param rateOfTurn: Rate of turn in degrees per second, which affects
+            the bank angle [°/s].
         :type h: float
         :type mass: float
         :type DeltaTemp: float
         :type rating: str
         :type rateOfTurn: float
-        :return: The true airspeed (TAS) corresponding to the best angle climb speed [m/s].
+        :return: The true airspeed (TAS) corresponding to the best angle climb
+            speed [m/s].
         :rtype: float
         """
         [theta, delta, sigma] = atm.atmosphereProperties(
@@ -778,7 +807,8 @@ class FlightEnvelope(BADAH):
 
 
 class Optimization(BADAH):
-    """This class implements the BADAH optimization following the BADAH manual.
+    """This class implements the BADAH optimization following the BADAH
+    manual.
 
     :param AC: Aircraft object {BADAH}.
     :type AC: badaHAircraft.
@@ -790,24 +820,29 @@ class Optimization(BADAH):
         self.flightEnvelope = FlightEnvelope(AC)
 
     def MRC(self, h, mass, DeltaTemp, wS):
-        """
-        Computes the True Airspeed (TAS) representing Maximum Range Cruise (MRC) for given flight conditions.
+        """Computes the True Airspeed (TAS) representing Maximum Range Cruise
+        (MRC) for given flight conditions.
 
-        The Maximum Range Cruise speed is the speed that maximizes the aircraft's range per unit of fuel,
-        which is determined by balancing the fuel flow rate and airspeed. The algorithm ensures that the
-        computed TAS stays within the power available limitations of the aircraft.
+        The Maximum Range Cruise speed is the speed that maximizes the
+        aircraft's range per unit of fuel, which is determined by balancing
+        the fuel flow rate and airspeed. The algorithm ensures that the
+        computed TAS stays within the power available limitations of the
+        aircraft.
 
         :param h: Altitude in meters [m].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from International Standard Atmosphere (ISA) temperature in Kelvin [K].
+        :param DeltaTemp: Deviation from International Standard Atmosphere
+            (ISA) temperature in Kelvin [K].
         :param wS: Longitudinal wind speed (TAS) in meters per second [m/s].
         :type h: float
         :type mass: float
         :type DeltaTemp: float
         :type wS: float
-        :return: Maximum Range Cruise (MRC) speed in True Airspeed (TAS) [m/s].
+        :return: Maximum Range Cruise (MRC) speed in True Airspeed (TAS)
+            [m/s].
         :rtype: float.
-        :raises ValueError: If no valid MRC speed is found, the function will return NaN.
+        :raises ValueError: If no valid MRC speed is found, the function will
+            return NaN.
         """
 
         # NOTE: check for precision of algorithm needed. Possible local minima, instead of global minima
@@ -869,16 +904,19 @@ class Optimization(BADAH):
         return mrc
 
     def LRC(self, h, mass, DeltaTemp, wS):
-        """
-        Computes the True Airspeed (TAS) representing Long Range Cruise (LRC) for the given flight conditions.
+        """Computes the True Airspeed (TAS) representing Long Range Cruise
+        (LRC) for the given flight conditions.
 
-        The Long Range Cruise speed is the speed that allows for 99% of the specific range (range per unit of fuel)
-        of the Maximum Range Cruise (MRC) speed while offering a higher cruise speed. This function ensures that the
-        computed TAS remains within the aircraft's power limitations.
+        The Long Range Cruise speed is the speed that allows for 99% of the
+        specific range (range per unit of fuel) of the Maximum Range Cruise
+        (MRC) speed while offering a higher cruise speed. This function
+        ensures that the computed TAS remains within the aircraft's power
+        limitations.
 
         :param h: Altitude in meters [m].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from International Standard Atmosphere (ISA) temperature in Kelvin [K].
+        :param DeltaTemp: Deviation from International Standard Atmosphere
+            (ISA) temperature in Kelvin [K].
         :param wS: Longitudinal wind speed (TAS) in meters per second [m/s].
         :type h: float
         :type mass: float
@@ -886,11 +924,11 @@ class Optimization(BADAH):
         :type wS: float
         :return: Long Range Cruise (LRC) speed in True Airspeed (TAS) [m/s].
         :rtype: float.
-        :raises ValueError: If no valid LRC speed is found, the function will return NaN.
-
-        The algorithm starts by computing the MRC speed. Using the MRC as a reference, it then calculates the
-        LRC by finding the TAS that achieves 99% of the specific range of the MRC while staying within
-        the aircraft’s thrust limitations.
+        :raises ValueError: If no valid LRC speed is found, the function will
+            return NaN. The algorithm starts by computing the MRC speed. Using
+            the MRC as a reference, it then calculates the LRC by finding the
+            TAS that achieves 99% of the specific range of the MRC while
+            staying within the aircraft’s thrust limitations.
         """
 
         # NOTE: check for precision of algorithm needed. Possible local minima, instead of global minima
@@ -964,27 +1002,30 @@ class Optimization(BADAH):
         return lrc
 
     def MEC(self, h, mass, DeltaTemp, wS):
-        """
-        Computes the True Airspeed (TAS) representing Maximum Endurance Cruise (MEC) for the given flight conditions.
+        """Computes the True Airspeed (TAS) representing Maximum Endurance
+        Cruise (MEC) for the given flight conditions.
 
-        The Maximum Endurance Cruise speed is the speed that maximizes the time an aircraft can stay in the air
-        for a given amount of fuel, making it ideal for loiter operations. This function minimizes fuel flow (ff)
-        to determine the most fuel-efficient speed.
+        The Maximum Endurance Cruise speed is the speed that maximizes the
+        time an aircraft can stay in the air for a given amount of fuel,
+        making it ideal for loiter operations. This function minimizes fuel
+        flow (ff) to determine the most fuel-efficient speed.
 
         :param h: Altitude in meters [m].
         :param mass: Aircraft weight in kilograms [kg].
-        :param DeltaTemp: Deviation from the International Standard Atmosphere (ISA) temperature in Kelvin [K].
+        :param DeltaTemp: Deviation from the International Standard Atmosphere
+            (ISA) temperature in Kelvin [K].
         :param wS: Longitudinal wind speed (TAS) in meters per second [m/s].
         :type h: float
         :type mass: float
         :type DeltaTemp: float
         :type wS: float
-        :return: Maximum Endurance Cruise (MEC) speed in True Airspeed (TAS) [m/s].
+        :return: Maximum Endurance Cruise (MEC) speed in True Airspeed (TAS)
+            [m/s].
         :rtype: float
-        :raises: If no valid MEC speed is found, the function returns NaN.
-
-        The algorithm iterates over possible True Airspeeds (TAS) and computes the fuel flow for each, aiming to
-        minimize fuel consumption and return the TAS that achieves this.
+        :raises: If no valid MEC speed is found, the function returns NaN. The
+            algorithm iterates over possible True Airspeeds (TAS) and computes
+            the fuel flow for each, aiming to minimize fuel consumption and
+            return the TAS that achieves this.
         """
 
         [theta, delta, sigma] = atm.atmosphereProperties(
@@ -1030,17 +1071,18 @@ class Optimization(BADAH):
         return mecTAS
 
     def parseOPT(self, filename):
-        """
-        Parses BADAH OPT ASCII formatted files and stores data for each available delta temperature in the file.
+        """Parses BADAH OPT ASCII formatted files and stores data for each
+        available delta temperature in the file.
 
         :param filename: Path to the ___.OPT ASCII formatted file.
         :type filename: str
-        :return: Dictionary of delta temperature values and corresponding data from the OPT file.
-        :rtype: dict
-
-        This function reads and processes a BADAH OPT file, extracting delta temperature values and the corresponding
-        performance data. The data is stored in a dictionary where each delta temperature is mapped to its respective
-        dataset of performance values.
+        :return: Dictionary of delta temperature values and corresponding data
+            from the OPT file.
+        :rtype: dict This function reads and processes a BADAH OPT file,
+            extracting delta temperature values and the corresponding
+            performance data. The data is stored in a dictionary where each
+            delta temperature is mapped to its respective dataset of
+            performance values.
         """
 
         file = open(filename, "r")
@@ -1099,21 +1141,21 @@ class Optimization(BADAH):
         return DeltaTempDict
 
     def findNearestIdx(self, value, array):
-        """
-        Finds the nearest index or indices for a given value in a sorted array.
+        """Finds the nearest index or indices for a given value in a sorted
+        array.
 
-        If the value is lower or higher than the array’s bounds, a single index is returned. If the value lies between
-        two elements, two closest indices (left and right) are returned.
+        If the value is lower or higher than the array’s bounds, a single
+        index is returned. If the value lies between two elements, two closest
+        indices (left and right) are returned.
 
         :param value: The value to find the nearest match for.
         :param array: The sorted array of values.
         :type value: float
         :type array: list[float]
         :return: A list of nearest index or indices.
-        :rtype: list[float]
-
-        The function uses binary search to efficiently find the nearest value or values, ensuring precise interpolation
-        when needed.
+        :rtype: list[float] The function uses binary search to efficiently
+            find the nearest value or values, ensuring precise interpolation
+            when needed.
         """
 
         nearestIdx = list()
@@ -1132,23 +1174,24 @@ class Optimization(BADAH):
         return nearestIdx
 
     def calculateOPTparam(self, var_1, var_2, detaTauList):
-        """
-        Calculates the interpolated value of an OPT parameter based on two optimizing factors.
+        """Calculates the interpolated value of an OPT parameter based on two
+        optimizing factors.
 
-        If the exact values of the factors exist in the data, the function returns the corresponding OPT value.
-        Otherwise, it interpolates between the nearest two values to provide a more accurate result.
+        If the exact values of the factors exist in the data, the function
+        returns the corresponding OPT value. Otherwise, it interpolates
+        between the nearest two values to provide a more accurate result.
 
         :param var_1: The first optimizing factor.
         :param var_2: The second optimizing factor.
-        :param detaTauList: List of values belonging to the specified delta temperature from the OPT file.
+        :param detaTauList: List of values belonging to the specified delta
+            temperature from the OPT file.
         :type var_1: float
         :type var_2: float
         :type detaTauList: list[float]
         :return: Interpolated or exact OPT value based on the input factors.
-        :rtype: float
-
-        This function handles both single-index and two-index cases for the nearest values, ensuring correct interpolation
-        in the case of multiple values being found.
+        :rtype: float This function handles both single-index and two- index
+            cases for the nearest values, ensuring correct interpolation in
+            the case of multiple values being found.
         """
 
         var_1_list = detaTauList[0]
@@ -1238,9 +1281,9 @@ class Optimization(BADAH):
             return interpVar_3
 
     def getOPTParam(self, optParam, var_1, var_2, DeltaTemp):
-        """
-        Retrieves the value of the specified optimization parameter (e.g., LRC, MEC, MRC) from the BADA OPT file,
-        either directly or through interpolation based on the given flight conditions.
+        """Retrieves the value of the specified optimization parameter (e.g.,
+        LRC, MEC, MRC) from the BADA OPT file, either directly or through
+        interpolation based on the given flight conditions.
 
         The function searches for the requested optimization parameter value using two optimizing factors.
         If the exact DeltaTemp exists in the OPT file, it retrieves the value. Otherwise, the function interpolates
@@ -1311,8 +1354,8 @@ class Optimization(BADAH):
 
 
 class ARPM(BADAH):
-    """This class is a BADAH aircraft subclass and implements the Airline Procedure Model (ARPM)
-    following the BADAH user manual.
+    """This class is a BADAH aircraft subclass and implements the Airline
+    Procedure Model (ARPM) following the BADAH user manual.
 
     :param AC: Aircraft object {BADAH}.
     :type AC: badaHAircraft.
@@ -1333,8 +1376,8 @@ class ARPM(BADAH):
         speedLimit=None,
         ROCDDefault=None,
     ):
-        """
-        Computes various parameters for the aircraft takeoff phase using the ARPM model (or other specified engine ratings).
+        """Computes various parameters for the aircraft takeoff phase using
+        the ARPM model (or other specified engine ratings).
 
         This function calculates key takeoff parameters, including the available and required power, true airspeed, rate of climb (ROCD), and other
         performance metrics. It also checks for speed limitations based on the flight envelope and applies them as necessary.
@@ -1491,8 +1534,8 @@ class ARPM(BADAH):
         ROCDDefault=None,
         tasDefault=None,
     ):
-        """
-        Computes various parameters for the aircraft climb phase using the ARPM model or other engine ratings.
+        """Computes various parameters for the aircraft climb phase using the
+        ARPM model or other engine ratings.
 
         This function calculates key climb parameters, including available and required power, true airspeed (TAS),
         rate of climb (ROCD), and performance limitations. It takes into account speed envelope constraints
@@ -1653,8 +1696,8 @@ class ARPM(BADAH):
         pass
 
     def cruise(self, h, mass, DeltaTemp, speedLimit=None, tasDefault=None):
-        """
-        Computes various parameters for the aircraft cruise phase using the ARPM model or default speed.
+        """Computes various parameters for the aircraft cruise phase using the
+        ARPM model or default speed.
 
         This function calculates key cruise parameters, including available and required power, true airspeed (TAS),
         and potential limitations due to the flight envelope or engine power. The calculations take into account
@@ -1764,8 +1807,8 @@ class ARPM(BADAH):
         ROCDDefault=None,
         tasDefault=None,
     ):
-        """
-        Computes various parameters for the aircraft descent phase using the ARPM model or default speed.
+        """Computes various parameters for the aircraft descent phase using
+        the ARPM model or default speed.
 
         This function calculates key descent parameters, including available and required power, true airspeed (TAS),
         rate of descent (ROD), and potential performance limitations. The calculations take into account atmospheric
@@ -1894,8 +1937,8 @@ class ARPM(BADAH):
         ROCDDefault=None,
         tasDefault=None,
     ):
-        """
-        Computes various parameters for the aircraft approach phase using the ARPM model.
+        """Computes various parameters for the aircraft approach phase using
+        the ARPM model.
 
         This function calculates key approach parameters, including available and required power, true airspeed (TAS),
         rate of descent (ROCD), and potential performance limitations. The calculations take into account atmospheric
@@ -2018,8 +2061,8 @@ class ARPM(BADAH):
         ROCDDefault=None,
         tasDefault=None,
     ):
-        """
-        Computes various parameters for the final approach phase using the ARPM model.
+        """Computes various parameters for the final approach phase using the
+        ARPM model.
 
         This function calculates key final approach parameters, including available and required power, true airspeed (TAS),
         rate of descent (ROCD), and potential performance limitations. The calculations take into account atmospheric
@@ -2131,8 +2174,8 @@ class ARPM(BADAH):
         pass
 
     def landing(self, h, mass, DeltaTemp, ROCDDefault=None):
-        """
-        Computes various parameters for the landing phase using the ARPM model.
+        """Computes various parameters for the landing phase using the ARPM
+        model.
 
         This function calculates key landing parameters, including available and required power, true airspeed (TAS),
         rate of descent (ROCD), and potential performance limitations. The calculations take into account atmospheric
@@ -2204,8 +2247,8 @@ class ARPM(BADAH):
         return [Pav, Peng, Preq, tas, ROCD, ESF, limitation]
 
     def hover(self, h, mass, DeltaTemp):
-        """
-        Computes various parameters for the hover phase using the ARPM model.
+        """Computes various parameters for the hover phase using the ARPM
+        model.
 
         This function calculates key hover parameters, including available and required power, true airspeed (TAS),
         and any potential performance limitations. The calculations take into account atmospheric conditions, altitude,
@@ -2269,8 +2312,8 @@ class ARPM(BADAH):
         ROCDDefault=None,
         tasDefault=None,
     ):
-        """
-        Computes various parameters for different flight phases using the ARPM model.
+        """Computes various parameters for different flight phases using the
+        ARPM model.
 
         This function calculates the available power (Pav), engine power (Peng), required power (Preq),
         true airspeed (TAS), rate of climb or descent (ROCD), energy share factor (ESF), and any limitations
@@ -2398,7 +2441,8 @@ class ARPM(BADAH):
 
 
 class PTD(BADAH):
-    """This class implements the PTD file creator for BADAH aircraft following BADAH manual.
+    """This class implements the PTD file creator for BADAH aircraft following
+    BADAH manual.
 
     :param AC: Aircraft object {BADAH}.
     :type AC: badaHAircraft.
@@ -2411,9 +2455,8 @@ class PTD(BADAH):
         self.ARPM = ARPM(AC)
 
     def create(self, saveToPath, DeltaTemp):
-        """
-        Creates a BADAH PTD file based on aircraft performance data at different
-        mass levels, altitudes, and temperatures.
+        """Creates a BADAH PTD file based on aircraft performance data at
+        different mass levels, altitudes, and temperatures.
 
         This function calculates performance data for three different mass levels (low, medium, high), at various
         altitudes, and for different temperature deviations from the International Standard Atmosphere (ISA).
@@ -2517,14 +2560,15 @@ class PTD(BADAH):
         HOVERList,
         DeltaTemp,
     ):
-        """
-        Saves the computed performance data to a BADAH PTD file.
+        """Saves the computed performance data to a BADAH PTD file.
 
-        This function saves the performance data generated during different flight phases (climb, cruise, descent,
-        hover) and for different engine ratings (ARPM, MTKF, MCNT) into a PTD file. The file is named based on
+        This function saves the performance data generated during different
+        flight phases (climb, cruise, descent, hover) and for different engine
+        ratings (ARPM, MTKF, MCNT) into a PTD file. The file is named based on
         the aircraft name and ISA deviation.
 
-        :param saveToPath: Path to the directory where the PTD file should be saved.
+        :param saveToPath: Path to the directory where the PTD file should be
+            saved.
         :param CLList_ARPM: List of climb data for the BADA ARPM rating.
         :param CLList_MTKF: List of climb data for the BADA MTKF rating.
         :param CLList_MCNT: List of climb data for the BADA MCNT rating.
@@ -3176,13 +3220,14 @@ class PTD(BADAH):
             )
 
     def PTD_climb(self, mass, altitudeList, DeltaTemp, rating):
-        """
-        Calculates the BADAH PTD (Performance Table Data) for the climb phase.
+        """Calculates the BADAH PTD (Performance Table Data) for the climb
+        phase.
 
-        This function computes the aircraft's performance parameters during the climb phase for each
-        altitude level in the given altitude list. Parameters such as temperature, pressure, density,
-        true airspeed (TAS), and rate of climb/descent (ROCD) are calculated and returned in a list format
-        that can be used for generating PTD files.
+        This function computes the aircraft's performance parameters during
+        the climb phase for each altitude level in the given altitude list.
+        Parameters such as temperature, pressure, density, true airspeed
+        (TAS), and rate of climb/descent (ROCD) are calculated and returned in
+        a list format that can be used for generating PTD files.
 
         :param mass: Aircraft mass [kg].
         :param altitudeList: List of altitude values [ft].
@@ -3289,13 +3334,14 @@ class PTD(BADAH):
         return CLList
 
     def PTD_descent(self, mass, altitudeList, DeltaTemp):
-        """
-        Calculates the BADAH PTD (Performance Table Data) for the descent phase.
+        """Calculates the BADAH PTD (Performance Table Data) for the descent
+        phase.
 
-        This function computes the aircraft's performance parameters during the descent phase for each
-        altitude level in the given altitude list. It calculates values such as temperature, pressure,
-        density, true airspeed (TAS), and rate of descent (ROD), and returns the data in a structured
-        list format for PTD file generation.
+        This function computes the aircraft's performance parameters during
+        the descent phase for each altitude level in the given altitude list.
+        It calculates values such as temperature, pressure, density, true
+        airspeed (TAS), and rate of descent (ROD), and returns the data in a
+        structured list format for PTD file generation.
 
         :param mass: Aircraft mass [kg].
         :param altitudeList: List of altitude values [ft].
@@ -3393,13 +3439,14 @@ class PTD(BADAH):
         return DESList
 
     def PTD_cruise(self, mass, altitudeList, DeltaTemp):
-        """
-        Calculates the BADAH PTD (Performance Table Data) for the cruise phase.
+        """Calculates the BADAH PTD (Performance Table Data) for the cruise
+        phase.
 
-        This function computes the aircraft's performance parameters during the cruise phase for each
-        altitude level in the given altitude list. Key performance metrics like temperature, pressure,
-        density, TAS, and fuel consumption are calculated and stored in a structured list for PTD file
-        generation.
+        This function computes the aircraft's performance parameters during
+        the cruise phase for each altitude level in the given altitude list.
+        Key performance metrics like temperature, pressure, density, TAS, and
+        fuel consumption are calculated and stored in a structured list for
+        PTD file generation.
 
         :param mass: Aircraft mass [kg].
         :param altitudeList: List of altitude values [ft].
@@ -3492,13 +3539,14 @@ class PTD(BADAH):
         return CRList
 
     def PTD_hover(self, mass, altitudeList, DeltaTemp):
-        """
-        Calculates the BADAH PTD (Performance Table Data) for the hover phase.
+        """Calculates the BADAH PTD (Performance Table Data) for the hover
+        phase.
 
-        This function computes the aircraft's performance parameters during the hover phase for each
-        altitude level in the given altitude list. It calculates values like temperature, pressure, density,
-        and fuel consumption during hover and returns the data in a structured list format for PTD
-        generation.
+        This function computes the aircraft's performance parameters during
+        the hover phase for each altitude level in the given altitude list. It
+        calculates values like temperature, pressure, density, and fuel
+        consumption during hover and returns the data in a structured list
+        format for PTD generation.
 
         :param mass: Aircraft mass [kg].
         :param altitudeList: List of altitude values [ft].
@@ -3592,7 +3640,8 @@ class PTD(BADAH):
 
 
 class PTF(BADAH):
-    """This class implements the PTF file creator for BADAH aircraft following BADAH manual.
+    """This class implements the PTF file creator for BADAH aircraft following
+    BADAH manual.
 
     :param AC: Aircraft object {BADAH}.
     :type AC: badaHAircraft.
@@ -3605,10 +3654,10 @@ class PTF(BADAH):
         self.ARPM = ARPM(AC)
 
     def create(self, saveToPath, DeltaTemp):
-        """
-        Creates the BADAH PTF and saves it to the specified directory.
+        """Creates the BADAH PTF and saves it to the specified directory.
 
-        :param saveToPath: Path to the directory where the PTF should be stored.
+        :param saveToPath: Path to the directory where the PTF should be
+            stored.
         :param DeltaTemp: Deviation from ISA temperature [K].
         :type saveToPath: str
         :type DeltaTemp: float
@@ -3662,10 +3711,10 @@ class PTF(BADAH):
         DeltaTemp,
         massList,
     ):
-        """
-        Saves the BADAH performance data to a PTF format.
+        """Saves the BADAH performance data to a PTF format.
 
-        :param saveToPath: Path to the directory where the PTF should be stored.
+        :param saveToPath: Path to the directory where the PTF should be
+            stored.
         :param CLList: List of PTD data for CLIMB.
         :param CRList: List of PTD data for CRUISE.
         :param DESList: List of PTD data for DESCENT.
@@ -3679,10 +3728,9 @@ class PTF(BADAH):
         :type DeltaTemp: float
         :type massList: list(float)
         :returns: None
-        :rtype: None
-
-        This function formats and writes the climb, cruise, and descent data for different mass levels
-        and altitudes into a .PTF file, adhering to the BADAH performance file format.
+        :rtype: None This function formats and writes the climb, cruise, and
+            descent data for different mass levels and altitudes into a .PTF
+            file, adhering to the BADAH performance file format.
         """
 
         newpath = saveToPath
@@ -3776,8 +3824,7 @@ class PTF(BADAH):
         )
 
     def PTF_cruise(self, massList, altitudeList, DeltaTemp):
-        """
-        Calculates the BADAH PTF for the CRUISE phase of flight.
+        """Calculates the BADAH PTF for the CRUISE phase of flight.
 
         :param massList: List of aircraft mass levels in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
@@ -3852,8 +3899,7 @@ class PTF(BADAH):
         return CRList
 
     def PTF_climb(self, massList, altitudeList, DeltaTemp, rating):
-        """
-        Calculates the BADAH PTF for the CLIMB phase of flight.
+        """Calculates the BADAH PTF for the CLIMB phase of flight.
 
         :param massList: List of aircraft mass levels in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
@@ -3863,8 +3909,8 @@ class PTF(BADAH):
         :type altitudeList: list of int
         :type DeltaTemp: float
         :type rating: str
-        :returns: List of PTF CLIMB data, including True Airspeed, Rates of Climb,
-                  and Fuel Flow for each mass level.
+        :returns: List of PTF CLIMB data, including True Airspeed, Rates of
+            Climb, and Fuel Flow for each mass level.
         :rtype: list
         """
 
@@ -3931,8 +3977,7 @@ class PTF(BADAH):
         return CLList
 
     def PTF_descent(self, massList, altitudeList, DeltaTemp):
-        """
-        Calculates the BADAH PTF for the DESCENT phase of flight.
+        """Calculates the BADAH PTF for the DESCENT phase of flight.
 
         :param massList: List of aircraft mass levels in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
@@ -4001,26 +4046,27 @@ class PTF(BADAH):
 
 
 class BadaHAircraft(BADAH):
-    """
-    This class encapsulates the BADAH performance model for an aircraft, extending the BADAH base class.
+    """This class encapsulates the BADAH performance model for an aircraft,
+    extending the BADAH base class.
 
     :param badaVersion: The version of the BADAH model being used.
     :param acName: The ICAO designation or name of the aircraft.
-    :param filePath: (Optional) Path to the BADAH XML file. If not provided, a default path is used.
-    :param allData: (Optional) Dataframe containing pre-loaded aircraft data, typically used to
-                    initialize the aircraft parameters without needing to parse XML files.
+    :param filePath: (Optional) Path to the BADAH XML file. If not provided, a
+        default path is used.
+    :param allData: (Optional) Dataframe containing pre-loaded aircraft data,
+        typically used to initialize the aircraft parameters without needing
+        to parse XML files.
     :type badaVersion: str
     :type acName: str
     :type filePath: str, optional
-    :type allData: pd.DataFrame, optional
-
-    This class initializes the aircraft's performance model using data from a dataframe or by
-    reading from XML files in the BADAH format.
+    :type allData: pd.DataFrame, optional This class initializes the
+        aircraft's performance model using data from a dataframe or by reading
+        from XML files in the BADAH format.
     """
 
     def __init__(self, badaVersion, acName, filePath=None, allData=None):
-        """
-        Initializes the BADAHAircraft class by loading aircraft-specific data.
+        """Initializes the BADAHAircraft class by loading aircraft-specific
+        data.
 
         - If `allData` is provided and contains the aircraft's information, it will be used to
           initialize various parameters such as engine type, mass, thrust settings, and performance

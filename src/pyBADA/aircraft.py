@@ -1,6 +1,4 @@
-"""
-Generic airplane/helicopter performance module
-"""
+"""Generic airplane/helicopter performance module."""
 
 from math import sqrt, pow, cos, radians, atan, tan, degrees
 
@@ -17,25 +15,30 @@ def checkArgument(argument, **kwargs):
 
 
 class Bada:
-    """This class implements the mechanisms applicable across all BADA families."""
+    """This class implements the mechanisms applicable across all BADA
+    families."""
 
     def __init__(self):
         pass
 
     @staticmethod
     def getBADAParameters(df, acName, parameters):
-        """
-        Retrieves specified parameters for a given aircraft name from a DataFrame.
+        """Retrieves specified parameters for a given aircraft name from a
+        DataFrame.
 
         :param df: DataFrame containing BADA aircraft data.
-        :param acName: Name of the aircraft or list of aircraft names to search for.
-        :param parameters: List of column names (or a single column name) to retrieve.
+        :param acName: Name of the aircraft or list of aircraft names to
+            search for.
+        :param parameters: List of column names (or a single column name) to
+            retrieve.
         :type df: pd.DataFrame
         :type acName: list or str
         :type parameters: list or str
-        :returns: A DataFrame containing the specified parameters for the given aircraft.
+        :returns: A DataFrame containing the specified parameters for the
+            given aircraft.
         :rtype: pd.DataFrame
-        :raises ValueError: If any of the specified columns or aircraft names are not found.
+        :raises ValueError: If any of the specified columns or aircraft names
+            are not found.
         """
 
         # Ensure parameters is a list
@@ -68,8 +71,7 @@ class Bada:
 
     @staticmethod
     def loadFactor(fi):
-        """
-        Computes the load factor from a given bank angle.
+        """Computes the load factor from a given bank angle.
 
         The load factor is calculated based on the cosine of the bank angle,
         which is expressed in degrees. A small rounding operation is applied
@@ -85,8 +87,8 @@ class Bada:
 
     @staticmethod
     def bankAngle(rateOfTurn, v):
-        """
-        Computes the bank angle based on true airspeed (TAS) and rate of turn.
+        """Computes the bank angle based on true airspeed (TAS) and rate of
+        turn.
 
         :param v: True airspeed (TAS) in meters per second (m/s).
         :param rateOfTurn: Rate of turn in degrees per second (deg/s).
@@ -103,8 +105,8 @@ class Bada:
 
     @staticmethod
     def rateOfTurn(v, nz=1.0):
-        """
-        Computes the rate of turn based on true airspeed (TAS) and load factor.
+        """Computes the rate of turn based on true airspeed (TAS) and load
+        factor.
 
         :param v: True airspeed (TAS) in meters per second (m/s).
         :param nz: Load factor (default is 1.0), dimensionless.
@@ -118,8 +120,8 @@ class Bada:
 
     @staticmethod
     def rateOfTurn_bankAngle(TAS, bankAngle):
-        """
-        Computes the rate of turn based on true airspeed (TAS) and bank angle.
+        """Computes the rate of turn based on true airspeed (TAS) and bank
+        angle.
 
         :param TAS: True airspeed (TAS) in meters per second (m/s).
         :param bankAngle: Bank angle in degrees.
@@ -135,8 +137,8 @@ class Bada:
 
     @staticmethod
     def turnRadius(v, nz=1.0):
-        """
-        Computes the turn radius based on true airspeed (TAS) and load factor.
+        """Computes the turn radius based on true airspeed (TAS) and load
+        factor.
 
         :param v: True airspeed (TAS) in meters per second (m/s).
         :param nz: Load factor (default is 1.0), dimensionless.
@@ -150,8 +152,8 @@ class Bada:
 
     @staticmethod
     def turnRadius_bankAngle(v, ba):
-        """
-        Computes the turn radius based on true airspeed (TAS) and bank angle.
+        """Computes the turn radius based on true airspeed (TAS) and bank
+        angle.
 
         :param v: True airspeed (TAS) in meters per second (m/s).
         :param ba: Bank angle in degrees.
@@ -165,8 +167,8 @@ class Bada:
 
     @staticmethod
     def GS(tas, gamma, Ws):
-        """
-        Computes the ground speed based on true airspeed (TAS), flight path angle, and wind speed.
+        """Computes the ground speed based on true airspeed (TAS), flight path
+        angle, and wind speed.
 
         :param tas: True airspeed (TAS) in meters per second (m/s).
         :param gamma: Flight path angle in degrees.
@@ -192,13 +194,13 @@ class BadaFamily:
 
 
 class Airplane:
-    """This is a generic airplane class based on a three-degrees-of-freedom point mass model (where all the forces
-    are applied at the center of gravity).
+    """This is a generic airplane class based on a three-degrees-of-freedom
+    point mass model (where all the forces are applied at the center of
+    gravity).
 
     .. note::this generic class only implements basic aircraft dynamics
             calculations, aircraft performance and optimisation can be obtained
             from its inherited classes
-
     """
 
     def __init__(self):
@@ -206,12 +208,12 @@ class Airplane:
 
     @staticmethod
     def esf(**kwargs):
-        """
-        Computes the energy share factor based on flight conditions.
+        """Computes the energy share factor based on flight conditions.
 
         :param h: Altitude in meters.
         :param DeltaTemp: Temperature deviation with respect to ISA in Kelvin.
-        :param flightEvolution: Type of flight evolution [constM/constCAS/acc/dec].
+        :param flightEvolution: Type of flight evolution
+            [constM/constCAS/acc/dec].
         :param phase: Phase of flight [cl/des].
         :param v: Constant speed (Mach number).
         :type h: float
@@ -319,7 +321,6 @@ class Helicopter:
     .. note::this generic class only implements basic aircraft dynamics
             calculations, aircraft performance and optimisation can be obtained
             from its inherited classes
-
     """
 
     def __init__(self):
@@ -327,12 +328,12 @@ class Helicopter:
 
     @staticmethod
     def esf(**kwargs):
-        """
-        Computes the energy share factor based on flight conditions.
+        """Computes the energy share factor based on flight conditions.
 
         :param h: Altitude in meters.
         :param DeltaTemp: Temperature deviation with respect to ISA in Kelvin.
-        :param flightEvolution: Type of flight evolution [constTAS/constCAS/acc/dec].
+        :param flightEvolution: Type of flight evolution
+            [constTAS/constCAS/acc/dec].
         :param phase: Phase of flight [Climb/Descent].
         :param v: Constant speed (Mach number).
         :type h: float

@@ -52,8 +52,7 @@ def kt2ms(val):
 
 
 def lb2kg(val):
-    """
-    This function converts from lb to kg
+    """This function converts from lb to kg.
 
     :param val: value in lb
     :returns: vaue in kg
@@ -62,8 +61,7 @@ def lb2kg(val):
 
 
 def deg2rad(val):
-    """
-    This function converts from decimal degrees to radians
+    """This function converts from decimal degrees to radians.
 
     :param val: value in decimal degrees
     :returns: vaue in radians
@@ -72,8 +70,7 @@ def deg2rad(val):
 
 
 def m2ft(val):
-    """
-    This function converts from meters to feets
+    """This function converts from meters to feets.
 
     :param val: value in meters
     :returns: value in feets
@@ -83,8 +80,7 @@ def m2ft(val):
 
 
 def m2nm(val):
-    """
-    This function converts from meters to nautical miles
+    """This function converts from meters to nautical miles.
 
     :param val: value in meters
     :returns: value in nautical miles
@@ -93,8 +89,7 @@ def m2nm(val):
 
 
 def s2h(val):
-    """
-    This function converts from seconds to hours
+    """This function converts from seconds to hours.
 
     :param val: value in seconds
     :returns: value in hours
@@ -103,8 +98,7 @@ def s2h(val):
 
 
 def ms2kt(val):
-    """
-    This function converts from m s^-1 to kt
+    """This function converts from m s^-1 to kt.
 
     :param val: value in m s^-1
     :returns: value in kt
@@ -117,8 +111,7 @@ def ms2kt(val):
 
 
 def kg2lb(val):
-    """
-    This function converts from kg to lb
+    """This function converts from kg to lb.
 
     :param val: value in kg
     :returns: value in lb
@@ -127,8 +120,7 @@ def kg2lb(val):
 
 
 def rad2deg(val):
-    """
-    This function converts from radians to decimal degrees
+    """This function converts from radians to decimal degrees.
 
     :param val: value in radians
     :returns: value in decimal degrees
@@ -137,8 +129,7 @@ def rad2deg(val):
 
 
 def hp2W(val):
-    """
-    This function converts from horsepower to watts
+    """This function converts from horsepower to watts.
 
     :param val: value in horsepower
     :returns: value in watts
@@ -147,8 +138,7 @@ def hp2W(val):
 
 
 def date2posix(val):
-    """
-    This function converts a date format to posix
+    """This function converts a date format to posix.
 
     :param val: date in %Y-%m-%d %H:%M:%S format
     :returns: posix time referenced to 01-01-1970 [s]
@@ -157,8 +147,7 @@ def date2posix(val):
 
 
 def unix2date(val):
-    """
-    This function converts posix to date format
+    """This function converts posix to date format.
 
     :param val: time referenced to 01-01-1970 [s]
     :returns: date in %Y-%m-%d %H:%M:%S format

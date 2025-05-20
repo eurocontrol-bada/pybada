@@ -84,14 +84,17 @@ def cruiseFuelConsumption(AC, altitude, M, deltaTemp):
 def breguetLeducInitialMass(
     AC, distance, GS, cruiseFuelFlow, payload, fuelReserve
 ):
-    """
-    Calculate the estimated initial mass required for the aircraft using the Breguet Leduc formula.
+    """Calculate the estimated initial mass required for the aircraft using
+    the Breguet Leduc formula.
 
-    :param AC: Aircraft object (instance of Bada3Aircraft, Bada4Aircraft, or BadaHAircraft).
+    :param AC: Aircraft object (instance of Bada3Aircraft, Bada4Aircraft, or
+        BadaHAircraft).
     :param distance: Flight distance in meters.
-    :param GS: Ground speed in m/s (assumed equal to true airspeed under no-wind conditions).
+    :param GS: Ground speed in m/s (assumed equal to true airspeed under no-
+        wind conditions).
     :param cruiseFuelFlow: Fuel flow rate during cruise in kg/s.
-    :param payload: Payload percentage (of the maximum payload mass) to be used.
+    :param payload: Payload percentage (of the maximum payload mass) to be
+        used.
     :param fuelReserve: Fuel reserve time in seconds.
     :type AC: object
     :type distance: float
@@ -130,16 +133,20 @@ def getInitialMass(
     flightPlanInitialMass=None,
     deltaTemp=0,
 ):
-    """Calculates the estimated initial aircraft mass assumig cruise phase, combining flight plan data, aircraft envelope constraints,
-    and an exponential fuel consumption model inspired by the Breguet Leduc formula.
+    """Calculates the estimated initial aircraft mass assumig cruise phase,
+    combining flight plan data, aircraft envelope constraints, and an
+    exponential fuel consumption model inspired by the Breguet Leduc formula.
 
-    :param AC: Aircraft object (instance of Bada3Aircraft, Bada4Aircraft, BadaEAircraft, or BadaHAircraft).
+    :param AC: Aircraft object (instance of Bada3Aircraft, Bada4Aircraft,
+        BadaEAircraft, or BadaHAircraft).
     :param distance: Distance to be flown in meters.
     :param altitude: Cruising altitude in meters.
     :param M: Mach number at cruising altitude.
     :param payload: Percentage of the maximum payload mass (default is 60%).
-    :param fuelReserve: Fuel reserve time in seconds (default is 3600 seconds, or 1 hour).
-    :param flightPlanInitialMass: Optional initial mass from a flight plan, in kg.
+    :param fuelReserve: Fuel reserve time in seconds (default is 3600 seconds,
+        or 1 hour).
+    :param flightPlanInitialMass: Optional initial mass from a flight plan, in
+        kg.
     :param deltaTemp: Temperature deviation from standard atmosphere.
     :type AC: object
     :type distance: float

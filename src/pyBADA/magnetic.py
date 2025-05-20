@@ -50,7 +50,8 @@ class Grid:
 
         :param LAT_target: Target latitude to search for.
         :type LAT_target: float
-        :return: The closest latitude from the grid or None if the target is out of bounds.
+        :return: The closest latitude from the grid or None if the target is
+            out of bounds.
         :rtype: float or None
         """
 
@@ -78,7 +79,8 @@ class Grid:
 
         :param LON_target: Target longitude to search for.
         :type LON_target: float
-        :return: The closest longitude from the grid or None if the target is out of bounds.
+        :return: The closest longitude from the grid or None if the target is
+            out of bounds.
         :rtype: float or None
         """
 
@@ -102,13 +104,15 @@ class Grid:
         return closest
 
     def getClosestIdx(self, LAT_target, LON_target):
-        """Finds the index of the closest grid point for a given latitude and longitude.
+        """Finds the index of the closest grid point for a given latitude and
+        longitude.
 
         :param LAT_target: Target latitude.
         :param LON_target: Target longitude.
         :type LAT_target: float
         :type LON_target: float
-        :return: Index of the closest point in the grid or None if no point is found.
+        :return: Index of the closest point in the grid or None if no point is
+            found.
         :rtype: int or None
         """
 
@@ -133,13 +137,15 @@ class Grid:
         return None
 
     def getMagneticDeclination(self, LAT_target, LON_target):
-        """Returns the magnetic declination for the closest grid point to the target coordinates.
+        """Returns the magnetic declination for the closest grid point to the
+        target coordinates.
 
         :param LAT_target: Target latitude.
         :param LON_target: Target longitude.
         :type LAT_target: float
         :type LON_target: float
-        :return: Magnetic declination at the closest grid point or None if no point is found.
+        :return: Magnetic declination at the closest grid point or None if no
+            point is found.
         :rtype: float or None
         """
 

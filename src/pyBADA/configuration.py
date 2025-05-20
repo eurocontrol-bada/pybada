@@ -36,16 +36,18 @@ def list_subfolders(folderPath):
 
 @staticmethod
 def safe_get(df, column_name, default_value=None):
-    """
-    Safely retrieves a column's value from a DataFrame, returning a default value if the column does not exist or if the value is NaN.
+    """Safely retrieves a column's value from a DataFrame, returning a default
+    value if the column does not exist or if the value is NaN.
 
     :param df: DataFrame to retrieve the value from.
     :param column_name: Name of the column to retrieve.
-    :param default_value: Value to return if the column does not exist. Default is None.
+    :param default_value: Value to return if the column does not exist.
+        Default is None.
     :type df: pd.DataFrame
     :type column_name: str
     :type default_value: any
-    :returns: The value from the specified column or the default value if the column is missing.
+    :returns: The value from the specified column or the default value if the
+        column is missing.
     :rtype: any
     """
 
@@ -69,10 +71,12 @@ def safe_get(df, column_name, default_value=None):
 def getVersionsList(badaFamily):
     """Retrieve a list of available BADA versions for a given BADA family.
 
-    This function scans the directory corresponding to the specified BADA family
-    and returns a list of all subdirectories (which represent different versions of BADA).
+    This function scans the directory corresponding to the specified BADA
+    family and returns a list of all subdirectories (which represent different
+    versions of BADA).
 
-    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which versions are being retrieved.
+    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which versions
+        are being retrieved.
     :type badaFamily: str.
     :returns: List of available BADA versions.
     :rtype: list of str.
@@ -91,14 +95,18 @@ def getVersionsList(badaFamily):
 
 
 def getAircraftList(badaFamily, badaVersion):
-    """Retrieve a list of available aircraft for a given BADA family and version.
+    """Retrieve a list of available aircraft for a given BADA family and
+    version.
 
-    This function checks if the specified BADA family and version directory exists, and if so,
-    determines whether the aircraft data is stored in XML format or as standard ASCII files
-    (like OPF, APF, PTD, or PTF). It then returns a list of available aircraft.
+    This function checks if the specified BADA family and version
+    directory exists, and if so, determines whether the aircraft data is
+    stored in XML format or as standard ASCII files (like OPF, APF, PTD,
+    or PTF). It then returns a list of available aircraft.
 
-    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which aircraft are being retrieved.
-    :param badaVersion: The specific version of the BADA family (e.g., 3.10, 4.2).
+    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which
+        aircraft are being retrieved.
+    :param badaVersion: The specific version of the BADA family (e.g.,
+        3.10, 4.2).
     :type badaFamily: str.
     :type badaVersion: str.
     :returns: List of available aircraft names.
@@ -148,7 +156,8 @@ def getAircraftList(badaFamily, badaVersion):
 def getBadaFamilyPath(badaFamily):
     """Get the full path to the specified BADA family directory.
 
-    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which the path is required.
+    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which the path
+        is required.
     :type badaFamily: str.
     :returns: The path to the BADA family directory.
     :rtype: str.
@@ -161,7 +170,8 @@ def getBadaFamilyPath(badaFamily):
 def getBadaVersionPath(badaFamily, badaVersion):
     """Get the full path to the specified BADA version directory.
 
-    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which the path is required.
+    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which the path
+        is required.
     :param badaVersion: The specific version of the BADA family.
     :type badaFamily: str.
     :type badaVersion: str.
@@ -176,8 +186,8 @@ def getBadaVersionPath(badaFamily, badaVersion):
 def getAircraftPath():
     """Get the path to the 'aircraft' resource directory.
 
-    This function locates the 'aircraft' directory within the pyBADA package and
-    returns its absolute path.
+    This function locates the 'aircraft' directory within the pyBADA package
+    and returns its absolute path.
 
     :returns: The absolute path to the 'aircraft' resource directory.
     :rtype: str.
@@ -196,7 +206,8 @@ def getAircraftPath():
 def getDataPath():
     """Get the path to the 'data' resource directory.
 
-    This function locates the 'data' directory within the pyBADA package and returns its absolute path.
+    This function locates the 'data' directory within the pyBADA package and
+    returns its absolute path.
 
     :returns: The absolute path to the 'data' resource directory.
     :rtype: str.

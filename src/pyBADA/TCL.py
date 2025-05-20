@@ -1,6 +1,5 @@
-"""
-Trajectory Computation Light (TCL) for BADAH/BADAE/BADA3/BADA4 aircraft performance module
-"""
+"""Trajectory Computation Light (TCL) for BADAH/BADAE/BADA3/BADA4 aircraft
+performance module."""
 
 import numpy as np
 from pyBADA.geodesic import Vincenty as vincenty
@@ -54,10 +53,9 @@ def constantSpeedLevel(
     magneticDeclinationGrid=None,
     **kwargs,
 ):
-    """
-    Calculates the time, fuel consumption, and other parameters for a level flight
-    segment at a constant speed for a given aircraft in the BADA model. It supports step-climb,
-    constant heading (true or magnetic), and turns.
+    """Calculates the time, fuel consumption, and other parameters for a level
+    flight segment at a constant speed for a given aircraft in the BADA model.
+    It supports step-climb, constant heading (true or magnetic), and turns.
 
     The function handles different BADA families (BADA3, BADA4, BADAH, BADAE), and computes various
     parameters such as altitude, speed, fuel consumption, power, heading, and mass based on aircraft
@@ -1186,9 +1184,10 @@ def constantSpeedROCD(
     magneticDeclinationGrid=None,
     **kwargs,
 ):
-    """
-    Computes the time, fuel consumption, and other parameters required for an aircraft to climb or descend
-    from a given initial altitude (Hp_init) to a final altitude (Hp_final) at a constant speed and rate of climb/descent (ROCD).
+    """Computes the time, fuel consumption, and other parameters required for
+    an aircraft to climb or descend from a given initial altitude (Hp_init) to
+    a final altitude (Hp_final) at a constant speed and rate of climb/descent
+    (ROCD).
 
     The function handles multiple BADA families (BADA3, BADA4, BADAH, BADAE), computing various parameters
     such as altitude, speed, fuel consumption, power, heading, and mass based on the aircraft's performance
@@ -2225,10 +2224,10 @@ def constantSpeedROCD_time(
     magneticDeclinationGrid=None,
     **kwargs,
 ):
-    """
-    Computes the time, fuel consumption, and performance parameters required for an aircraft to
-    perform a climb or descent based on a set amount of time, while maintaining a constant speed and constant
-    rate of climb/descent (ROCD).
+    """Computes the time, fuel consumption, and performance parameters
+    required for an aircraft to perform a climb or descent based on a set
+    amount of time, while maintaining a constant speed and constant rate of
+    climb/descent (ROCD).
 
     The function supports various BADA families (BADA3, BADA4, BADAH, BADAE), with different handling for mass changes,
     aerodynamic configurations, and energy consumption. It calculates parameters such as fuel consumption, power
@@ -3242,9 +3241,10 @@ def constantSpeedSlope(
     magneticDeclinationGrid=None,
     **kwargs,
 ):
-    """
-    Calculates time, fuel consumption, and other parameters required for an aircraft to perform a climb or descent
-    from an initial altitude (Hp_init) to a final altitude (Hp_final) while maintaining a constant speed and a constant slope.
+    """Calculates time, fuel consumption, and other parameters required for an
+    aircraft to perform a climb or descent from an initial altitude (Hp_init)
+    to a final altitude (Hp_final) while maintaining a constant speed and a
+    constant slope.
 
     It uses different models for BADA (Base of Aircraft Data) families (BADA3, BADA4, BADAH, BADAE) to compute key flight parameters
     such as energy consumption, rate of climb/descent (ROCD), fuel burn, mass changes, and power requirements. The function also supports
@@ -4273,8 +4273,9 @@ def constantSpeedSlope_time(
     magneticDeclinationGrid=None,
     **kwargs,
 ):
-    """
-    Computes the time, fuel, and trajectory parameters required by an aircraft to climb or descend at constant speed and slope over a given duration.
+    """Computes the time, fuel, and trajectory parameters required by an
+    aircraft to climb or descend at constant speed and slope over a given
+    duration.
 
     This function models a trajectory with constant speed (either CAS, TAS, or Mach) and a specified slope (degrees). The aircraft's dynamics are modeled based on BADA family data (BADA3, BADA4, BADAH, BADAE), supporting various aircraft types including electric models. It also accounts for turns, heading changes, and wind effects.
 
@@ -5296,9 +5297,10 @@ def constantSpeedRating(
     initRating=None,
     **kwargs,
 ):
-    """
-    Calculates time, fuel consumption, and other parameters required for an aircraft to perform a climb or descent
-    from an initial altitude (Hp_init) to a final altitude (Hp_final) while maintaining a constant speed and engine rating.
+    """Calculates time, fuel consumption, and other parameters required for an
+    aircraft to perform a climb or descent from an initial altitude (Hp_init)
+    to a final altitude (Hp_final) while maintaining a constant speed and
+    engine rating.
 
     It uses different models for BADA (Base of Aircraft Data) families (BADA3, BADA4, BADAH, BADAE) to compute key flight parameters
     such as fuel burn, rate of climb/descent (ROCD), thrust, drag, and energy requirements. The function also supports
@@ -6240,9 +6242,9 @@ def constantSpeedRating_time(
     initRating=None,
     **kwargs,
 ):
-    """
-    Calculates the time, fuel consumption, and other flight parameters required for an aircraft to perform
-    a climb or descent at constant speed and engine rating for a specified duration.
+    """Calculates the time, fuel consumption, and other flight parameters
+    required for an aircraft to perform a climb or descent at constant speed
+    and engine rating for a specified duration.
 
     It uses different models for BADA (Base of Aircraft Data) families (BADA3, BADA4, BADAH, BADAE) to compute key parameters
     such as rate of climb/descent (ROCD), thrust, drag, fuel burn, and power requirements. The function also supports complex
@@ -7174,10 +7176,10 @@ def accDec(
     magneticDeclinationGrid=None,
     **kwargs,
 ):
-    """
-    Calculates the time, fuel consumption, and other key flight parameters required for an aircraft
-    to perform an acceleration or deceleration from an initial speed (v_init) to a final speed (v_final)
-    during the climb, cruise, or descent phases of flight.
+    """Calculates the time, fuel consumption, and other key flight parameters
+    required for an aircraft to perform an acceleration or deceleration from
+    an initial speed (v_init) to a final speed (v_final) during the climb,
+    cruise, or descent phases of flight.
 
     The flight parameters are calculated using different models for the BADA (Base of Aircraft Data) families (BADA3, BADA4, BADAH, BADAE).
     The function can also accommodate different control laws, vertical evolution phases, wind conditions, and complex flight dynamics like turns.
@@ -8456,10 +8458,10 @@ def accDec_time(
     magneticDeclinationGrid=None,
     **kwargs,
 ):
-    """
-    Calculates the time, fuel consumption, and other key flight parameters required for an aircraft
-    to perform an acceleration or deceleration from an initial speed (v_init) over a set period of time
-    during the climb, cruise, or descent phases of flight.
+    """Calculates the time, fuel consumption, and other key flight parameters
+    required for an aircraft to perform an acceleration or deceleration from
+    an initial speed (v_init) over a set period of time during the climb,
+    cruise, or descent phases of flight.
 
     The flight parameters are calculated using different models for the BADA (Base of Aircraft Data) families (BADA3, BADA4, BADAH, BADAE).
     The function can also accommodate different control laws, vertical evolution phases, wind conditions, and complex flight dynamics like turns.

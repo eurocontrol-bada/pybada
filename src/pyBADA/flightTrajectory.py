@@ -11,19 +11,18 @@ from pyBADA import conversions as conv
 
 
 class FlightTrajectory:
-    """This class implements the flight trajectory module and handles
-    all the operations on the flight trajectory
-
-    """
+    """This class implements the flight trajectory module and handles all the
+    operations on the flight trajectory."""
 
     def __init__(self):
         self.flightData = {}
 
     def createFT(self):
-        """
-        Creates and returns an empty DataFrame for storing aircraft flight trajectory data. This DataFrame includes various
-        flight parameters such as altitude, speed, fuel consumption, acceleration, and more. The columns are predefined to
-        match the data typically recorded during a flight.
+        """Creates and returns an empty DataFrame for storing aircraft flight
+        trajectory data. This DataFrame includes various flight parameters
+        such as altitude, speed, fuel consumption, acceleration, and more. The
+        columns are predefined to match the data typically recorded during a
+        flight.
 
         :param AC: Aircraft object from the BADA family (BADA3/4/H/E).
         :param Hp: Pressure altitude [ft].
@@ -111,15 +110,17 @@ class FlightTrajectory:
 
     @staticmethod
     def createFlightTrajectoryDataframe(flight_data):
-        """
-        Creates a pandas DataFrame from flight trajectory data, ensuring that all lists of data have the
-        same length by padding shorter lists with None. This makes sure the resulting DataFrame has equal
-        column lengths for each parameter.
+        """Creates a pandas DataFrame from flight trajectory data, ensuring
+        that all lists of data have the same length by padding shorter lists
+        with None. This makes sure the resulting DataFrame has equal column
+        lengths for each parameter.
 
-        :param flight_data: Dictionary containing flight trajectory data, where values are lists of float
-                           values representing various parameters.
+        :param flight_data: Dictionary containing flight trajectory data,
+            where values are lists of float values representing various
+            parameters.
         :type flight_data: dict{list[float]}
-        :returns: A pandas DataFrame representing the aircraft's flight trajectory.
+        :returns: A pandas DataFrame representing the aircraft's flight
+            trajectory.
         :rtype: pandas.DataFrame
         """
 
@@ -158,14 +159,16 @@ class FlightTrajectory:
     def getACList(self):
         """Returns a list of aircraft present in the flight trajectory object.
 
-        :returns: A list of BadaAircraft objects corresponding to the aircraft in the current flight trajectory.
+        :returns: A list of BadaAircraft objects corresponding to the aircraft
+            in the current flight trajectory.
         :rtype: list[BadaAircraft]
         """
 
         return list(self.flightData.keys())
 
     def addFT(self, AC, flightTrajectory):
-        """Adds a flight trajectory for a specific aircraft to the internal data structure.
+        """Adds a flight trajectory for a specific aircraft to the internal
+        data structure.
 
         .. note:: This will overwrite any previously stored flight trajectory for the same aircraft.
 
@@ -180,22 +183,28 @@ class FlightTrajectory:
     def getFT(self, AC):
         """Returns the flight trajectory DataFrame for a specific aircraft.
 
-        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is being retrieved.
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is
+            being retrieved.
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
-        :returns: A pandas DataFrame containing the flight trajectory data of the aircraft.
+        :returns: A pandas DataFrame containing the flight trajectory data of
+            the aircraft.
         :rtype: pandas.DataFrame
         """
 
         return self.flightData.get(AC)
 
     def getAllValues(self, AC, parameter):
-        """Retrieves all values for a specific parameter from the aircraft's flight trajectory.
+        """Retrieves all values for a specific parameter from the aircraft's
+        flight trajectory.
 
-        :param AC: Aircraft object (BADA3/4/H/E) whose flight data is being queried.
-        :param parameter: The name of the parameter to retrieve values for (e.g., 'altitude', 'speed').
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight data is being
+            queried.
+        :param parameter: The name of the parameter to retrieve values for
+            (e.g., 'altitude', 'speed').
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
         :type parameter: str
-        :returns: A list of values corresponding to the specified parameter throughout the flight.
+        :returns: A list of values corresponding to the specified parameter
+            throughout the flight.
         :rtype: list[float]
         """
 
@@ -207,13 +216,17 @@ class FlightTrajectory:
             return []
 
     def getFinalValue(self, AC, parameter):
-        """Retrieves the last value for a specific parameter or a list of parameters from the aircraft's flight trajectory.
+        """Retrieves the last value for a specific parameter or a list of
+        parameters from the aircraft's flight trajectory.
 
-        :param AC: Aircraft object (BADA3/4/H/E) whose flight data is being queried.
-        :param parameter: The name or list of names of the parameter(s) to retrieve the final value(s) for.
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight data is being
+            queried.
+        :param parameter: The name or list of names of the parameter(s) to
+            retrieve the final value(s) for.
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
         :type parameter: list[str] or str
-        :returns: The last value (or list of last values) for the specified parameter(s).
+        :returns: The last value (or list of last values) for the specified
+            parameter(s).
         :rtype: float or list[float]
         """
 
@@ -236,15 +249,21 @@ class FlightTrajectory:
                 return self.getAllValues(AC, parameter)[-1]
 
     def append(self, AC, flightTrajectoryToAppend, overwriteLastRow=False):
-        """Appends two consecutive flight trajectories and merges them, adjusting cumulative fields such as time, distance,
-        and fuel consumed. If the aircraft is not already present, the new trajectory will be added.
+        """Appends two consecutive flight trajectories and merges them,
+        adjusting cumulative fields such as time, distance, and fuel consumed.
+        If the aircraft is not already present, the new trajectory will be
+        added.
 
-        If overwriteLastRow is True, the last point of the existing trajectory is removed so that the first row of the
-        appended trajectory replaces it.
+        If overwriteLastRow is True, the last point of the existing trajectory
+        is removed so that the first row of the appended trajectory replaces
+        it.
 
-        :param AC: Aircraft object (BADA3/4/H/E) whose trajectory is being appended.
-        :param flightTrajectoryToAppend: The second flight trajectory to append, in the form of a DataFrame.
-        :param overwriteLastRow: Flag to indicate whether the last point of the existing trajectory should be overwritten.
+        :param AC: Aircraft object (BADA3/4/H/E) whose trajectory is being
+            appended.
+        :param flightTrajectoryToAppend: The second flight trajectory to
+            append, in the form of a DataFrame.
+        :param overwriteLastRow: Flag to indicate whether the last point of
+            the existing trajectory should be overwritten.
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
         :type flightTrajectoryToAppend: pd.DataFrame
         :type overwriteLastRow: bool
@@ -300,8 +319,9 @@ class FlightTrajectory:
         self.addFT(AC, flightTrajectoryCombined)
 
     def cut(self, AC, parameter, threshold, direction="BELOW"):
-        """Cuts the aircraft's flight trajectory based on a specified parameter and threshold value,
-        keeping either the data above or below the threshold, depending on the direction.
+        """Cuts the aircraft's flight trajectory based on a specified
+        parameter and threshold value, keeping either the data above or below
+        the threshold, depending on the direction.
 
         .. note:: The data must be sorted by the parameter for the cut to work as expected.
 
@@ -329,10 +349,13 @@ class FlightTrajectory:
         self.addFT(AC, flightTrajectoryCut)
 
     def removeLines(self, AC, numberOfLines=1):
-        """Removes from the aircraft's flight trajectory list X number of lines,
+        """Removes from the aircraft's flight trajectory list X number of
+        lines,
 
-        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is being modified.
-        :param numberOfLines: How many lines should be removed from teh end of the trajectory
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is
+            being modified.
+        :param numberOfLines: How many lines should be removed from teh end of
+            the trajectory
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
         :type numberOfLines: int
         """
@@ -350,14 +373,19 @@ class FlightTrajectory:
         self.addFT(AC, flightTrajectoryCut)
 
     def overwriteLastValue(self, AC, parameter, new_value):
-        """Overwrites the last value of a specified parameter (column) in the aircraft's flight trajectory with a new value.
+        """Overwrites the last value of a specified parameter (column) in the
+        aircraft's flight trajectory with a new value.
 
-        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is being modified.
-        :param parameter: The name of the parameter (column) whose last value is to be overwritten.
-        :param new_value: The new value to assign to the last entry of the specified parameter.
+        :param AC: Aircraft object (BADA3/4/H/E) whose flight trajectory is
+            being modified.
+        :param parameter: The name of the parameter (column) whose last value
+            is to be overwritten.
+        :param new_value: The new value to assign to the last entry of the
+            specified parameter.
         :type AC: {Bada3Aircraft, Bada4Aircraft, BadaEAircraft, BadaHAircraft}
         :type parameter: str
-        :type new_value: Depends on the data type of the column (e.g., int, float, str)
+        :type new_value: Depends on the data type of the column (e.g., int,
+            float, str)
         """
 
         # Retrieve the current flight trajectory
@@ -380,12 +408,14 @@ class FlightTrajectory:
         self.addFT(AC, flightTrajectory)
 
     def save2csv(self, saveToPath, separator=","):
-        """
-        Saves the aircraft flight trajectory data into a CSV file with a custom header depending on the BADA family.
-        The CSV file will be saved with a timestamp in the filename.
+        """Saves the aircraft flight trajectory data into a CSV file with a
+        custom header depending on the BADA family. The CSV file will be saved
+        with a timestamp in the filename.
 
-        :param saveToPath: Path to the directory where the file should be stored.
-        :param separator: Separator to be used in the CSV file. Default is a comma (',').
+        :param saveToPath: Path to the directory where the file should be
+            stored.
+        :param separator: Separator to be used in the CSV file. Default is a
+            comma (',').
         :type saveToPath: str
         :type separator: str
         :returns: None
@@ -650,11 +680,12 @@ class FlightTrajectory:
             )
 
     def save2xlsx(self, saveToPath):
-        """
-        Saves the aircraft flight trajectory data into an Excel (.xlsx) file with a custom header depending on the BADA family.
-        The Excel file will be saved with a timestamp in the filename.
+        """Saves the aircraft flight trajectory data into an Excel (.xlsx)
+        file with a custom header depending on the BADA family. The Excel file
+        will be saved with a timestamp in the filename.
 
-        :param saveToPath: Path to the directory where the file should be stored.
+        :param saveToPath: Path to the directory where the file should be
+            stored.
         :type saveToPath: str
         :returns: None
         """
@@ -919,11 +950,13 @@ class FlightTrajectory:
                 )
 
     def save2kml(self, saveToPath):
-        """
-        Saves the aircraft flight trajectory data into a KML (Keyhole Markup Language) file for visualization in tools like Google Earth.
-        The KML file is generated with a timestamp in the filename and includes aircraft trajectory details with altitude extrusion.
+        """Saves the aircraft flight trajectory data into a KML (Keyhole
+        Markup Language) file for visualization in tools like Google Earth.
+        The KML file is generated with a timestamp in the filename and
+        includes aircraft trajectory details with altitude extrusion.
 
-        :param saveToPath: Path to the directory where the file should be stored.
+        :param saveToPath: Path to the directory where the file should be
+            stored.
         :type saveToPath: str
         :returns: None
         """
