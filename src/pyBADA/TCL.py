@@ -5811,7 +5811,12 @@ def constantSpeedRating(
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
                 CD = AC.CD(
-                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                    M=M_i,
+                    CL=CL,
+                    HLid=HLid_i,
+                    LG=LG_i,
+                    speedBrakes=speedBrakes,
+                    expedite=expedite,
                 )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)
@@ -6748,7 +6753,12 @@ def constantSpeedRating_time(
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
                 CD = AC.CD(
-                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                    M=M_i,
+                    CL=CL,
+                    HLid=HLid_i,
+                    LG=LG_i,
+                    speedBrakes=speedBrakes,
+                    expedite=expedite,
                 )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)

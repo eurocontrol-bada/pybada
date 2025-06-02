@@ -58,7 +58,7 @@ class Parser:
         try:
             tree = ET.parse(filename)
             root = tree.getroot()
-        except:
+        except Exception:
             raise IOError(filename + " not found or in correct format")
 
         modificationDateOPF = "UNKNOWN"
@@ -736,7 +736,7 @@ class Parser:
             try:
                 tree = ET.parse(filename)
                 root = tree.getroot()
-            except:
+            except Exception:
                 raise IOError(filename + " not found or in correct format")
 
             for child in root.iter("SYN"):
@@ -842,7 +842,7 @@ class Parser:
             try:
                 tree = ET.parse(filename)
                 root = tree.getroot()
-            except:
+            except Exception:
                 raise IOError(filename + " not found or in correct format")
 
             allEngines = ["JET", "TURBOPROP", "PISTON", "ELECTRIC"]
