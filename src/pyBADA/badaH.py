@@ -64,7 +64,7 @@ class Parser:
         try:
             tree = ET.parse(acXmlFile)
             root = tree.getroot()
-        except:
+        except Exception:
             raise IOError(acXmlFile + " not found or in correct format")
 
         # Parse general aircraft data
@@ -184,7 +184,7 @@ class Parser:
             try:
                 tree = ET.parse(filename)
                 root = tree.getroot()
-            except:
+            except Exception:
                 raise IOError(filename + " not found or in correct format")
 
             for child in root.iter("SYN"):

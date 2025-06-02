@@ -70,7 +70,7 @@ class Parser:
             try:
                 tree = ET.parse(filename)
                 root = tree.getroot()
-            except:
+            except Exception:
                 raise IOError(filename + " not found or in correct format")
 
             for child in root.iter("MAP"):
@@ -134,7 +134,7 @@ class Parser:
         try:
             tree = ET.parse(acXmlFile)
             root = tree.getroot()
-        except:
+        except Exception:
             raise IOError(acXmlFile + " not found or in correct format")
 
         # Parse general aircraft data
@@ -568,7 +568,7 @@ class Parser:
         try:
             tree = ET.parse(filename)
             root = tree.getroot()
-        except:
+        except Exception:
             raise IOError(filename + " not found or in correct format")
 
         CVminTO = float(root.find("CVminTO").text)  # CVminTO
@@ -1632,6 +1632,7 @@ class BADA4(Airplane, Bada):
         LG,
         CL,
         M,
+        expedite=False,
         speedBrakes={"deployed": False, "value": 0.03},
         **kwargs,
     ):
@@ -1646,11 +1647,13 @@ class BADA4(Airplane, Bada):
         :param LG: Landing gear position, [LGUP/LGDN] [-].
         :param speedBrakes: Dictionary indicating if speed brakes are deployed
             and their value. Default: {"deployed": False, "value": 0.03}.
+        :param expedite: Flag indicating if expedite descent is used (default is False).
         :type M: float.
         :type CL: float.
         :type HLid: float.
         :type LG: string.
         :type speedBrakes: dict.
+        :type expedite: bool
         :returns: Drag coefficient [-].
         :rtype: float.
         """
@@ -1682,6 +1685,11 @@ class BADA4(Airplane, Bada):
                 CD = CD + speedBrakes["value"]
             else:
                 CD = CD + 0.03
+            return CD
+
+        # implementation of expedite descent
+        if expedite:
+            CD = CD + 0.03
             return CD
 
         # calculation of drag coefficient in transition for HLid assuming LG is not changing
