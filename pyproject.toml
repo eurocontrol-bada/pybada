@@ -6,9 +6,10 @@ build-backend = "hatchling.build"
 name = "pyBADA"
 version = "0.1.4"
 authors = [
-  { name="Henrich Glaser-Opitz", email="henrich.glaser-opitz@eurocontrol.int" }
+  { name="Henrich Glaser-Opitz", email="henrich.glaser-opitz@eurocontrol.int" },
+  { name="Antonio Vivace", email="antonio.vivace@eurocontrol.int" }
 ]
-description = "pyBADA"
+description = "Aircraft performance modelling, trajectory prediction and optimisation, and visualisation with EUROCONTROL's BADA."
 readme = "README.md"
 requires-python = ">=3.12"
 classifiers = [
