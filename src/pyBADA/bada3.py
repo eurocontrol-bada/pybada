@@ -2253,7 +2253,6 @@ class FlightEnvelope(BADA3):
                 ) * self.VStall(mass=mass, config=config)
         elif envelopeType == "CERTIFIED":
             VminStall = self.VStall(mass=mass, config=config)
-            return VminStall
 
         if self.AC.Clbo == 0.0 and self.AC.k == 0.0:
             Vmin = VminStall
