@@ -1,6 +1,7 @@
 """Atmosphere module."""
 
-from math import sqrt, pow
+from math import pow, sqrt
+
 import numpy as np
 
 from pyBADA import constants as const

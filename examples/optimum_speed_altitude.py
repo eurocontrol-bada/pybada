@@ -7,7 +7,6 @@ Example of BADA4 and BADAH optimum speed and altitude calculation
 
 from pyBADA import atmosphere as atm
 from pyBADA import conversions as conv
-
 from pyBADA.bada4 import Bada4Aircraft
 from pyBADA.badaH import BadaHAircraft
 

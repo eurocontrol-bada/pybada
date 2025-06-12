@@ -1,5 +1,5 @@
-from pyBADA.bada3 import Parser as Bada3Parser
 from pyBADA.aircraft import Bada
+from pyBADA.bada3 import Parser as Bada3Parser
 
 
 def test_data_load():

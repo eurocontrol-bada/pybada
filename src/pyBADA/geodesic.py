@@ -3,20 +3,21 @@ Geodesic calculation module
 """
 
 from math import (
-    tan,
-    atan2,
-    sin,
     asin,
+    atan2,
     cos,
-    radians,
     degrees,
-    sqrt,
-    pi,
     log,
     log2,
+    pi,
+    radians,
+    sin,
+    sqrt,
+    tan,
 )
-from pyBADA.aircraft import Airplane as airplane
+
 from pyBADA import constants as const
+from pyBADA.aircraft import Airplane as airplane
 
 
 class Haversine:

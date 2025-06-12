@@ -64,7 +64,8 @@ exclude = [
 ]
 
 [tool.ruff.lint]
-select = ["E", "F401"]
+# select = ["E", "F401", "W", "C90", "B", "UP", "SIM", "I"]
+select = ["E", "F401", "W", "I"]
 ignore = ["E501"]
 
 [tool.hatch.build.targets.wheel]

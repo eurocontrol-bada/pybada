@@ -2,19 +2,19 @@
 Generic BADAH aircraft performance module
 """
 
+import os
 import xml.etree.ElementTree as ET
 from datetime import date
-import os
+from math import asin, cos, isnan, pi, pow, radians, sqrt
+
 import numpy as np
-from math import sqrt, pow, pi, cos, asin, radians, isnan
 import pandas as pd
 
-
-from pyBADA import constants as const
-from pyBADA import conversions as conv
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
-from pyBADA.aircraft import Helicopter, BadaFamily, Bada
+from pyBADA import constants as const
+from pyBADA import conversions as conv
+from pyBADA.aircraft import Bada, BadaFamily, Helicopter
 
 
 def proper_round(num, dec=0):

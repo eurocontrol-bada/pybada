@@ -2,8 +2,9 @@
 Magnetic declination module
 """
 
-import json
 import bisect
+import json
+
 from pyBADA import configuration
 
 

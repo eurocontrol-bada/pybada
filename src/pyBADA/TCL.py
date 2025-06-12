@@ -1,21 +1,20 @@
 """Trajectory Computation Light (TCL) for BADAH/BADAE/BADA3/BADA4 aircraft
 performance module."""
 
-import numpy as np
-from pyBADA.geodesic import Vincenty as vincenty
-from pyBADA.geodesic import RhumbLine as rhumb
-from pyBADA.geodesic import Turn as turn
-
-from dataclasses import dataclass
 import itertools
 import warnings
+from dataclasses import dataclass
+from math import asin, atan, cos, degrees, radians, sin, tan
 
-from math import atan, asin, sin, tan, cos, radians, degrees
+import numpy as np
 
 from pyBADA import atmosphere as atm
-from pyBADA import conversions as conv
 from pyBADA import constants as const
+from pyBADA import conversions as conv
 from pyBADA.flightTrajectory import FlightTrajectory as FT
+from pyBADA.geodesic import RhumbLine as rhumb
+from pyBADA.geodesic import Turn as turn
+from pyBADA.geodesic import Vincenty as vincenty
 
 
 @dataclass

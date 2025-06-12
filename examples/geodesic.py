@@ -11,7 +11,6 @@ import folium
 
 from pyBADA import geodesic as geo
 
-
 # input parameters
 LAT_init = 48.596289
 LON_init = 2.351640

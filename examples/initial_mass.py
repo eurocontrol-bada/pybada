@@ -6,11 +6,10 @@ Example calculation of aircraft initial mass
 
 """
 
-from pyBADA.bada3 import Bada3Aircraft
-from pyBADA import trajectoryPrediction as TP
 from pyBADA import atmosphere as atm
 from pyBADA import conversions as conv
-
+from pyBADA import trajectoryPrediction as TP
+from pyBADA.bada3 import Bada3Aircraft
 
 # calculate estimations for the fuel flow, and aircraft initial mass
 AC = Bada3Aircraft(badaVersion="DUMMY", acName="J2M")

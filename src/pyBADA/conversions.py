@@ -2,8 +2,8 @@
 Common unit conversions module
 """
 
-from math import pi
 from datetime import datetime
+from math import pi
 from time import mktime
 
 

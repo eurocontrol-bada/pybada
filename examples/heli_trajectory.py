@@ -5,16 +5,16 @@ Helicopter Trajectory Calculation
 Example of BADAH trajectory using TCL
 """
 
-from math import tan, pi
 from dataclasses import dataclass
+from math import pi, tan
+
 import matplotlib.pyplot as plt
 
-from pyBADA import constants as const
 from pyBADA import TCL as TCL
-from pyBADA.flightTrajectory import FlightTrajectory as FT
-
-from pyBADA.badaH import Parser as BadaHParser
+from pyBADA import constants as const
 from pyBADA.badaH import BadaHAircraft
+from pyBADA.badaH import Parser as BadaHParser
+from pyBADA.flightTrajectory import FlightTrajectory as FT
 
 
 @dataclass

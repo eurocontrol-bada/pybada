@@ -2,8 +2,9 @@
 Common configuration module
 """
 
-import os
 import importlib.resources
+import os
+
 import pandas as pd
 
 

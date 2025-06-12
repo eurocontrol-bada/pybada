@@ -2,8 +2,9 @@
 Basic calculations for the Trajectory Prediction (TP) using BADA
 """
 
-from pyBADA import atmosphere as atm
 from math import exp
+
+from pyBADA import atmosphere as atm
 
 
 def cruiseFuelConsumption(AC, altitude, M, deltaTemp):

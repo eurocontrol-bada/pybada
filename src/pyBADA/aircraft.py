@@ -1,10 +1,10 @@
 """Generic airplane/helicopter performance module."""
 
-from math import sqrt, pow, cos, radians, atan, tan, degrees
+from math import atan, cos, degrees, pow, radians, sqrt, tan
 
+from pyBADA import atmosphere as atm
 from pyBADA import constants as const
 from pyBADA import conversions as conv
-from pyBADA import atmosphere as atm
 
 
 def checkArgument(argument, **kwargs):

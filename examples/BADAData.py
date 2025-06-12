@@ -5,9 +5,8 @@ BADA Data Retrieval
 Example of BADA parametes retrieval for specific aircraft
 """
 
-from pyBADA.bada3 import Parser as Bada3Parser
 from pyBADA.aircraft import Bada
-
+from pyBADA.bada3 import Parser as Bada3Parser
 
 # loading all the BADA data into a dataframe
 allData = Bada3Parser.parseAll(badaVersion="DUMMY")

@@ -5,21 +5,20 @@ Developed @EUROCONTROL (EIH)
 2024
 """
 
-from math import sqrt, pow, pi, isnan, sin, asin
+import os
+import xml.etree.ElementTree as ET
+from datetime import date
+from math import asin, isnan, pi, pow, sin, sqrt
 
 import numpy as np
-import os
-from datetime import date
-import xml.etree.ElementTree as ET
-
-from scipy.optimize import fminbound
 import pandas as pd
+from scipy.optimize import fminbound
 
-from pyBADA import constants as const
-from pyBADA import conversions as conv
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
-from pyBADA.aircraft import Airplane, BadaFamily, Bada
+from pyBADA import constants as const
+from pyBADA import conversions as conv
+from pyBADA.aircraft import Airplane, Bada, BadaFamily
 
 
 def proper_round(num, dec=0):

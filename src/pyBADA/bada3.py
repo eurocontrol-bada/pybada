@@ -1,18 +1,18 @@
 """Generic BADA3 aircraft performance module."""
 
-from math import sqrt, isnan, asin, atan
-import numpy as np
-
 import os
-from datetime import date
 import xml.etree.ElementTree as ET
+from datetime import date
+from math import asin, atan, isnan, sqrt
+
+import numpy as np
 import pandas as pd
 
-from pyBADA import constants as const
-from pyBADA import conversions as conv
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
-from pyBADA.aircraft import Airplane, BadaFamily, Bada
+from pyBADA import constants as const
+from pyBADA import conversions as conv
+from pyBADA.aircraft import Airplane, Bada, BadaFamily
 
 
 def proper_round(num, dec=0):
