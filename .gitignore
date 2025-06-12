@@ -3,3 +3,6 @@ __pycache__
 dist/
 docs/build
 env/
+
+docs/source/auto_examples/
+docs/source/sg_execution_times.rst
