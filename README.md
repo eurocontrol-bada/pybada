@@ -57,4 +57,5 @@ You won't receive support for it, but you can pass the flag `--ignore-requires-p
 
 BADA and pyBADA are developed and maintained by [EUROCONTROL](https://www.eurocontrol.int/model/bada).
 
-This project is released under the European Union Public License v1.2 - see the [LICENSE](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) file for details.
+This project is released under the European Union Public License v1.2 - see the [LICENCE](https://joinup.ec.europa.eu/collection/eupl/eupl-text-eupl-12) file for details.
+See the [Amendment to the EUPL](./AMENDMENT_TO_EUPL_license.md) for additional terms.
