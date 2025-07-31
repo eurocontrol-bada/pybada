@@ -8,25 +8,12 @@ from math import asin, atan, isnan, sqrt
 import numpy as np
 import pandas as pd
 
+from pyBADA import utils
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const
 from pyBADA import conversions as conv
 from pyBADA.aircraft import Airplane, Bada, BadaFamily
-
-
-def proper_round(num, dec=0):
-    num = str(num)[: str(num).index(".") + dec + 2]
-    if num[-1] >= "5":
-        return float(num[: -2 - (not dec)] + str(int(num[-2 - (not dec)]) + 1))
-    return float(num[:-1])
-
-
-def checkArgument(argument, **kwargs):
-    if kwargs.get(argument) is not None:
-        return kwargs.get(argument)
-    else:
-        raise TypeError("Missing " + argument + " argument")
 
 
 class Parser:
@@ -1758,11 +1745,11 @@ class BADA3(Airplane, Bada):
 
         elif rating == "ADAPTED":
             # ADAPTED
-            ROCD = checkArgument("ROCD", **kwargs)
-            mass = checkArgument("mass", **kwargs)
-            v = checkArgument("v", **kwargs)
-            acc = checkArgument("acc", **kwargs)
-            Drag = checkArgument("Drag", **kwargs)
+            ROCD = utils.checkArgument("ROCD", **kwargs)
+            mass = utils.checkArgument("mass", **kwargs)
+            v = utils.checkArgument("v", **kwargs)
+            acc = utils.checkArgument("acc", **kwargs)
+            Drag = utils.checkArgument("Drag", **kwargs)
             T = self.TAdapted(
                 h=h,
                 DeltaTemp=DeltaTemp,
@@ -3895,7 +3882,7 @@ class PTD(BADA3):
                 * 60
             )
 
-            FL_complet.append(proper_round(FL))
+            FL_complet.append(utils.proper_round(FL))
             T_complet.append(theta * const.temp_0)
             p_complet.append(delta * const.p_0)
             rho_complet.append(sigma * const.rho_0)
@@ -4082,7 +4069,7 @@ class PTD(BADA3):
             else:
                 gamma = conv.rad2deg(asin(dhdt / tas))
 
-            FL_complet.append(proper_round(FL))
+            FL_complet.append(utils.proper_round(FL))
             T_complet.append(theta * const.temp_0)
             p_complet.append(delta * const.p_0)
             rho_complet.append(sigma * const.rho_0)
@@ -4320,7 +4307,7 @@ class PTF(BADA3):
         DESList = Nan2Zero(DESList)
 
         for k in range(0, len(altitudeList)):
-            FL = proper_round(altitudeList[k] / 100)
+            FL = utils.proper_round(altitudeList[k] / 100)
             if FL < 30:
                 file.write(
                     "%3.0f |                           |  %3.0f   %5.0f %5.0f %5.0f   %5.1f  |  %3.0f  %5.0f  %5.1f  \n"

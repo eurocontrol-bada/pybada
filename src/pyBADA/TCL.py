@@ -25,13 +25,6 @@ class target:
     ESFtarget: float = None
 
 
-def checkArgument(argument, **kwargs):
-    if kwargs.get(argument) is not None:
-        return kwargs.get(argument)
-    else:
-        raise TypeError("Missing " + argument + " argument")
-
-
 def constantSpeedLevel(
     AC,
     lengthType,
@@ -7505,7 +7498,7 @@ def accDec(
         else:
             maxRating = "MCMB"
     else:
-        maxRating = checkArgument("maxRating", **kwargs)
+        maxRating = utils.checkArgument("maxRating", **kwargs)
 
     # Determine engine rating
     if (
@@ -8778,7 +8771,7 @@ def accDec_time(
         else:
             maxRating = "MCMB"
     else:
-        maxRating = checkArgument("maxRating", **kwargs)
+        maxRating = utils.checkArgument("maxRating", **kwargs)
 
     # Determine engine rating
     if (

@@ -3,20 +3,12 @@
 from math import pow, sqrt
 
 import numpy as np
+import xarray as xr
+import pandas as pd
 
+from pyBADA import utils
 from pyBADA import constants as const
 from pyBADA import conversions as conv
-
-
-def proper_round(num, dec=0):
-    # First, round the number to the specified number of decimal places
-    rounded_num = round(num, dec)
-
-    # Check if the result is an integer (no decimal part)
-    if rounded_num.is_integer():
-        return int(rounded_num)  # Return as an integer
-
-    return rounded_num  # Return as a float if there is a decimal part
 
 
 def theta(h, DeltaTemp):
@@ -33,13 +25,45 @@ def theta(h, DeltaTemp):
         tropopause, a constant temperature is assumed.
     """
 
-    if h < const.h_11:
-        theta = 1 - const.temp_h * h / const.temp_0 + DeltaTemp / const.temp_0
+    # xarray DataArray branch: native vectorized operations preserve metadata
+    if isinstance(h, xr.DataArray):
+        # align DeltaTemp to h, broadcasting if scalar or array
+        if isinstance(DeltaTemp, xr.DataArray):
+            dt = DeltaTemp
+        else:
+            # broadcast scalar or numpy array to match h
+            dt = xr.full_like(h, utils.to_numpy(DeltaTemp))
 
-    else:
-        theta = (const.temp_11 + DeltaTemp) / const.temp_0
+        cond = h < const.h_11
+        base = 1 - const.temp_h * h / const.temp_0
+        tropo = const.temp_11 / const.temp_0
+        out = xr.where(cond, base + dt / const.temp_0, tropo + dt / const.temp_0)
+        return out.round(10)
 
-    return proper_round(theta, 10)
+    # pandas Series/DataFrame branch: native vectorized operations preserve index/columns
+    if isinstance(h, (pd.Series, pd.DataFrame)):
+        # align DeltaTemp
+        if isinstance(DeltaTemp, type(h)):
+            dt = DeltaTemp
+        else:
+            arr_dt = utils.to_numpy(DeltaTemp)
+            dt = pd.Series(arr_dt, index=h.index) if isinstance(h, pd.Series) else pd.DataFrame(arr_dt, index=h.index, columns=h.columns)
+
+        base = 1 - const.temp_h * h / const.temp_0
+        tropo = const.temp_11 / const.temp_0
+        result = base.where(h < const.h_11, tropo) + dt / const.temp_0
+        return result.round(10)
+
+    # NumPy array or scalar fallback: inline piecewise ISA computation
+    arr_h = utils.to_numpy(h)
+    arr_dT = utils.to_numpy(DeltaTemp)
+    out = np.where(
+        arr_h < const.h_11,
+        1 - const.temp_h * arr_h / const.temp_0 + arr_dT / const.temp_0,
+        (const.temp_11 + arr_dT) / const.temp_0
+    )
+    out = np.round(out, 10)
+    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
 
 
 def delta(h, DeltaTemp):
@@ -65,7 +89,7 @@ def delta(h, DeltaTemp):
             -const.g / const.R / const.temp_11 * (h - const.h_11)
         )
 
-    return proper_round(delta, 10)
+    return utils.proper_round(delta, 10)
 
 
 def sigma(theta, delta):
@@ -79,7 +103,7 @@ def sigma(theta, delta):
         to relate pressure, temperature, and density.
     """
 
-    return proper_round(
+    return utils.proper_round(
         ((delta * const.p_0) / (theta * const.temp_0 * const.R)) / const.rho_0,
         10,
     )
@@ -96,7 +120,7 @@ def aSound(theta):
     """
 
     a = sqrt(const.Agamma * const.R * theta * const.temp_0)
-    return proper_round(a, 10)
+    return utils.proper_round(a, 10)
 
 
 def mach2Tas(Mach, theta):
@@ -187,7 +211,7 @@ def cas2Tas(cas, delta, sigma):
     B = pow(1 + (1 / delta) * A, const.Amu) - 1
     tas = sqrt(2 * p * B / (const.Amu * rho))
 
-    return proper_round(tas, 10)
+    return utils.proper_round(tas, 10)
 
 
 def mach2Cas(Mach, theta, delta, sigma):
@@ -232,35 +256,60 @@ def cas2Mach(cas, theta, delta, sigma):
     tas = cas2Tas(cas, delta, sigma)
     M = tas2Mach(tas, theta)
 
-    return proper_round(M, 10)
+    return utils.proper_round(M, 10)
 
 
 def pressureAltitude(pressure, QNH=101325.0):
-    """Calculates pressure altitude based on normalized pressure and reference
-    pressure (QNH).
-
-    :param QNH: Reference pressure in Pascals (Pa), default is standard sea
-        level pressure (101325 Pa).
-    :param pressure: air pressure (Pa)
-    :type pressure: float
-    :type QNH: float
-    :returns: Pressure altitude in meters (m). The pressure altitude is
-        calculated by applying the barometric formula. Below the tropopause,
-        the altitude is computed using the standard temperature lapse rate.
-        Above the tropopause, it applies an exponential relationship for
-        altitude based on pressure ratio.
     """
+    Calculates pressure altitude based on air pressure and reference pressure (QNH).
 
-    if pressure > const.p_11:
-        hp = (const.temp_0 / const.temp_h) * (
-            1 - pow(pressure / QNH, const.R * const.temp_h / const.g)
+    :param pressure: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
+        Air pressure in Pascals (Pa).
+    :param QNH: float
+        Reference sea level pressure in Pascals (Pa). Default is 101325 Pa.
+    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
+        Pressure altitude in meters (m), matching the type and metadata of `pressure`.
+    """
+    # xarray DataArray branch: preserves coords and attrs
+    if isinstance(pressure, xr.DataArray):
+        p = pressure
+        branch1 = (const.temp_0/const.temp_h) * (
+            1 - (p/QNH)**(const.R*const.temp_h/const.g)
         )
-    else:
-        hp = const.h_11 + const.R * const.temp_11 / const.g * np.log(
-            const.p_11 / pressure
+        branch2 = const.h_11 + (const.R*const.temp_11/const.g) * xr.ufuncs.log(
+            const.p_11/p
         )
+        out = xr.where(p > const.p_11, branch1, branch2)
+        out.attrs.update(units="m", long_name="pressure altitude")
+        return out.round(2)
 
-    return hp
+    # pandas Series/DataFrame branch: preserves index/columns
+    if isinstance(pressure, (pd.Series, pd.DataFrame)):
+        p = pressure.astype(float)
+        part1 = (const.temp_0/const.temp_h) * (
+            1 - (p/QNH)**(const.R*const.temp_h/const.g)
+        )
+        part2 = const.h_11 + (const.R*const.temp_11/const.g) * np.log(
+            const.p_11/p
+        )
+        arr_out = np.where(p > const.p_11, part1, part2)
+        if isinstance(p, pd.Series):
+            out = pd.Series(arr_out, index=p.index, name=p.name)
+        else:
+            out = pd.DataFrame(arr_out, index=p.index, columns=p.columns)
+        return out.round(2)
+
+    # NumPy array or scalar fallback: preserves shape and returns scalar if needed
+    arr = np.asarray(pressure, dtype=float)
+    part1 = (const.temp_0/const.temp_h) * (
+        1 - (arr/QNH)**(const.R*const.temp_h/const.g)
+    )
+    part2 = const.h_11 + (const.R*const.temp_11/const.g) * np.log(
+        const.p_11/arr
+    )
+    out = np.where(arr > const.p_11, part1, part2)
+    out = np.round(out, 2)
+    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
 
 
 def ISATemperatureDeviation(temperature, pressureAltitude):
