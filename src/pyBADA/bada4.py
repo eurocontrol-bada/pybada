@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import fminbound
 
+from pyBADA import utils
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const

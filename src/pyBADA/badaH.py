@@ -10,6 +10,7 @@ from math import asin, cos, isnan, pi, pow, radians, sqrt
 import numpy as np
 import pandas as pd
 
+from pyBADA import utils
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const
