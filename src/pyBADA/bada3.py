@@ -3883,21 +3883,21 @@ class PTD(BADA3):
             )
 
             FL_complet.append(utils.proper_round(FL))
-            T_complet.append(theta * const.temp_0)
-            p_complet.append(delta * const.p_0)
-            rho_complet.append(sigma * const.rho_0)
-            a_complet.append(a)
-            TAS_complet.append(conv.ms2kt(tas))
-            CAS_complet.append(conv.ms2kt(cas))
-            M_complet.append(M)
-            mass_complet.append(mass)
-            Thrust_complet.append(Thrust)
-            Drag_complet.append(Drag)
-            ff_comlet.append(ff)
-            ESF_complet.append(ESF)
-            ROCD_complet.append(ROCD)
-            TDC_complet.append(TDC)
-            PWC_complet.append(CPowRed)
+            T_complet.append(utils.proper_round(theta * const.temp_0))
+            p_complet.append(utils.proper_round(delta * const.p_0))
+            rho_complet.append(utils.proper_round(sigma * const.rho_0,3))
+            a_complet.append(utils.proper_round(a))
+            TAS_complet.append(utils.proper_round(conv.ms2kt(tas),2))
+            CAS_complet.append(utils.proper_round(conv.ms2kt(cas),2))
+            M_complet.append(utils.proper_round(M,2))
+            mass_complet.append(utils.proper_round(mass))
+            Thrust_complet.append(utils.proper_round(Thrust))
+            Drag_complet.append(utils.proper_round(Drag))
+            ff_comlet.append(utils.proper_round(ff,1))
+            ESF_complet.append(utils.proper_round(ESF,2))
+            ROCD_complet.append(utils.proper_round(ROCD))
+            TDC_complet.append(utils.proper_round(TDC))
+            PWC_complet.append(utils.proper_round(CPowRed,2))
 
         CLList = [
             FL_complet,
@@ -4070,21 +4070,21 @@ class PTD(BADA3):
                 gamma = conv.rad2deg(asin(dhdt / tas))
 
             FL_complet.append(utils.proper_round(FL))
-            T_complet.append(theta * const.temp_0)
-            p_complet.append(delta * const.p_0)
-            rho_complet.append(sigma * const.rho_0)
-            a_complet.append(a)
-            TAS_complet.append(conv.ms2kt(tas))
-            CAS_complet.append(conv.ms2kt(cas))
-            M_complet.append(M)
-            mass_complet.append(mass)
-            Thrust_complet.append(Thrust)
-            Drag_complet.append(Drag)
-            ff_comlet.append(ff)
-            ESF_complet.append(ESF)
-            ROCD_complet.append(-1 * ROCD)
-            TDC_complet.append(TDC)
-            gamma_complet.append(gamma)
+            T_complet.append(utils.proper_round(theta * const.temp_0))
+            p_complet.append(utils.proper_round(delta * const.p_0))
+            rho_complet.append(utils.proper_round(sigma * const.rho_0,3))
+            a_complet.append(utils.proper_round(a))
+            TAS_complet.append(utils.proper_round(conv.ms2kt(tas),2))
+            CAS_complet.append(utils.proper_round(conv.ms2kt(cas),2))
+            M_complet.append(utils.proper_round(M,2))
+            mass_complet.append(utils.proper_round(mass))
+            Thrust_complet.append(utils.proper_round(Thrust))
+            Drag_complet.append(utils.proper_round(Drag))
+            ff_comlet.append(utils.proper_round(ff,1))
+            ESF_complet.append(utils.proper_round(ESF,2))
+            ROCD_complet.append(utils.proper_round(-1 * ROCD))
+            TDC_complet.append(utils.proper_round(TDC))
+            gamma_complet.append(utils.proper_round(gamma,2))
 
         DESList = [
             FL_complet,
@@ -4415,10 +4415,10 @@ class PTF(BADA3):
                     self.ff(flightPhase="Cruise", v=tas, h=H_m, T=Thrust) * 60
                 )
 
-            TAS_CR_complet.append(conv.ms2kt(tas_nominal))
-            FF_CR_LO_complet.append(ff[0])
-            FF_CR_NOM_complet.append(ff[1])
-            FF_CR_HI_complet.append(ff[2])
+            TAS_CR_complet.append(utils.proper_round(conv.ms2kt(tas_nominal)))
+            FF_CR_LO_complet.append(utils.proper_round(ff[0],1))
+            FF_CR_NOM_complet.append(utils.proper_round(ff[1],1))
+            FF_CR_HI_complet.append(utils.proper_round(ff[2],1))
 
         CRList = [
             TAS_CR_complet,
@@ -4539,11 +4539,11 @@ class PTF(BADA3):
                 tas_list.append(tas)
                 ff_list.append(ff)
 
-            TAS_CL_complet.append(conv.ms2kt(tas_list[1]))
-            ROCD_CL_LO_complet.append(ROC[0])
-            ROCD_CL_NOM_complet.append(ROC[1])
-            ROCD_CL_HI_complet.append(ROC[2])
-            FF_CL_NOM_complet.append(ff_list[1])
+            TAS_CL_complet.append(utils.proper_round(conv.ms2kt(tas_list[1])))
+            ROCD_CL_LO_complet.append(utils.proper_round(ROC[0]))
+            ROCD_CL_NOM_complet.append(utils.proper_round(ROC[1]))
+            ROCD_CL_HI_complet.append(utils.proper_round(ROC[2]))
+            FF_CL_NOM_complet.append(utils.proper_round(ff_list[1],1))
 
         CLList = [
             TAS_CL_complet,
@@ -4680,9 +4680,9 @@ class PTF(BADA3):
                 * 60
             )
 
-            TAS_DES_complet.append(conv.ms2kt(tas_nominal))
-            ROCD_DES_NOM_complet.append(ROCD)
-            FF_DES_NOM_complet.append(ff_nominal)
+            TAS_DES_complet.append(utils.proper_round(conv.ms2kt(tas_nominal)))
+            ROCD_DES_NOM_complet.append(utils.proper_round(ROCD))
+            FF_DES_NOM_complet.append(utils.proper_round(ff_nominal,1))
 
         DESList = [TAS_DES_complet, ROCD_DES_NOM_complet, FF_DES_NOM_complet]
 

@@ -8,6 +8,7 @@ from math import asin, atan, cos, degrees, radians, sin, tan
 
 import numpy as np
 
+from pyBADA import utils
 from pyBADA import atmosphere as atm
 from pyBADA import constants as const
 from pyBADA import conversions as conv

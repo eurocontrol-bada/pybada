@@ -4705,20 +4705,20 @@ class PTD(BADA4):
             gamma = conv.rad2deg(asin(dhdt / tas))
 
             FL_complet.append(utils.proper_round(FL))
-            T_complet.append(theta * const.temp_0)
-            p_complet.append(delta * const.p_0)
-            rho_complet.append(sigma * const.rho_0)
-            a_complet.append(a)
-            TAS_complet.append(conv.ms2kt(tas))
-            CAS_complet.append(conv.ms2kt(cas))
-            M_complet.append(M)
-            mass_complet.append(mass)
-            Thrust_complet.append(Thrust)
-            Drag_complet.append(Drag)
-            ff_comlet.append(ff)
-            ESF_complet.append(ESF)
-            ROCD_complet.append(ROCD)
-            gamma_complet.append(gamma)
+            T_complet.append(utils.proper_round(theta * const.temp_0,2))
+            p_complet.append(utils.proper_round(delta * const.p_0))
+            rho_complet.append(utils.proper_round(sigma * const.rho_0,3))
+            a_complet.append(utils.proper_round(a,1))
+            TAS_complet.append(utils.proper_round(conv.ms2kt(tas),2))
+            CAS_complet.append(utils.proper_round(conv.ms2kt(cas),2))
+            M_complet.append(utils.proper_round(M,3))
+            mass_complet.append(utils.proper_round(mass))
+            Thrust_complet.append(utils.proper_round(Thrust))
+            Drag_complet.append(utils.proper_round(Drag))
+            ff_comlet.append(utils.proper_round(ff,2))
+            ESF_complet.append(utils.proper_round(ESF,3))
+            ROCD_complet.append(utils.proper_round(ROCD))
+            gamma_complet.append(utils.proper_round(gamma,2))
             conf_complet.append(config)
             Lim_complet.append(limitation)
 
@@ -4908,20 +4908,20 @@ class PTD(BADA4):
                 )
 
             FL_complet = [utils.proper_round(FL)] + FL_complet
-            T_complet = [theta * const.temp_0] + T_complet
-            p_complet = [delta * const.p_0] + p_complet
-            rho_complet = [sigma * const.rho_0] + rho_complet
-            a_complet = [a] + a_complet
-            TAS_complet = [conv.ms2kt(tas)] + TAS_complet
-            CAS_complet = [conv.ms2kt(cas)] + CAS_complet
-            M_complet = [M] + M_complet
-            mass_complet = [mass] + mass_complet
-            Thrust_complet = [Thrust] + Thrust_complet
-            Drag_complet = [Drag] + Drag_complet
-            ff_complet = [ff] + ff_complet
-            ESF_complet = [ESF] + ESF_complet
-            ROCD_complet = [-1 * ROCD] + ROCD_complet
-            gamma_complet = [gamma] + gamma_complet
+            T_complet = [utils.proper_round(theta * const.temp_0,2)] + T_complet
+            p_complet = [utils.proper_round(delta * const.p_0)] + p_complet
+            rho_complet = [utils.proper_round(sigma * const.rho_0,3)] + rho_complet
+            a_complet = [utils.proper_round(a,1)] + a_complet
+            TAS_complet = [utils.proper_round(conv.ms2kt(tas),2)] + TAS_complet
+            CAS_complet = [utils.proper_round(conv.ms2kt(cas),2)] + CAS_complet
+            M_complet = [utils.proper_round(M,3)] + M_complet
+            mass_complet = [utils.proper_round(mass)] + mass_complet
+            Thrust_complet = [utils.proper_round(Thrust)] + Thrust_complet
+            Drag_complet = [utils.proper_round(Drag)] + Drag_complet
+            ff_complet = [utils.proper_round(ff,2)] + ff_complet
+            ESF_complet = [utils.proper_round(ESF,3)] + ESF_complet
+            ROCD_complet = [utils.proper_round(-1 * ROCD)] + ROCD_complet
+            gamma_complet = [utils.proper_round(gamma,2)] + gamma_complet
             conf_complet = [config] + conf_complet
             Lim_complet = [limitation] + Lim_complet
 
@@ -5037,20 +5037,20 @@ class PTD(BADA4):
             gamma = 0.0
 
             FL_complet.append(utils.proper_round(FL))
-            T_complet.append(theta * const.temp_0)
-            p_complet.append(delta * const.p_0)
-            rho_complet.append(sigma * const.rho_0)
-            a_complet.append(a)
-            TAS_complet.append(conv.ms2kt(tas))
-            CAS_complet.append(conv.ms2kt(cas))
-            M_complet.append(M)
-            mass_complet.append(mass)
-            Thrust_complet.append(Thrust)
-            Drag_complet.append(Drag)
-            ff_comlet.append(ff)
-            ESF_complet.append(ESF)
-            ROCD_complet.append(ROCD)
-            gamma_complet.append(gamma)
+            T_complet.append(utils.proper_round(theta * const.temp_0,2))
+            p_complet.append(utils.proper_round(delta * const.p_0))
+            rho_complet.append(utils.proper_round(sigma * const.rho_0,3))
+            a_complet.append(utils.proper_round(a,1))
+            TAS_complet.append(utils.proper_round(conv.ms2kt(tas),2))
+            CAS_complet.append(utils.proper_round(conv.ms2kt(cas),2))
+            M_complet.append(utils.proper_round(M,3))
+            mass_complet.append(utils.proper_round(mass))
+            Thrust_complet.append(utils.proper_round(Thrust))
+            Drag_complet.append(utils.proper_round(Drag))
+            ff_comlet.append(utils.proper_round(ff,2))
+            ESF_complet.append(utils.proper_round(ESF,3))
+            ROCD_complet.append(utils.proper_round(ROCD))
+            gamma_complet.append(utils.proper_round(gamma,2))
             conf_complet.append(config)
             Lim_complet.append(limitation)
 
@@ -5395,15 +5395,15 @@ class PTF(BADA4):
             if isinstance(ff[0], str):
                 FF_CR_LO_complet.append(" " + ff[0] + " ")
             else:
-                FF_CR_LO_complet.append(f"{ff[0]:5.1f}")
+                FF_CR_LO_complet.append(f"{utils.proper_round(ff[0],1):5.1f}")
             if isinstance(ff[1], str):
                 FF_CR_NOM_complet.append(" " + ff[1] + " ")
             else:
-                FF_CR_NOM_complet.append(f"{ff[1]:5.1f}")
+                FF_CR_NOM_complet.append(f"{utils.proper_round(ff[1],1):5.1f}")
             if isinstance(ff[2], str):
                 FF_CR_HI_complet.append(" " + ff[2] + " ")
             else:
-                FF_CR_HI_complet.append(f"{ff[2]:5.1f}")
+                FF_CR_HI_complet.append(f"{utils.proper_round(ff[2],1):5.1f}")
 
         CRList = [
             TAS_CR_complet,
@@ -5555,10 +5555,10 @@ class PTF(BADA4):
                 conf_complet[str(mass)].append(config)
 
             TAS_CL_complet.append(conv.ms2kt(tas_nominal))
-            ROCD_CL_LO_complet.append(ROC[0])
-            ROCD_CL_NOM_complet.append(ROC[1])
-            ROCD_CL_HI_complet.append(ROC[2])
-            FF_CL_NOM_complet.append(ff_nominal)
+            ROCD_CL_LO_complet.append(utils.proper_round(ROC[0]))
+            ROCD_CL_NOM_complet.append(utils.proper_round(ROC[1]))
+            ROCD_CL_HI_complet.append(utils.proper_round(ROC[2]))
+            FF_CL_NOM_complet.append(utils.proper_round(ff_nominal,1))
 
         CLList = [
             TAS_CL_complet,
@@ -5745,11 +5745,11 @@ class PTF(BADA4):
             if not isnan(ff_gamma_list[1]):
                 ff_nominal = ff_gamma_list[1]
 
-            TAS_DES_complet = [conv.ms2kt(tas_nominal)] + TAS_DES_complet
-            ROCD_DES_LO_complet = [-1 * ROD[0]] + ROCD_DES_LO_complet
-            ROCD_DES_NOM_complet = [-1 * ROD[1]] + ROCD_DES_NOM_complet
-            ROCD_DES_HI_complet = [-1 * ROD[2]] + ROCD_DES_HI_complet
-            FF_DES_NOM_complet = [ff_nominal] + FF_DES_NOM_complet
+            TAS_DES_complet = [utils.proper_round(conv.ms2kt(tas_nominal))] + TAS_DES_complet
+            ROCD_DES_LO_complet = [utils.proper_round(-1 * ROD[0])] + ROCD_DES_LO_complet
+            ROCD_DES_NOM_complet = [utils.proper_round(-1 * ROD[1])] + ROCD_DES_NOM_complet
+            ROCD_DES_HI_complet = [utils.proper_round(-1 * ROD[2])] + ROCD_DES_HI_complet
+            FF_DES_NOM_complet = [utils.proper_round(ff_nominal,1)] + FF_DES_NOM_complet
 
         DESList = [
             TAS_DES_complet,
