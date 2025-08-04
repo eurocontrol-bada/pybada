@@ -12,351 +12,252 @@ import pandas as pd
 
 from pyBADA import utils
 
+
 def ft2m(val):
     """
-    Convert from feet to meters, preserving metadata for xarray and pandas inputs.
+    Convert from feet to meters, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in feet.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in meters, matching the type and metadata of `val`.
+    :param val: Input value(s) in feet (ft). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in meters (m), matching input type.
     """
     factor = 0.3048
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor).round(10)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor).round(10)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def nm2m(val):
     """
-    Convert from nautical miles to meters, preserving metadata for xarray and pandas inputs.
+    Convert from nautical miles to meters, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in nautical miles.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in meters, matching the type and metadata of `val`.
+    :param val: Input value(s) in nautical miles (nm). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in meters (m), matching input type.
     """
     factor = 1852.0
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor).round(10)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor).round(10)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def h2s(val):
     """
-    Convert from hours to seconds, preserving metadata for xarray and pandas inputs.
+    Convert from hours to seconds, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in hours.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in seconds, matching the type and metadata of `val`.
+    :param val: Input value(s) in hours (h). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in seconds (s), matching input type.
     """
     factor = 3600.0
-
-    if isinstance(val, xr.DataArray):
-        return val * factor
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def kt2ms(val):
     """
-    Convert from knots to meters per second, preserving metadata for xarray and pandas inputs.
+    Convert from knots to meters per second, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in knots.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in meters per second, matching the type and metadata of `val`.
+    :param val: Input value(s) in knots (kt). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in meters per second (m/s), matching input type.
     """
     factor = 0.514444
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor).round(10)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor).round(10)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def lb2kg(val):
     """
-    Convert from pounds to kilograms, preserving metadata for xarray and pandas inputs.
+    Convert from pounds to kilograms, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in pounds.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in kilograms, matching the type and metadata of `val`.
+    :param val: Input value(s) in pounds (lb). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in kilograms (kg), matching input type.
     """
     factor = 0.453592
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor).round(10)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor).round(10)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def deg2rad(val):
-    """This function converts from decimal degrees to radians.
-
-    :param val: value in decimal degrees
-    :returns: vaue in radians
     """
-    return val * pi / 180.0
+    Convert from decimal degrees to radians, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-def deg2rad(val):
-    """
-    Convert from decimal degrees to radians, preserving metadata for xarray and pandas inputs.
-
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in decimal degrees.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in radians, matching the type and metadata of `val`.
+    :param val: Input value(s) in decimal degrees (°). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in radians (rad), matching input type.
     """
     factor = pi / 180.0
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
-    if isinstance(val, xr.DataArray):
-        return (val * factor)
+def rad2deg(val):
+    """
+    Convert from decimal degrees to radians, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    :param val: Input value(s) in decimal degrees (°). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in radians (rad), matching input type.
+    """
+    factor = 180 / pi
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def m2ft(val):
     """
-    Convert from meters to feet, preserving metadata for xarray and pandas inputs.
+    Convert from meters to feet, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in meters.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in feet, matching the type and metadata of `val`.
+    :param val: Input value(s) in meters (m). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in feet (ft), matching input type.
     """
     factor = 1 / 0.3048
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor).round(10)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor).round(10)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def m2nm(val):
     """
-    Convert from meters to nautical miles, preserving metadata for xarray and pandas inputs.
+    Convert from meters to nautical miles, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in meters.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in nautical miles, matching the type and metadata of `val`.
+    :param val: Input value(s) in meters (m). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in nautical miles (nm), matching input type.
     """
     factor = 1 / 1852.0
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def s2h(val):
     """
-    Convert from seconds to hours, preserving metadata for xarray and pandas inputs.
+    Convert from seconds to hours, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in seconds.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in hours, matching the type and metadata of `val`.
+    :param val: Input value(s) in seconds (s). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in hours (h), matching input type.
     """
     factor = 1 / 3600.0
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def ms2kt(val):
     """
-    Convert from meters per second to knots, preserving metadata for xarray and pandas inputs.
+    Convert from meters per second to knots, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in meters per second.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in knots, matching the type and metadata of `val`.
+    :param val: Input value(s) in meters per second (m/s). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in knots (kt), matching input type.
     """
-    if val is None:
-        return None
-
     factor = 1 / 0.514444
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor).round(10)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor).round(10)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def kg2lb(val):
     """
-    Convert from kilograms to pounds, preserving metadata for xarray and pandas inputs.
+    Convert from kilograms to pounds, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in kilograms.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in pounds, matching the type and metadata of `val`.
+    :param val: Input value(s) in kilograms (kg). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in pounds (lb), matching input type.
     """
     factor = 1 / 0.453592
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor).round(10)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor).round(10)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
-
-
-def rad2deg(val):
-    """
-    Convert from radians to decimal degrees, preserving metadata for xarray and pandas inputs.
-
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in radians.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in decimal degrees, matching the type and metadata of `val`.
-    """
-    factor = 180.0 / pi
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def hp2W(val):
     """
-    Convert from horsepower to watts, preserving metadata for xarray and pandas inputs.
+    Convert from horsepower to watts, vectorized for
+    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
-    :param val: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Input value(s) in horsepower.
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted value(s) in watts, matching the type and metadata of `val`.
+    :param val: Input value(s) in horsepower (hp). Scalar, numpy array,
+                pandas Series/DataFrame, or xarray.DataArray.
+    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :returns: Converted value(s) in watts (W), matching input type.
     """
     factor = 745.699872
-
-    if val is None:
-        return None
-
-    if isinstance(val, xr.DataArray):
-        return (val * factor).round(10)
-
-    if isinstance(val, (pd.Series, pd.DataFrame)):
-        return val.mul(factor).round(10)
-
-    arr = utils.to_numpy(val) * factor
-    out = np.round(arr, 10)
-    return out.item() if (isinstance(out, np.ndarray) and out.ndim == 0) else out
+    arr_val = utils._extract(val)
+    core = arr_val * factor
+    return utils._wrap(core)
 
 
 def date2posix(val):
     """
-    Convert date(s) to POSIX timestamp in seconds since 1970-01-01.
+    Convert date(s) to POSIX timestamp in seconds since 1970-01-01, vectorized for
+    numpy arrays, pandas Series/DataFrame, and xarray.DataArray.
 
-    :param val: str, datetime.datetime, np.ndarray of strings/datetimes,
-                pandas.Series/DataFrame of datetime-like, or xr.DataArray of datetime dtype
-    :returns: float, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        POSIX time in seconds, matching the type and metadata of `val`.
+    :param val: Input date(s). Can be string, datetime, numpy array of strings/datetimes,
+                pandas Series/DataFrame of datetime-like, or xarray.DataArray of datetime64.
+    :type val: str or datetime or array-like or pandas Series/DataFrame or xarray.DataArray
+    :returns: POSIX timestamp(s) in seconds, matching input type.
     """
     # xarray DataArray of datetime64
-    if isinstance(val, _xr.DataArray):
-        # convert datetime64 to seconds since epoch
+    if isinstance(val, xr.DataArray):
         out = val.astype('datetime64[s]').astype(int)
         out.attrs.update(units='s', long_name='POSIX timestamp')
         return out
 
-    # pandas Series/DataFrame
-    if isinstance(val, (_pd.Series, _pd.DataFrame)):
-        ts = _pd.to_datetime(val)
-        # view nanoseconds and convert to seconds
+    if isinstance(val, (pd.Series, pd.DataFrame)):
+        ts = pd.to_datetime(val)
         arr = ts.values.astype('datetime64[s]').astype(int)
-        if isinstance(val, _pd.Series):
-            return _pd.Series(arr, index=val.index, name=val.name)
-        return _pd.DataFrame(arr, index=val.index, columns=val.columns)
+        if isinstance(val, pd.Series):
+            return pd.Series(arr, index=val.index, name=val.name)
+        return pd.DataFrame(arr, index=val.index, columns=val.columns)
 
-    # single string or datetime
     if isinstance(val, str):
         dt = datetime.strptime(val, "%Y-%m-%d %H:%M:%S")
         return mktime(dt.timetuple())
+
     try:
-        # handle datetime.datetime
         if isinstance(val, datetime):
             return mktime(val.timetuple())
     except NameError:
         pass
 
-    # numpy array or list of strings/datetimes
-    arr = _np.asarray(val)
-    # attempt to parse or convert
+    arr = np.asarray(val)
     try:
         dt64 = arr.astype('datetime64[s]')
-        out = dt64.astype(int)
-        return out
+        return dt64.astype(int)
     except Exception:
-        # try string parse fallback
         flat = arr.ravel()
         result = []
         for v in flat:
@@ -364,46 +265,39 @@ def date2posix(val):
                 dt = datetime.strptime(v, "%Y-%m-%d %H:%M:%S")
                 result.append(mktime(dt.timetuple()))
             else:
-                # assume datetime
                 result.append(mktime(v.timetuple()))
-        out = _np.array(result)
+        out = np.array(result)
         return out.reshape(arr.shape)
 
 
 def unix2date(val):
     """
-    Convert POSIX timestamp(s) in seconds to date string(s) in "%Y-%m-%d %H:%M:%S" format, preserving metadata for xarray and pandas inputs.
+    Convert POSIX timestamp(s) in seconds to date string(s) in "%Y-%m-%d %H:%M:%S" format, vectorized for
+    numpy arrays, pandas Series/DataFrame, and xarray.DataArray.
 
-    :param val: float, np.ndarray, pandas.Series/DataFrame of floats, or xr.DataArray of ints
-        Input POSIX timestamp(s).
-    :returns: str, np.ndarray, pandas.Series, pandas.DataFrame, or xr.DataArray
-        Converted date string(s) matching the format and metadata of `val`.
+    :param val: Input POSIX timestamp(s). Float, numpy array, pandas Series/DataFrame of floats,
+                or xarray.DataArray of ints.
+    :type val: float or array-like or pandas Series/DataFrame or xarray.DataArray
+    :returns: Date string(s) in "%Y-%m-%d %H:%M:%S", matching input type.
     """
-    # xarray DataArray
-    if isinstance(val, _xr.DataArray):
-        # convert seconds to datetime64 then to string
+    if isinstance(val, xr.DataArray):
         dt64 = val.astype('datetime64[s]')
-        out = dt64.dt.strftime("%Y-%m-%d %H:%M:%S")
-        return out
+        return dt64.dt.strftime("%Y-%m-%d %H:%M:%S")
 
-    # pandas Series/DataFrame
-    if isinstance(val, (_pd.Series, _pd.DataFrame)):
-        ts = _pd.to_datetime(val, unit='s')
-        out = ts.dt.strftime("%Y-%m-%d %H:%M:%S")
-        return out
+    if isinstance(val, (pd.Series, pd.DataFrame)):
+        ts = pd.to_datetime(val, unit='s')
+        return ts.dt.strftime("%Y-%m-%d %H:%M:%S")
 
-    # numpy array or scalar
-    arr = _np.asarray(val, dtype=float)
+    arr = np.asarray(val, dtype=float)
     flat = arr.ravel()
     result = []
     for v in flat:
         dt = datetime.fromtimestamp(int(v))
         result.append(dt.strftime("%Y-%m-%d %H:%M:%S"))
-    res_arr = _np.array(result)
+    res_arr = np.array(result)
     if res_arr.ndim == 0:
         return res_arr.item()
     return res_arr.reshape(arr.shape)
-
 
 convertFrom = {
     "unix": unix2date,
