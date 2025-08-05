@@ -19,8 +19,12 @@ def _unit_converter(factor):
     vectorized through utils._extract / utils._wrap.
     """
     def converter(val):
+        # pull out the raw array
         arr = utils._extract(val)
-        return utils._wrap(arr * factor)
+        # do the multiplication
+        core = arr * factor
+        # pass both the result and the original to _wrap
+        return utils._wrap(core, original=val)
     return converter
 
 # Linear unit conversions (factor-based)

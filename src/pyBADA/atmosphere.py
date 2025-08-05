@@ -12,11 +12,7 @@ from pyBADA import conversions as conv
 
 
 def _theta_core(arr_h, arr_dT):
-    """
-    Core normalized temperature ratio computation
-    with constant temperature above the tropopause.
-    """
-
+    """Core formula only — both h and dT are already broadcasted arrays."""
     return np.where(
         arr_h < const.h_11,
         1 - const.temp_h * arr_h / const.temp_0 + arr_dT / const.temp_0,
@@ -34,15 +30,16 @@ def theta(h, DeltaTemp):
     :param DeltaTemp: Deviation from ISA temperature in Kelvin (K). Same type as h.
     :type h: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :type DeltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Normalized temperature [-], rounded with half-up.
+    :returns: Normalized temperature [-].
     """
 
     arr_h  = utils._extract(h)
     arr_dT = utils._extract(DeltaTemp)
+    arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
-    core = _theta_core(arr_h, arr_dT)
+    core = _theta_core(arr_h_b, arr_dT_b)
 
-    return utils._wrap(core)
+    return utils._wrap(core, original=h)
 
 
 def _delta_core(arr_h, arr_dT):
@@ -83,15 +80,16 @@ def delta(h, DeltaTemp):
     :param DeltaTemp: Deviation from ISA temperature in Kelvin (K). Same type as h.
     :type h: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :type DeltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Normalized pressure [-], rounded with half-up.
+    :returns: Normalized pressure [-].
     """
 
     arr_h  = utils._extract(h)
     arr_dT = utils._extract(DeltaTemp)
+    arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
-    core = _delta_core(arr_h, arr_dT)
+    core = _delta_core(arr_h_b, arr_dT_b)
 
-    return utils._wrap(core)
+    return utils._wrap(core, original=h)
 
 
 def _sigma_core(arr_theta, arr_delta):
@@ -99,7 +97,6 @@ def _sigma_core(arr_theta, arr_delta):
     Core normalized density computation from precomputed arrays
     """
 
-    # Apply ideal gas law to normalized variables
     return (arr_delta * const.p_0) / (arr_theta * const.temp_0 * const.R) / const.rho_0
 
 
@@ -127,19 +124,23 @@ def sigma(h=None, DeltaTemp=None, theta=None, delta=None):
     if theta is not None and delta is not None:
         arr_t = utils._extract(theta)
         arr_d = utils._extract(delta)
-        core = _sigma_core(arr_t, arr_d)
+        arr_t_b, arr_d_b = utils._broadcast(arr_t, arr_d)
+        core = _sigma_core(arr_t_b, arr_d_b)
 
-        return utils._wrap(core)
+        return utils._wrap(core, original=theta)
 
-    if h is None or DeltaTemp is None:
-        raise ValueError("Either provide both h & DeltaTemp, or theta & delta.")
+    elif h is not None or DeltaTemp is not None:
         arr_h  = utils._extract(h)
         arr_dT = utils._extract(DeltaTemp)
-        arr_t  = _theta_core(arr_h, arr_dT)
-        arr_d  = _delta_core(arr_h, arr_dT)
+        arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
+        arr_t  = _theta_core(arr_h_b, arr_dT_b)
+        arr_d  = _delta_core(arr_h_b, arr_dT_b)
         core   = _sigma_core(arr_t, arr_d)
 
-        return utils._wrap(core)
+        return utils._wrap(core, original=h)
+
+    else:
+        raise ValueError("Either provide both h & DeltaTemp, or theta & delta.")
 
 
 def _aSound_core(arr_theta):
@@ -161,7 +162,7 @@ def aSound(theta):
 
     core = _aSound_core(arr)
 
-    return utils._wrap(core)
+    return utils._wrap(core, original=theta)
 
 
 def _mach2Tas_core(arr_mach, arr_theta):
@@ -192,7 +193,9 @@ def mach2Tas(Mach, theta):
     :returns: True airspeed in meters per second (m/s).
     """
 
-    return utils._vectorized_wrapper(_mach2Tas_core, Mach, theta)
+    Mach_b, theta_b = utils._broadcast(Mach, theta)
+
+    return utils._vectorized_wrapper(_mach2Tas_core, Mach_b, theta_b)
 
 
 def tas2Mach(v, theta):
@@ -207,7 +210,9 @@ def tas2Mach(v, theta):
     :returns: Mach number [-].
     """
 
-    return utils._vectorized_wrapper(_tas2Mach_core, v, theta)
+    v_b, theta_b = utils._broadcast(v, theta)
+
+    return utils._vectorized_wrapper(_tas2Mach_core, v_b, theta_b)
 
 
 def _tas2Cas_core(arr_tas, arr_delta, arr_sigma):
@@ -217,9 +222,9 @@ def _tas2Cas_core(arr_tas, arr_delta, arr_sigma):
     """
     rho = arr_sigma * const.rho_0
     p = arr_delta * const.p_0
-    A = pow(1 + const.Amu * rho * arr_tas**2 / (2 * p), 1 / const.Amu) - 1
-    B = pow(1 + arr_delta * A, const.Amu) - 1
-    return sqrt(2 * const.p_0 * B / (const.Amu * const.rho_0))
+    A = np.power(1 + const.Amu * rho * arr_tas**2 / (2 * p), 1 / const.Amu) - 1
+    B = np.power(1 + arr_delta * A, const.Amu) - 1
+    return np.sqrt(2 * const.p_0 * B / (const.Amu * const.rho_0))
 
 
 def _cas2Tas_core(arr_cas, arr_delta, arr_sigma):
@@ -229,9 +234,9 @@ def _cas2Tas_core(arr_cas, arr_delta, arr_sigma):
     """
     rho = arr_sigma * const.rho_0
     p = arr_delta * const.p_0
-    A = pow(1 + const.Amu * const.rho_0 * arr_cas**2 / (2 * const.p_0), 1 / const.Amu) - 1
-    B = pow(1 + (1 / arr_delta) * A, const.Amu) - 1
-    return sqrt(2 * p * B / (const.Amu * rho))
+    A = np.power(1 + const.Amu * const.rho_0 * arr_cas**2 / (2 * const.p_0), 1 / const.Amu) - 1
+    B = np.power(1 + (1 / arr_delta) * A, const.Amu) - 1
+    return np.sqrt(2 * p * B / (const.Amu * rho))
 
 
 def tas2Cas(tas, delta, sigma):
@@ -248,7 +253,9 @@ def tas2Cas(tas, delta, sigma):
     :returns: Calibrated airspeed in meters per second (m/s)
     """
 
-    return utils._vectorized_wrapper(_tas2Cas_core, tas, delta, sigma)
+    tas_b, delta_b, sigma_b = utils._broadcast(tas, delta, sigma)
+
+    return utils._vectorized_wrapper(_tas2Cas_core, tas_b, delta_b, sigma_b)
 
 
 def cas2Tas(cas, delta, sigma):
@@ -265,7 +272,9 @@ def cas2Tas(cas, delta, sigma):
     :returns: True airspeed in meters per second (m/s).
     """
 
-    return utils._vectorized_wrapper(_cas2Tas_core, cas, delta, sigma)
+    cas_b, delta_b, sigma_b = utils._broadcast(cas, delta, sigma)
+
+    return utils._vectorized_wrapper(_cas2Tas_core, cas_b, delta_b, sigma_b)
 
 
 def _mach2Cas_core(arr_mach, arr_theta, arr_delta, arr_sigma):
@@ -302,7 +311,9 @@ def mach2Cas(Mach, theta, delta, sigma):
     :returns: Calibrated airspeed in meters per second (m/s).
     """
 
-    return utils._vectorized_wrapper(_mach2Cas_core, Mach, theta, delta, sigma)
+    Mach_b, theta_b, delta_b, sigma_b = utils._broadcast(Mach, theta, delta, sigma)
+
+    return utils._vectorized_wrapper(_mach2Cas_core, Mach_b, theta_b, delta_b, sigma_b)
 
 
 def cas2Mach(cas, theta, delta, sigma):
@@ -321,7 +332,9 @@ def cas2Mach(cas, theta, delta, sigma):
     :returns: Mach number [-].
     """
 
-    return utils._vectorized_wrapper(_cas2Mach_core, cas, theta, delta, sigma)
+    cas_b, theta_b, delta_b, sigma_b = utils._broadcast(cas, theta, delta, sigma)
+
+    return utils._vectorized_wrapper(_cas2Mach_core, cas_b, theta_b, delta_b, sigma_b)
 
 
 def _pressureAltitude_core(arr_p, QNH):
@@ -343,42 +356,42 @@ def pressureAltitude(pressure, QNH=101325.0):
     :param QNH:     Reference sea-level pressure in Pascals (Pa). Default 101325 Pa.
     :type pressure: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :type QNH:      float
-    :returns:       Pressure altitude in meters (m), rounded with half-up, preserving type and metadata.
+    :returns:       Pressure altitude in meters (m).
     """
 
-    arr = utils._extract(pressure)
+    arr_pressure = utils._extract(pressure)
+    arr_QNH = utils._extract(QNH)
+    arr_pressure_b, arr_QNH_b = utils._broadcast(arr_pressure, arr_QNH)
 
-    core = _pressureAltitude_core(arr, QNH)
+    core = _pressureAltitude_core(arr_pressure_b, arr_QNH_b)
 
-    return utils._wrap(core)
+    return utils._wrap(core, original=pressure)
 
 
 def _isaTempDev_core(arr_temp, arr_h):
     """
-    Core ISA temperature deviation computation
+    Core ISA temperature deviation computation, with scalar passthrough for Python numbers and array broadcasting for others.
     """
 
     return arr_temp - _theta_core(arr_h, np.zeros_like(arr_h)) * const.temp_0
 
 
 def ISATemperatureDeviation(temperature, pressureAltitude):
-    """Calculates deviation from ISA temperature at a specific pressure altitude,
-    vectorized for xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
+    """Calculates ISA temperature deviation at a given pressure altitude.
+    Supports Python scalars, numpy arrays, pandas Series/DataFrame, xarray DataArray; handles broadcasting between inputs.
 
-    :param temperature: Air temperature in Kelvin. Can be scalar, numpy array,
-                        pandas Series/DataFrame, or xarray.DataArray.
-    :param pressureAltitude: Pressure altitude in meters. Same type as temperature.
-    :type temperature: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :type pressureAltitude: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: ISA temperature deviation in Kelvin, rounded with half-up.
+    :param temperature: Air temperature in Kelvin.
+    :param pressureAltitude: Pressure altitude in meters.
+    :returns: ISA temperature deviation in Kelvin, wrapped to original type.
     """
 
-    arr_temp = utils._extract(temperature)
-    arr_h = utils._extract(pressureAltitude)
+    h = utils._extract(pressureAltitude)
+    T = utils._extract(temperature)
+    h_b, T_b = utils._broadcast(h, T)
 
-    core = _isaTempDev_core(arr_temp, arr_h)
+    core = _isaTempDev_core(T_b, h_b)
 
-    return utils._wrap(core)
+    return utils._wrap(core, original=temperature)
 
 
 def _crossOver_core(arr_cas, arr_mach):
@@ -386,18 +399,18 @@ def _crossOver_core(arr_cas, arr_mach):
     Core cross-over altitude computation:
     Calculates the altitude where CAS and Mach yield the same TAS.
     """
-    # Pressure at transition
+
     p_trans = const.p_0 * (
         (
-            pow(1 + ((const.Agamma - 1.0)/2.0) * ((arr_cas/const.a_0)**2), 1/const.Amu) - 1.0
+            np.power(1 + ((const.Agamma - 1.0)/2.0) * ((arr_cas/const.a_0)**2), 1/const.Amu) - 1.0
         ) /
         (
-            pow(1 + ((const.Agamma - 1.0)/2.0) * (arr_mach**2), 1/const.Amu) - 1.0
+            np.power(1 + ((const.Agamma - 1.0)/2.0) * (arr_mach**2), 1/const.Amu) - 1.0
         )
     )
-    # Temperature ratio at transition
+
     theta_trans = np.power(p_trans/const.p_0, (const.temp_h*const.R)/const.g)
-    # Altitude branch
+
     h = np.where(
         p_trans < const.p_11,
         const.h_11 - (const.R*const.temp_11/const.g)*np.log(p_trans/const.p_11),
@@ -415,9 +428,12 @@ def crossOver(cas, Mach):
     :param Mach: Mach number [-]. Same type as cas.
     :type cas: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :type Mach: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Cross-over altitude in meters (m), rounded with half-up.
+    :returns: Cross-over altitude in meters (m).
     """
-    return utils._vectorized_wrapper(_crossOver_core, cas, Mach)
+
+    cas_b, Mach_b = utils._broadcast(cas, Mach)
+
+    return utils._vectorized_wrapper(_crossOver_core, cas_b, Mach_b)
 
 
 def atmosphereProperties(h, DeltaTemp):
@@ -436,15 +452,16 @@ def atmosphereProperties(h, DeltaTemp):
 
     arr_h  = utils._extract(h)
     arr_dT = utils._extract(DeltaTemp)
+    arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
-    arr_theta = _theta_core(arr_h, arr_dT)
-    arr_delta = _delta_core(arr_h, arr_dT)
+    arr_theta = _theta_core(arr_h_b, arr_dT_b)
+    arr_delta = _delta_core(arr_h_b, arr_dT_b)
     arr_sigma = _sigma_core(arr_theta, arr_delta)
 
     return [
-        utils._wrap(arr_theta),
-        utils._wrap(arr_delta),
-        utils._wrap(arr_sigma),
+        utils._wrap(arr_theta, original=h),
+        utils._wrap(arr_delta, original=h),
+        utils._wrap(arr_sigma, original=h),
     ]
 
 
@@ -463,33 +480,34 @@ def convertSpeed(v, speedType, theta, delta, sigma):
     :param sigma: Normalized air density [-]. Same type as v.
     :returns: [Mach number, CAS (m/s), TAS (m/s)] each matching the type of input.
     """
-    # Extract raw numpy arrays
+
     arr_v     = utils._extract(v)
     arr_theta = utils._extract(theta)
     arr_delta = utils._extract(delta)
     arr_sigma = utils._extract(sigma)
 
-    # Compute core values on raw arrays
+    arr_v_b, arr_theta_b, arr_delta_b, arr_sigma_b = utils._broadcast(arr_v, arr_theta, arr_delta, arr_sigma)
+
     if speedType.upper() == "TAS":
-        arr_TAS = conv.kt2ms(arr_v)
-        arr_CAS = _tas2Cas_core(arr_TAS, arr_delta, arr_sigma)
-        arr_M   = _tas2Mach_core(arr_TAS, arr_theta)
+        arr_TAS = conv.kt2ms(arr_v_b)
+        arr_CAS = _tas2Cas_core(arr_TAS, arr_delta_b, arr_sigma_b)
+        arr_M   = _tas2Mach_core(arr_TAS, arr_theta_b)
 
     elif speedType.upper() == "CAS":
-        arr_CAS = conv.kt2ms(arr_v)
-        arr_TAS = _cas2Tas_core(arr_CAS, arr_delta, arr_sigma)
-        arr_M   = _tas2Mach_core(arr_TAS, arr_theta)
+        arr_CAS = conv.kt2ms(arr_v_b)
+        arr_TAS = _cas2Tas_core(arr_CAS, arr_delta_b, arr_sigma_b)
+        arr_M   = _tas2Mach_core(arr_TAS, arr_theta_b)
 
-    elif speedType.upper() == "M":
-        arr_M   = arr_v
-        arr_CAS = _mach2Cas_core(arr_M, arr_theta, arr_delta, arr_sigma)
-        arr_TAS = _cas2Tas_core(arr_CAS, arr_delta, arr_sigma)
+    elif speedType.upper() == "M" or speedType.upper() == "MACH":
+        arr_M   = arr_v_b
+        arr_CAS = _mach2Cas_core(arr_M, arr_theta_b, arr_delta_b, arr_sigma_b)
+        arr_TAS = _cas2Tas_core(arr_CAS, arr_delta_b, arr_sigma_b)
 
     else:
         raise ValueError(f"Expected speedType 'TAS', 'CAS' or 'M', got: {speedType!r}")
 
     return [
-        utils._wrap(arr_M),
-        utils._wrap(arr_CAS),
-        utils._wrap(arr_TAS),
+        utils._wrap(arr_M, original=v),
+        utils._wrap(arr_CAS, original=v),
+        utils._wrap(arr_TAS, original=v),
     ]
