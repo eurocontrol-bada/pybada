@@ -13,211 +13,36 @@ import pandas as pd
 from pyBADA import utils
 
 
-def ft2m(val):
+def _unit_converter(factor):
     """
-    Convert from feet to meters, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in feet (ft). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in meters (m), matching input type.
+    Returns a function that multiplies its input by `factor`,
+    vectorized through utils._extract / utils._wrap.
     """
-    factor = 0.3048
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
+    def converter(val):
+        arr = utils._extract(val)
+        return utils._wrap(arr * factor)
+    return converter
 
+# Linear unit conversions (factor-based)
+_factor_map = {
+    "ft2m":    0.3048,
+    "nm2m":    1852.0,
+    "h2s":     3600.0,
+    "kt2ms":   0.514444,
+    "lb2kg":   0.453592,
+    "deg2rad": pi / 180.0,
+    "rad2deg": 180.0 / pi,
+    "m2ft":    1 / 0.3048,
+    "m2nm":    1 / 1852.0,
+    "s2h":     1 / 3600.0,
+    "ms2kt":   1 / 0.514444,
+    "kg2lb":   1 / 0.453592,
+    "hp2W":    745.699872,
+}
 
-def nm2m(val):
-    """
-    Convert from nautical miles to meters, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in nautical miles (nm). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in meters (m), matching input type.
-    """
-    factor = 1852.0
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def h2s(val):
-    """
-    Convert from hours to seconds, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in hours (h). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in seconds (s), matching input type.
-    """
-    factor = 3600.0
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def kt2ms(val):
-    """
-    Convert from knots to meters per second, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in knots (kt). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in meters per second (m/s), matching input type.
-    """
-    factor = 0.514444
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def lb2kg(val):
-    """
-    Convert from pounds to kilograms, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in pounds (lb). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in kilograms (kg), matching input type.
-    """
-    factor = 0.453592
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def deg2rad(val):
-    """
-    Convert from decimal degrees to radians, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in decimal degrees (°). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in radians (rad), matching input type.
-    """
-    factor = pi / 180.0
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-def rad2deg(val):
-    """
-    Convert from decimal degrees to radians, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in decimal degrees (°). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in radians (rad), matching input type.
-    """
-    factor = 180 / pi
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def m2ft(val):
-    """
-    Convert from meters to feet, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in meters (m). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in feet (ft), matching input type.
-    """
-    factor = 1 / 0.3048
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def m2nm(val):
-    """
-    Convert from meters to nautical miles, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in meters (m). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in nautical miles (nm), matching input type.
-    """
-    factor = 1 / 1852.0
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def s2h(val):
-    """
-    Convert from seconds to hours, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in seconds (s). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in hours (h), matching input type.
-    """
-    factor = 1 / 3600.0
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def ms2kt(val):
-    """
-    Convert from meters per second to knots, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in meters per second (m/s). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in knots (kt), matching input type.
-    """
-    factor = 1 / 0.514444
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def kg2lb(val):
-    """
-    Convert from kilograms to pounds, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in kilograms (kg). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in pounds (lb), matching input type.
-    """
-    factor = 1 / 0.453592
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
-
-
-def hp2W(val):
-    """
-    Convert from horsepower to watts, vectorized for
-    xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
-
-    :param val: Input value(s) in horsepower (hp). Scalar, numpy array,
-                pandas Series/DataFrame, or xarray.DataArray.
-    :type val: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :returns: Converted value(s) in watts (W), matching input type.
-    """
-    factor = 745.699872
-    arr_val = utils._extract(val)
-    core = arr_val * factor
-    return utils._wrap(core)
+# Dynamically create each converter in the module namespace
+for _name, _factor in _factor_map.items():
+    globals()[_name] = _unit_converter(_factor)
 
 
 def date2posix(val):
