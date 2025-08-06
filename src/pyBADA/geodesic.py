@@ -46,7 +46,9 @@ class GeodesicCommon:
         if dist == 0:
             raise ValueError("Waypoints must be distinct (distance = 0)")
 
-        delta_h = conv.ft2m(waypoint_final["altitude"] - waypoint_init["altitude"])
+        delta_h = conv.ft2m(
+            waypoint_final["altitude"] - waypoint_init["altitude"]
+        )
         slope = degrees(atan(delta_h / dist))
         return slope, dist
 
@@ -201,9 +203,9 @@ class Haversine(GeodesicCommon):
         phi_init = radians(LAT_init)
         lambda_init = radians(LON_init)
 
-        sinPhi_final = sin(phi_init) * cos(delta) + cos(phi_init) * sin(delta) * cos(
-            theta
-        )
+        sinPhi_final = sin(phi_init) * cos(delta) + cos(phi_init) * sin(
+            delta
+        ) * cos(theta)
         phi_final = asin(sinPhi_final)
         y = sin(theta) * sin(delta) * cos(phi_init)
         x = cos(delta) - sin(phi_init) * sinPhi_final
@@ -238,7 +240,8 @@ class Haversine(GeodesicCommon):
         """
 
         bearing = atan2(
-            sin(radians(LON_final) - radians(LON_init)) * cos(radians(LAT_final)),
+            sin(radians(LON_final) - radians(LON_init))
+            * cos(radians(LAT_final)),
             cos(radians(LAT_init)) * sin(radians(LAT_final))
             - sin(radians(LAT_init))
             * cos(radians(LAT_final))
@@ -298,7 +301,9 @@ class Vincenty(GeodesicCommon):
         lambd = L
         lambd_new = 0.0
         iterations = 0
-        while iterations == 0 or (abs(lambd - lambd_new) > 1e-12 and iterations < 1000):
+        while iterations == 0 or (
+            abs(lambd - lambd_new) > 1e-12 and iterations < 1000
+        ):
             iterations += 1
             sinlambda = sin(lambd)
             coslambda = cos(lambd)
@@ -316,13 +321,21 @@ class Vincenty(GeodesicCommon):
             else:
                 cos2sigmam = 0.0
 
-            C = const.f / 16 * cosSqalpha * (4 + const.f * (4 - 3 * cosSqalpha))
+            C = (
+                const.f
+                / 16
+                * cosSqalpha
+                * (4 + const.f * (4 - 3 * cosSqalpha))
+            )
             lambd_new = lambd
             lambd = L + (1 - C) * const.f * sinalpha * (
                 sigma
                 + C
                 * sinsigma
-                * (cos2sigmam + C * cossigma * (-1 + 2 * cos2sigmam * cos2sigmam))
+                * (
+                    cos2sigmam
+                    + C * cossigma * (-1 + 2 * cos2sigmam * cos2sigmam)
+                )
             )
 
             if antipodal:
@@ -337,7 +350,9 @@ class Vincenty(GeodesicCommon):
         if iterations >= 1000:
             return [None, None, None]
 
-        uSq = cosSqalpha * (pow(const.a, 2) - pow(const.b, 2)) / pow(const.b, 2)
+        uSq = (
+            cosSqalpha * (pow(const.a, 2) - pow(const.b, 2)) / pow(const.b, 2)
+        )
         A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)))
         B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)))
         deltaSigma = (
@@ -361,11 +376,15 @@ class Vincenty(GeodesicCommon):
         s = const.b * A * (sigma - deltaSigma)
 
         # initial bearing
-        alpha1 = atan2(cosU2 * sinlambda, cosU1 * sinU2 - sinU1 * cosU2 * coslambda)
+        alpha1 = atan2(
+            cosU2 * sinlambda, cosU1 * sinU2 - sinU1 * cosU2 * coslambda
+        )
         alpha1 = (degrees(alpha1) + 360) % 360
 
         # final bearing
-        alpha2 = atan2(cosU1 * sinlambda, -sinU1 * cosU2 + cosU1 * sinU2 * coslambda)
+        alpha2 = atan2(
+            cosU1 * sinlambda, -sinU1 * cosU2 + cosU1 * sinU2 * coslambda
+        )
         alpha2 = (degrees(alpha2) + 360) % 360
 
         return (s, alpha1, alpha2)
@@ -417,7 +436,9 @@ class Vincenty(GeodesicCommon):
         :rtype: float
         """
 
-        b_initial = Vincenty.distance_bearing(LAT_init, LON_init, LAT_final, LON_final)
+        b_initial = Vincenty.distance_bearing(
+            LAT_init, LON_init, LAT_final, LON_final
+        )
         return b_initial[1]
 
     @staticmethod
@@ -441,7 +462,9 @@ class Vincenty(GeodesicCommon):
         :rtype: float
         """
 
-        b_final = Vincenty.distance_bearing(LAT_init, LON_init, LAT_final, LON_final)
+        b_final = Vincenty.distance_bearing(
+            LAT_init, LON_init, LAT_final, LON_final
+        )
         return b_final[2]
 
     @staticmethod
@@ -480,7 +503,9 @@ class Vincenty(GeodesicCommon):
         sigma1 = atan2(tanU1, cosalpha1)
         sinalpha = cosU1 * sinalpha1
         cosSqalpha = 1 - pow(sinalpha, 2)
-        uSq = cosSqalpha * (pow(const.a, 2) - pow(const.b, 2)) / pow(const.b, 2)
+        uSq = (
+            cosSqalpha * (pow(const.a, 2) - pow(const.b, 2)) / pow(const.b, 2)
+        )
         A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)))
         B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)))
 
@@ -488,7 +513,9 @@ class Vincenty(GeodesicCommon):
 
         sigma_new = 0.0
         iterations = 0
-        while iterations == 0 or (abs(sigma - sigma_new) > 1e-12 and iterations < 1000):
+        while iterations == 0 or (
+            abs(sigma - sigma_new) > 1e-12 and iterations < 1000
+        ):
             iterations += 1
             cos2sigmam = cos(2 * sigma1 + sigma)
             sinsigma = sin(sigma)
@@ -727,7 +754,9 @@ class RhumbLine(GeodesicCommon):
         return (lat_b, lon_b)
 
     @staticmethod
-    def loxodromic_mid_point(LAT_init, LON_init, LAT_final, LON_final) -> tuple:
+    def loxodromic_mid_point(
+        LAT_init, LON_init, LAT_final, LON_final
+    ) -> tuple:
         """Calculates the midpoint along a rhumbline between two geographical
         points.
 
@@ -793,7 +822,9 @@ class RhumbLine(GeodesicCommon):
 
         n_points = int(n_points)
         if not log2(n_points + 1).is_integer():
-            print("N_Points must be an power of 2 minus 1 Number! e.g. 1,3,7,15,...")
+            print(
+                "N_Points must be an power of 2 minus 1 Number! e.g. 1,3,7,15,..."
+            )
             return []
 
         lmp = RhumbLine.loxodromic_mid_point
@@ -809,7 +840,9 @@ class RhumbLine(GeodesicCommon):
                     solution(solution(a, b, 1), b, (idx - 1) / 2),
                 )
 
-        points = solution((LAT_init, LON_init), (LAT_final, LON_final), n_points)
+        points = solution(
+            (LAT_init, LON_init), (LAT_final, LON_final), n_points
+        )
 
         # Decouple points
         decoupled_points = []
@@ -867,7 +900,9 @@ class Turn:
         """
 
         if TAS == 0:
-            arcLength = rateOfTurn * timeOfTurn  # amount of degrees to do the rotation
+            arcLength = (
+                rateOfTurn * timeOfTurn
+            )  # amount of degrees to do the rotation
 
             if directionOfTurn == "RIGHT":
                 bearing_final = (bearingInit + arcLength) % 360
@@ -877,10 +912,16 @@ class Turn:
             return (LAT_init, LON_init, bearing_final)
 
         else:
-            bankAngle = airplane.bankAngle(rateOfTurn=rateOfTurn, v=TAS)  # [degrees]
+            bankAngle = airplane.bankAngle(
+                rateOfTurn=rateOfTurn, v=TAS
+            )  # [degrees]
 
-            arcLength = rateOfTurn * timeOfTurn  # amount of degrees to do the rotation
-            turnRadius = airplane.turnRadius_bankAngle(v=TAS, ba=bankAngle)  # [m]
+            arcLength = (
+                rateOfTurn * timeOfTurn
+            )  # amount of degrees to do the rotation
+            turnRadius = airplane.turnRadius_bankAngle(
+                v=TAS, ba=bankAngle
+            )  # [m]
 
             # find center of rotation, which is at (bearingInit + 90 degrees) and distance of turnRadius
             if directionOfTurn == "RIGHT":
@@ -950,7 +991,9 @@ class Turn:
             arcLengthDegrees = (
                 rateOfTurn * timeOfTurn
             )  # amount of degrees to do the rotation
-            turnRadius = airplane.turnRadius_bankAngle(v=TAS, ba=bankAngle)  # [m]
+            turnRadius = airplane.turnRadius_bankAngle(
+                v=TAS, ba=bankAngle
+            )  # [m]
             distance = radians(arcLengthDegrees) * turnRadius  # arcLength [m]
 
         return distance

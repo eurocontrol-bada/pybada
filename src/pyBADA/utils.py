@@ -66,7 +66,9 @@ def to_numpy(x):
 
 
 def _extract(x):
-    if isinstance(x, numbers.Real) and not isinstance(x, (np.generic, np.ndarray)):
+    if isinstance(x, numbers.Real) and not isinstance(
+        x, (np.generic, np.ndarray)
+    ):
         return float(x)
     if isinstance(x, xr.DataArray):
         return x.data
@@ -85,7 +87,8 @@ def _broadcast(*arrays):
     """
     # 1) Scalar passthrough
     if all(
-        isinstance(a, numbers.Real) and not isinstance(a, (np.generic, np.ndarray))
+        isinstance(a, numbers.Real)
+        and not isinstance(a, (np.generic, np.ndarray))
         for a in arrays
     ):
         return tuple(arrays)
@@ -127,7 +130,9 @@ def _align_1d_to_nd(one_d, nd):
             new_shape = tuple(1 if j != i else N for j in range(nd.ndim))
             return one_d.reshape(new_shape)
     # no matching dimension found
-    raise ValueError(f"Cannot align 1D array of length {N} with ND shape {nd.shape}")
+    raise ValueError(
+        f"Cannot align 1D array of length {N} with ND shape {nd.shape}"
+    )
 
 
 # def _broadcast(*arrays):
@@ -173,7 +178,9 @@ def _wrap(core, original):
 
     # pandas DataFrame
     if isinstance(original, pd.DataFrame):
-        return pd.DataFrame(core, index=original.index, columns=original.columns)
+        return pd.DataFrame(
+            core, index=original.index, columns=original.columns
+        )
 
     # fallback: NumPy arrays/scalars
     return core
@@ -199,7 +206,9 @@ def _vectorized_wrapper(core_func, *args):
         return xr.DataArray(core, coords=first.coords, dims=first.dims)
 
     # pandas Series
-    if isinstance(first, pd.Series) and all(isinstance(a, pd.Series) for a in args):
+    if isinstance(first, pd.Series) and all(
+        isinstance(a, pd.Series) for a in args
+    ):
         return pd.Series(core, index=first.index, name=first.name)
 
     # pandas DataFrame

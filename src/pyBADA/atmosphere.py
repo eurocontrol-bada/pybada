@@ -55,7 +55,9 @@ def _delta_core(arr_h, arr_dT):
     base = arr_theta - (arr_dT / const.temp_0)
     p = np.power(base, exponent)
 
-    strato_factor = np.exp(-const.g / (const.R * const.temp_11) * (arr_h - const.h_11))
+    strato_factor = np.exp(
+        -const.g / (const.R * const.temp_11) * (arr_h - const.h_11)
+    )
 
     return np.where(arr_h <= const.h_11, p, p * strato_factor)
 
@@ -87,7 +89,11 @@ def _sigma_core(arr_theta, arr_delta):
     Core normalized density computation from precomputed arrays
     """
 
-    return (arr_delta * const.p_0) / (arr_theta * const.temp_0 * const.R) / const.rho_0
+    return (
+        (arr_delta * const.p_0)
+        / (arr_theta * const.temp_0 * const.R)
+        / const.rho_0
+    )
 
 
 def sigma(h=None, DeltaTemp=None, theta=None, delta=None):
@@ -130,7 +136,9 @@ def sigma(h=None, DeltaTemp=None, theta=None, delta=None):
         return utils._wrap(core, original=h)
 
     else:
-        raise ValueError("Either provide both h & DeltaTemp, or theta & delta.")
+        raise ValueError(
+            "Either provide both h & DeltaTemp, or theta & delta."
+        )
 
 
 def _aSound_core(arr_theta):
@@ -307,9 +315,13 @@ def mach2Cas(Mach, theta, delta, sigma):
     :returns: Calibrated airspeed in meters per second (m/s).
     """
 
-    Mach_b, theta_b, delta_b, sigma_b = utils._broadcast(Mach, theta, delta, sigma)
+    Mach_b, theta_b, delta_b, sigma_b = utils._broadcast(
+        Mach, theta, delta, sigma
+    )
 
-    return utils._vectorized_wrapper(_mach2Cas_core, Mach_b, theta_b, delta_b, sigma_b)
+    return utils._vectorized_wrapper(
+        _mach2Cas_core, Mach_b, theta_b, delta_b, sigma_b
+    )
 
 
 def cas2Mach(cas, theta, delta, sigma):
@@ -328,9 +340,13 @@ def cas2Mach(cas, theta, delta, sigma):
     :returns: Mach number [-].
     """
 
-    cas_b, theta_b, delta_b, sigma_b = utils._broadcast(cas, theta, delta, sigma)
+    cas_b, theta_b, delta_b, sigma_b = utils._broadcast(
+        cas, theta, delta, sigma
+    )
 
-    return utils._vectorized_wrapper(_cas2Mach_core, cas_b, theta_b, delta_b, sigma_b)
+    return utils._vectorized_wrapper(
+        _cas2Mach_core, cas_b, theta_b, delta_b, sigma_b
+    )
 
 
 def _pressureAltitude_core(arr_p, QNH):
@@ -403,22 +419,28 @@ def _crossOver_core(arr_cas, arr_mach):
     p_trans = const.p_0 * (
         (
             np.power(
-                1 + ((const.Agamma - 1.0) / 2.0) * ((arr_cas / const.a_0) ** 2),
+                1
+                + ((const.Agamma - 1.0) / 2.0) * ((arr_cas / const.a_0) ** 2),
                 1 / const.Amu,
             )
             - 1.0
         )
         / (
-            np.power(1 + ((const.Agamma - 1.0) / 2.0) * (arr_mach**2), 1 / const.Amu)
+            np.power(
+                1 + ((const.Agamma - 1.0) / 2.0) * (arr_mach**2), 1 / const.Amu
+            )
             - 1.0
         )
     )
 
-    theta_trans = np.power(p_trans / const.p_0, (const.temp_h * const.R) / const.g)
+    theta_trans = np.power(
+        p_trans / const.p_0, (const.temp_h * const.R) / const.g
+    )
 
     h = np.where(
         p_trans < const.p_11,
-        const.h_11 - (const.R * const.temp_11 / const.g) * np.log(p_trans / const.p_11),
+        const.h_11
+        - (const.R * const.temp_11 / const.g) * np.log(p_trans / const.p_11),
         (const.temp_0 / -const.temp_h) * (theta_trans - 1),
     )
     return h
@@ -511,7 +533,9 @@ def convertSpeed(v, speedType, theta, delta, sigma):
         arr_TAS = _cas2Tas_core(arr_CAS, arr_delta_b, arr_sigma_b)
 
     else:
-        raise ValueError(f"Expected speedType 'TAS', 'CAS' or 'M', got: {speedType!r}")
+        raise ValueError(
+            f"Expected speedType 'TAS', 'CAS' or 'M', got: {speedType!r}"
+        )
 
     return [
         utils._wrap(arr_M, original=v),

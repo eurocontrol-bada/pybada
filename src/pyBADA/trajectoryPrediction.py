@@ -23,7 +23,9 @@ def cruiseFuelConsumption(AC, altitude, M, DeltaTemp):
     :rtype: float
     """
 
-    [theta, delta, sigma] = atm.atmosphereProperties(h=altitude, DeltaTemp=DeltaTemp)
+    [theta, delta, sigma] = atm.atmosphereProperties(
+        h=altitude, DeltaTemp=DeltaTemp
+    )
     TAS = atm.mach2Tas(Mach=M, theta=theta)
 
     config = "CR"
@@ -80,7 +82,9 @@ def cruiseFuelConsumption(AC, altitude, M, DeltaTemp):
     return fuelFlow
 
 
-def breguetLeducInitialMass(AC, distance, GS, cruiseFuelFlow, payload, fuelReserve):
+def breguetLeducInitialMass(
+    AC, distance, GS, cruiseFuelFlow, payload, fuelReserve
+):
     """Calculate the estimated initial mass required for the aircraft using
     the Breguet Leduc formula.
 
@@ -113,7 +117,9 @@ def breguetLeducInitialMass(AC, distance, GS, cruiseFuelFlow, payload, fuelReser
 
     minimumLandingMass = AC.OEW + payloadMass + fuelReserveMass
 
-    initialMass = minimumLandingMass * exp((cruiseFuelFlow * distance) / (AC.MREF * GS))
+    initialMass = minimumLandingMass * exp(
+        (cruiseFuelFlow * distance) / (AC.MREF * GS)
+    )
 
     return initialMass
 

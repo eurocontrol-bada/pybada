@@ -40,21 +40,27 @@ if AC.BADAFamily.BADA4:
     print("EconMach_precomputed = ", econMach_precomputed)
 
     # Maximum Range Cruise (MRC) Mach speed
-    MRC = AC.OPT.MRC(theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS)
+    MRC = AC.OPT.MRC(
+        theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS
+    )
     print("MRC = ", MRC)
 
     MRC_precomputed = AC.OPT.getOPTParam("MRC", CW)
     print("MRC_precomputed = ", MRC_precomputed)
 
     # Long Range Cruise (LRC) Mach speed
-    LRC = AC.OPT.LRC(theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS)
+    LRC = AC.OPT.LRC(
+        theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS
+    )
     print("LRC = ", LRC)
 
     LRC_precomputed = AC.OPT.getOPTParam("LRC", CW)
     print("LRC_precomputed = ", LRC_precomputed)
 
     # Maximum Endurance Cruise (MEC) Mach speed
-    MEC = AC.OPT.MEC(theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS)
+    MEC = AC.OPT.MEC(
+        theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS
+    )
     print("MEC = ", MEC)
 
     MEC_precomputed = AC.OPT.getOPTParam("MEC", CW)

@@ -189,7 +189,9 @@ def constantSpeedLevel(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # optional parameter - iteration step length based on the type of aircraft
     if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -203,9 +205,13 @@ def constantSpeedLevel(
 
     #  weight iteration constant
     if AC.BADAFamily.BADAE:
-        m_iter = kwargs.get("m_iter", 1)  # number of iterations for integration loop[-]
+        m_iter = kwargs.get(
+            "m_iter", 1
+        )  # number of iterations for integration loop[-]
     else:
-        m_iter = kwargs.get("m_iter", 2)  # number of iterations for integration loop[-]
+        m_iter = kwargs.get(
+            "m_iter", 2
+        )  # number of iterations for integration loop[-]
 
     # comment line describing type of trajectory calculation
     if flightPhase != "Cruise":
@@ -329,7 +335,9 @@ def constantSpeedLevel(
 
         # atmosphere properties
         H_m = conv.ft2m(Hp_i)  # altitude [m]
-        [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
+        [theta, delta, sigma] = atm.atmosphereProperties(
+            h=H_m, DeltaTemp=DeltaTemp
+        )
         # aircraft speed
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
@@ -339,10 +347,14 @@ def constantSpeedLevel(
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
                 # bankAngle is defined
-                rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                rateOfTurn = AC.rateOfTurn_bankAngle(
+                    TAS=TAS_i, bankAngle=bankAngle
+                )
             else:
                 # rateOfTurn is defined
-                bankAngle = AC.bankAngle(rateOfTurn=rateOfTurn, v=TAS_i)  # [degrees]
+                bankAngle = AC.bankAngle(
+                    rateOfTurn=rateOfTurn, v=TAS_i
+                )  # [degrees]
 
         if lengthType == "distance":
             # step time is: distance differantial divided by ground speed
@@ -371,7 +383,9 @@ def constantSpeedLevel(
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required for level flight
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
                 Peng_i = Preq_i
                 if AC.BADAFamily.BADAH:
                     Pav_i = AC.Pav(
@@ -403,7 +417,9 @@ def constantSpeedLevel(
                     Pelc_i = Preq_i / AC.eta
                     Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC_i)
                     Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC_i)
-                    Vgbat_i = AC.Vocbat(SOC=SOC_i) - AC.R0bat(SOC=SOC_i) * Ibat_i
+                    Vgbat_i = (
+                        AC.Vocbat(SOC=SOC_i) - AC.R0bat(SOC=SOC_i) * Ibat_i
+                    )
 
             # BADA4
             elif AC.BADAFamily.BADA4:
@@ -427,12 +443,16 @@ def constantSpeedLevel(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
-                CD = AC.CD(M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes)
+                CD = AC.CD(
+                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)
                 # compute thrust force and fuel flow
@@ -714,7 +734,9 @@ def constantSpeedLevel(
             # determine atmosphere properties at upper cruise altitude
             nextHp = min(Hp_i + HpStep, maxRFL)
             H_m = conv.ft2m(nextHp)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
 
             # aircraft speed at upper cruise altitude
             [M_up, CAS_up, TAS_up] = atm.convertSpeed(
@@ -783,7 +805,9 @@ def constantSpeedLevel(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_up, delta=delta, mass=mass_i, nz=nz)
@@ -919,7 +943,9 @@ def constantSpeedLevel(
                         ROT.extend(flightTrajectory_CL["ROT"])
 
                         comment_CL = flightTrajectory_CL["comment"]
-                        Comment.extend([com + "_stepClimb" for com in comment_CL])
+                        Comment.extend(
+                            [com + "_stepClimb" for com in comment_CL]
+                        )
 
                         # BADA4
                         if AC.BADAFamily.BADA4:
@@ -941,7 +967,9 @@ def constantSpeedLevel(
                         if Lat and Lon and magneticHeading:
                             LAT.extend(flightTrajectory_CL["LAT"])
                             LON.extend(flightTrajectory_CL["LON"])
-                            HDGMagnetic.extend(flightTrajectory_CL["HDGMagnetic"])
+                            HDGMagnetic.extend(
+                                flightTrajectory_CL["HDGMagnetic"]
+                            )
                             HDGTrue.extend(flightTrajectory_CL["HDGTrue"])
 
                         # Compute cruise fuel at upper altitude
@@ -961,18 +989,20 @@ def constantSpeedLevel(
 
                             # ensure continuity of configuration change within the segment
                             if config:
-                                config_i = (
-                                    AC.flightEnvelope.checkConfigurationContinuity(
-                                        phase=flightPhase,
-                                        previousConfig=config[-1],
-                                        currentConfig=config_i,
-                                    )
+                                config_i = AC.flightEnvelope.checkConfigurationContinuity(
+                                    phase=flightPhase,
+                                    previousConfig=config[-1],
+                                    currentConfig=config_i,
                                 )
 
                             # compute lift coefficient
-                            CL = AC.CL(tas=TAS_up, sigma=sigma, mass=mass[-1], nz=nz)
+                            CL = AC.CL(
+                                tas=TAS_up, sigma=sigma, mass=mass[-1], nz=nz
+                            )
                             # compute drag coefficient
-                            CD = AC.CD(CL=CL, config=config_i, speedBrakes=speedBrakes)
+                            CD = AC.CD(
+                                CL=CL, config=config_i, speedBrakes=speedBrakes
+                            )
                             # compute drag force
                             Drag = AC.D(tas=TAS_up, sigma=sigma, CD=CD)
                             # compute thrust force and fuel flow
@@ -1002,12 +1032,10 @@ def constantSpeedLevel(
 
                             # ensure continuity of configuration change within the segment
                             if config:
-                                config_i = (
-                                    AC.flightEnvelope.checkConfigurationContinuity(
-                                        phase=flightPhase,
-                                        previousConfig=config[-1],
-                                        currentConfig=config_i,
-                                    )
+                                config_i = AC.flightEnvelope.checkConfigurationContinuity(
+                                    phase=flightPhase,
+                                    previousConfig=config[-1],
+                                    currentConfig=config_i,
                                 )
 
                             [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
@@ -1015,7 +1043,9 @@ def constantSpeedLevel(
                             )
 
                             # compute lift coefficient
-                            CL = AC.CL(M=M_up, delta=delta, mass=mass[-1], nz=nz)
+                            CL = AC.CL(
+                                M=M_up, delta=delta, mass=mass[-1], nz=nz
+                            )
                             # compute drag coefficient
                             CD = AC.CD(
                                 M=M_up,
@@ -1292,7 +1322,9 @@ def constantSpeedROCD(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # optional parameter - iteration step for altitude loop
     if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -1340,7 +1372,9 @@ def constantSpeedROCD(
         constHeadingStr = ""
 
     # comment line describing type of trajectory calculation
-    comment = phase + turnComment + "_const_ROCD_" + speedType + constHeadingStr
+    comment = (
+        phase + turnComment + "_const_ROCD_" + speedType + constHeadingStr
+    )
 
     if Lat and Lon and (magneticHeading or trueHeading):
         comment = comment + "_" + headingToFly + "_Heading"
@@ -1361,7 +1395,9 @@ def constantSpeedROCD(
                 )
 
     #  weight iteration constant
-    m_iter = kwargs.get("m_iter", 5)  # number of iterations for integration loop[-]
+    m_iter = kwargs.get(
+        "m_iter", 5
+    )  # number of iterations for integration loop[-]
 
     # convert ROCD to IS units
     ROCDisu = conv.ft2m(ROCDtarget) / 60
@@ -1430,8 +1466,12 @@ def constantSpeedROCD(
 
         # atmosphere properties
         H_m = conv.ft2m(Hp_i)  # altitude [m]
-        [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
-        temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+        [theta, delta, sigma] = atm.atmosphereProperties(
+            h=H_m, DeltaTemp=DeltaTemp
+        )
+        temp_const = (theta * const.temp_0) / (
+            theta * const.temp_0 - DeltaTemp
+        )
 
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
@@ -1468,10 +1508,14 @@ def constantSpeedROCD(
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
                 # bankAngle is defined
-                rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                rateOfTurn = AC.rateOfTurn_bankAngle(
+                    TAS=TAS_i, bankAngle=bankAngle
+                )
             else:
                 # rateOfTurn is defined
-                bankAngle = AC.bankAngle(rateOfTurn=rateOfTurn, v=TAS_i)  # [degrees]
+                bankAngle = AC.bankAngle(
+                    rateOfTurn=rateOfTurn, v=TAS_i
+                )  # [degrees]
 
         # Load factor
         nz = 1 / cos(radians(bankAngle))
@@ -1485,7 +1529,9 @@ def constantSpeedROCD(
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required for level flight
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
                 # Compute power required for target ROCD
                 Preq_target_i = AC.Peng_target(
                     temp=theta * const.temp_0,
@@ -1518,17 +1564,22 @@ def constantSpeedROCD(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
-                CD = AC.CD(M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes)
+                CD = AC.CD(
+                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)
                 # compute thrust force
                 THR_i = (
-                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i) + Drag
+                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i)
+                    + Drag
                 )  # [N]
 
             # BADA3
@@ -1561,7 +1612,8 @@ def constantSpeedROCD(
                 Drag = AC.D(tas=TAS_i, sigma=sigma, CD=CD)
                 # compute thrust force
                 THR_i = (
-                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i) + Drag
+                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i)
+                    + Drag
                 )  # [N]
 
             # check that required thrust/power fits in the avialable thrust/power envelope,
@@ -1660,7 +1712,9 @@ def constantSpeedROCD(
                 Pelc_i = Preq_target_i / AC.eta
                 Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
                 Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
-                Vgbat_i = AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                Vgbat_i = (
+                    AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                )
 
             # BADA4
             elif AC.BADAFamily.BADA4:
@@ -1900,10 +1954,14 @@ def constantSpeedROCD(
                 gamma_i = 90 * np.sign(ROCD_i)
             else:
                 if AC.BADAFamily.BADAE:
-                    gamma_i = degrees(atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
                 else:
                     # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                    gamma_i = degrees(asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
 
             Slope.append(gamma_i)
 
@@ -2298,7 +2356,9 @@ def constantSpeedROCD_time(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # step size in [s]
     step_length = kwargs.get("step_length", 1)
@@ -2331,7 +2391,9 @@ def constantSpeedROCD_time(
         constHeadingStr = ""
 
     # comment line describing type of trajectory calculation
-    comment = phase + turnComment + "_const_ROCD_" + speedType + constHeadingStr
+    comment = (
+        phase + turnComment + "_const_ROCD_" + speedType + constHeadingStr
+    )
 
     if Lat and Lon and (magneticHeading or trueHeading):
         comment = comment + "_" + headingToFly + "_Heading"
@@ -2352,7 +2414,9 @@ def constantSpeedROCD_time(
                 )
 
     #  weight iteration constant
-    m_iter = kwargs.get("m_iter", 5)  # number of iterations for integration loop[-]
+    m_iter = kwargs.get(
+        "m_iter", 5
+    )  # number of iterations for integration loop[-]
 
     # convert ROCD to IS units
     ROCDisu = conv.ft2m(ROCDtarget) / 60
@@ -2430,8 +2494,12 @@ def constantSpeedROCD_time(
         for _ in itertools.repeat(None, m_iter):
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
-            temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
+            temp_const = (theta * const.temp_0) / (
+                theta * const.temp_0 - DeltaTemp
+            )
 
             # aircraft speed
             if calculationType == "POINT" and AC.BADAFamily.BADAH:
@@ -2468,7 +2536,9 @@ def constantSpeedROCD_time(
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
                     # bankAngle is defined
-                    rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                    rateOfTurn = AC.rateOfTurn_bankAngle(
+                        TAS=TAS_i, bankAngle=bankAngle
+                    )
                 else:
                     # rateOfTurn is defined
                     bankAngle = AC.bankAngle(
@@ -2483,7 +2553,9 @@ def constantSpeedROCD_time(
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required for level flight
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
                 # Compute power required for target ROCD
                 Preq_target_i = AC.Peng_target(
                     temp=theta * const.temp_0,
@@ -2516,17 +2588,22 @@ def constantSpeedROCD_time(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
-                CD = AC.CD(M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes)
+                CD = AC.CD(
+                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)
                 # compute thrust force
                 THR_i = (
-                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i) + Drag
+                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i)
+                    + Drag
                 )  # [N]
 
             # BADA3
@@ -2559,7 +2636,8 @@ def constantSpeedROCD_time(
                 Drag = AC.D(tas=TAS_i, sigma=sigma, CD=CD)
                 # compute thrust force
                 THR_i = (
-                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i) + Drag
+                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i)
+                    + Drag
                 )  # [N]
 
             # check that required thrust/power fits in the avialable thrust/power envelope,
@@ -2658,7 +2736,9 @@ def constantSpeedROCD_time(
                 Pelc_i = Preq_target_i / AC.eta
                 Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
                 Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
-                Vgbat_i = AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                Vgbat_i = (
+                    AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                )
 
             # BADA4
             elif AC.BADAFamily.BADA4:
@@ -2901,12 +2981,18 @@ def constantSpeedROCD_time(
                 [theta, delta, sigma] = atm.atmosphereProperties(
                     h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
                 )
-                temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+                temp_const = (theta * const.temp_0) / (
+                    theta * const.temp_0 - DeltaTemp
+                )
                 if AC.BADAFamily.BADAE:
-                    gamma_i = degrees(atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
                 else:
                     # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                    gamma_i = degrees(asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
 
             # ground speed can be calcualted as TAS projected on the ground minus wind
             GS_i = cos(radians(gamma_i)) * TAS_i - wS
@@ -3287,7 +3373,9 @@ def constantSpeedSlope(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # optional parameter - iteration step for altitude loop
     if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -3332,7 +3420,9 @@ def constantSpeedSlope(
         constHeadingStr = ""
 
     # comment line describing type of trajectory calculation
-    comment = phase + turnComment + "_const_Slope_" + speedType + constHeadingStr
+    comment = (
+        phase + turnComment + "_const_Slope_" + speedType + constHeadingStr
+    )
 
     if Lat and Lon and (magneticHeading or trueHeading):
         comment = comment + "_" + headingToFly + "_Heading"
@@ -3353,7 +3443,9 @@ def constantSpeedSlope(
                 )
 
     #  weight iteration constant
-    m_iter = kwargs.get("m_iter", 5)  # number of iterations for integration loop[-]
+    m_iter = kwargs.get(
+        "m_iter", 5
+    )  # number of iterations for integration loop[-]
 
     # initialize output parameters
     Hp = []
@@ -3419,8 +3511,12 @@ def constantSpeedSlope(
 
         # atmosphere properties
         H_m = conv.ft2m(Hp_i)  # altitude [m]
-        [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
-        temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+        [theta, delta, sigma] = atm.atmosphereProperties(
+            h=H_m, DeltaTemp=DeltaTemp
+        )
+        temp_const = (theta * const.temp_0) / (
+            theta * const.temp_0 - DeltaTemp
+        )
 
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
@@ -3449,10 +3545,14 @@ def constantSpeedSlope(
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
                 # bankAngle is defined
-                rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                rateOfTurn = AC.rateOfTurn_bankAngle(
+                    TAS=TAS_i, bankAngle=bankAngle
+                )
             else:
                 # rateOfTurn is defined
-                bankAngle = AC.bankAngle(rateOfTurn=rateOfTurn, v=TAS_i)  # [degrees]
+                bankAngle = AC.bankAngle(
+                    rateOfTurn=rateOfTurn, v=TAS_i
+                )  # [degrees]
 
         # Load factor
         nz = 1 / cos(radians(bankAngle))
@@ -3480,7 +3580,9 @@ def constantSpeedSlope(
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required for level flight
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
                 # Compute power required for target ROCD
                 Preq_target_i = AC.Peng_target(
                     temp=theta * const.temp_0,
@@ -3513,17 +3615,22 @@ def constantSpeedSlope(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
-                CD = AC.CD(M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes)
+                CD = AC.CD(
+                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)
                 # compute thrust force
                 THR_i = (
-                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i) + Drag
+                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i)
+                    + Drag
                 )  # [N]
 
             # BADA3
@@ -3556,7 +3663,8 @@ def constantSpeedSlope(
                 Drag = AC.D(tas=TAS_i, sigma=sigma, CD=CD)
                 # compute thrust force
                 THR_i = (
-                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i) + Drag
+                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i)
+                    + Drag
                 )  # [N]
 
             # check that required thrust/power fits in the avialable thrust/power envelope,
@@ -3655,7 +3763,9 @@ def constantSpeedSlope(
                 Pelc_i = Preq_target_i / AC.eta
                 Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
                 Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
-                Vgbat_i = AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                Vgbat_i = (
+                    AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                )
 
             # BADA4
             elif AC.BADAFamily.BADA4:
@@ -3895,10 +4005,14 @@ def constantSpeedSlope(
                 gamma_i = 90 * np.sign(ROCD_i)
             else:
                 if AC.BADAFamily.BADAE:
-                    gamma_i = degrees(atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
                 else:
                     # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                    gamma_i = degrees(asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
 
             # ground speed can be calcualted as TAS projected on the ground minus wind
             GS_i = cos(radians(gamma_i)) * TAS_i - wS
@@ -4289,7 +4403,9 @@ def constantSpeedSlope_time(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # step size in [s]
     step_length = kwargs.get("step_length", 1)
@@ -4322,7 +4438,9 @@ def constantSpeedSlope_time(
         constHeadingStr = ""
 
     # comment line describing type of trajectory calculation
-    comment = phase + turnComment + "_const_Slope_" + speedType + constHeadingStr
+    comment = (
+        phase + turnComment + "_const_Slope_" + speedType + constHeadingStr
+    )
 
     if Lat and Lon and (magneticHeading or trueHeading):
         comment = comment + "_" + headingToFly + "_Heading"
@@ -4343,7 +4461,9 @@ def constantSpeedSlope_time(
                 )
 
     #  weight iteration constant
-    m_iter = kwargs.get("m_iter", 5)  # number of iterations for integration loop[-]
+    m_iter = kwargs.get(
+        "m_iter", 5
+    )  # number of iterations for integration loop[-]
 
     # initialize output parameters
     Hp = [Hp_init]
@@ -4417,8 +4537,12 @@ def constantSpeedSlope_time(
         for _ in itertools.repeat(None, m_iter):
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
-            temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
+            temp_const = (theta * const.temp_0) / (
+                theta * const.temp_0 - DeltaTemp
+            )
 
             # aircraft speed
             if calculationType == "POINT" and AC.BADAFamily.BADAH:
@@ -4447,7 +4571,9 @@ def constantSpeedSlope_time(
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
                     # bankAngle is defined
-                    rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                    rateOfTurn = AC.rateOfTurn_bankAngle(
+                        TAS=TAS_i, bankAngle=bankAngle
+                    )
                 else:
                     # rateOfTurn is defined
                     bankAngle = AC.bankAngle(
@@ -4470,14 +4596,20 @@ def constantSpeedSlope_time(
             # Compute required ROCD
             if AC.BADAFamily.BADAE:
                 # special case for BADAE, in future it may apply also for BADAH
-                ROCDisu = tan(conv.deg2rad(slopetarget)) * TAS_i * (1 / temp_const)
+                ROCDisu = (
+                    tan(conv.deg2rad(slopetarget)) * TAS_i * (1 / temp_const)
+                )
             else:
-                ROCDisu = sin(conv.deg2rad(slopetarget)) * TAS_i * (1 / temp_const)
+                ROCDisu = (
+                    sin(conv.deg2rad(slopetarget)) * TAS_i * (1 / temp_const)
+                )
 
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required for level flight
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
                 # Compute power required for target ROCD
                 Preq_target_i = AC.Peng_target(
                     temp=theta * const.temp_0,
@@ -4510,17 +4642,22 @@ def constantSpeedSlope_time(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
-                CD = AC.CD(M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes)
+                CD = AC.CD(
+                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)
                 # compute thrust force
                 THR_i = (
-                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i) + Drag
+                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i)
+                    + Drag
                 )  # [N]
 
             # BADA3
@@ -4553,7 +4690,8 @@ def constantSpeedSlope_time(
                 Drag = AC.D(tas=TAS_i, sigma=sigma, CD=CD)
                 # compute thrust force
                 THR_i = (
-                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i) + Drag
+                    ROCDisu * mass_i * const.g * temp_const / (TAS_i * ESF_i)
+                    + Drag
                 )  # [N]
 
             # check that required thrust/power fits in the avialable thrust/power envelope,
@@ -4652,7 +4790,9 @@ def constantSpeedSlope_time(
                 Pelc_i = Preq_target_i / AC.eta
                 Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
                 Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
-                Vgbat_i = AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                Vgbat_i = (
+                    AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                )
 
             # BADA4
             elif AC.BADAFamily.BADA4:
@@ -4896,12 +5036,18 @@ def constantSpeedSlope_time(
                 [theta, delta, sigma] = atm.atmosphereProperties(
                     h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
                 )
-                temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+                temp_const = (theta * const.temp_0) / (
+                    theta * const.temp_0 - DeltaTemp
+                )
                 if AC.BADAFamily.BADAE:
-                    gamma_i = degrees(atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
                 else:
                     # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                    gamma_i = degrees(asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
 
             # ground speed can be calcualted as TAS projected on the ground minus wind
             GS_i = cos(radians(gamma_i)) * TAS_i - wS
@@ -5283,7 +5429,9 @@ def constantSpeedRating(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # optional parameter - iteration step for altitude loop
     if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -5342,7 +5490,13 @@ def constantSpeedRating(
 
     # comment line describing type of trajectory calculation
     comment = (
-        phase + turnComment + "_const_" + speedType + "_" + rating + constHeadingStr
+        phase
+        + turnComment
+        + "_const_"
+        + speedType
+        + "_"
+        + rating
+        + constHeadingStr
     )
 
     if Lat and Lon and (magneticHeading or trueHeading):
@@ -5367,7 +5521,9 @@ def constantSpeedRating(
                 )
 
     #  weight iteration constant
-    m_iter = kwargs.get("m_iter", 5)  # number of iterations for integration loop[-]
+    m_iter = kwargs.get(
+        "m_iter", 5
+    )  # number of iterations for integration loop[-]
 
     # The thrust_fuel method for BADA 3 models applies the cruise fuel correction
     # whenever the thrust is adapted, instead of only in cruise: this correction
@@ -5438,8 +5594,12 @@ def constantSpeedRating(
         ##         atmosphere, speeds, thrust. fuel flow, ESF
         # atmosphere properties
         H_m = conv.ft2m(Hp_i)  # altitude [m]
-        [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
-        temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+        [theta, delta, sigma] = atm.atmosphereProperties(
+            h=H_m, DeltaTemp=DeltaTemp
+        )
+        temp_const = (theta * const.temp_0) / (
+            theta * const.temp_0 - DeltaTemp
+        )
 
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
@@ -5468,10 +5628,14 @@ def constantSpeedRating(
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
                 # bankAngle is defined
-                rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                rateOfTurn = AC.rateOfTurn_bankAngle(
+                    TAS=TAS_i, bankAngle=bankAngle
+                )
             else:
                 # rateOfTurn is defined
-                bankAngle = AC.bankAngle(rateOfTurn=rateOfTurn, v=TAS_i)  # [degrees]
+                bankAngle = AC.bankAngle(
+                    rateOfTurn=rateOfTurn, v=TAS_i
+                )  # [degrees]
 
         # Load factor
         nz = 1 / cos(radians(bankAngle))
@@ -5490,7 +5654,9 @@ def constantSpeedRating(
         if AC.BADAFamily.BADAH:
             # compute available power
             if rating == "UNKNOWN":
-                Preq_target_i = 0.1 * AC.P0  # No minimum power model: assume 10% torque
+                Preq_target_i = (
+                    0.1 * AC.P0
+                )  # No minimum power model: assume 10% torque
             else:
                 Preq_target_i = AC.Pav(rating=rating, theta=theta, delta=delta)
 
@@ -5504,7 +5670,9 @@ def constantSpeedRating(
         elif AC.BADAFamily.BADAE:
             # compute available power
             if rating == "UNKNOWN":
-                Preq_target_i = 0.1 * AC.P0  # No minimum power model: assume 10% torque
+                Preq_target_i = (
+                    0.1 * AC.P0
+                )  # No minimum power model: assume 10% torque
             else:
                 Preq_target_i = AC.Pav(rating=rating, SOC=SOC[-1])
 
@@ -5567,7 +5735,9 @@ def constantSpeedRating(
                 config=config_i,
                 DeltaTemp=DeltaTemp,
             )
-            FUEL_i = AC.ff(flightPhase=phase, v=TAS_i, h=H_m, T=THR_i, config=config_i)
+            FUEL_i = AC.ff(
+                flightPhase=phase, v=TAS_i, h=H_m, T=THR_i, config=config_i
+            )
 
         if Hp_i != Hp_init:  # exclude first point: initial m already known
             # BADAE
@@ -5586,7 +5756,9 @@ def constantSpeedRating(
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
                 # compute ROCD
                 ROCD_i = (
                     conv.m2ft(
@@ -5624,7 +5796,9 @@ def constantSpeedRating(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
@@ -5803,10 +5977,14 @@ def constantSpeedRating(
                 gamma_i = 90 * np.sign(ROCD_i)
             else:
                 if AC.BADAFamily.BADAE:
-                    gamma_i = degrees(atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
                 else:
                     # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                    gamma_i = degrees(asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
 
             # ground speed can be calcualted as TAS projected on the ground minus wind
             GS_i = cos(radians(gamma_i)) * TAS_i - wS
@@ -6202,7 +6380,9 @@ def constantSpeedRating_time(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # step size in [s]
     step_length = kwargs.get("step_length", 1)
@@ -6237,7 +6417,9 @@ def constantSpeedRating_time(
             else:
                 rating = "LIDL"
         else:
-            raise Exception("Phase definition is wrong! It should be Climb or Descent")
+            raise Exception(
+                "Phase definition is wrong! It should be Climb or Descent"
+            )
     else:
         rating = initRating
 
@@ -6253,7 +6435,13 @@ def constantSpeedRating_time(
 
     # comment line describing type of trajectory calculation
     comment = (
-        phase + turnComment + "_const_" + speedType + "_" + rating + constHeadingStr
+        phase
+        + turnComment
+        + "_const_"
+        + speedType
+        + "_"
+        + rating
+        + constHeadingStr
     )
 
     if Lat and Lon and (magneticHeading or trueHeading):
@@ -6278,7 +6466,9 @@ def constantSpeedRating_time(
                 )
 
     #  weight iteration constant
-    m_iter = kwargs.get("m_iter", 5)  # number of iterations for integration loop[-]
+    m_iter = kwargs.get(
+        "m_iter", 5
+    )  # number of iterations for integration loop[-]
 
     # The thrust_fuel method for BADA 3 models applies the cruise fuel correction
     # whenever the thrust is adapted, instead of only in cruise: this correction
@@ -6358,8 +6548,12 @@ def constantSpeedRating_time(
         for _ in itertools.repeat(None, m_iter):
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
-            temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
+            temp_const = (theta * const.temp_0) / (
+                theta * const.temp_0 - DeltaTemp
+            )
 
             # aircraft speed
             if calculationType == "POINT" and AC.BADAFamily.BADAH:
@@ -6388,7 +6582,9 @@ def constantSpeedRating_time(
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
                     # bankAngle is defined
-                    rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                    rateOfTurn = AC.rateOfTurn_bankAngle(
+                        TAS=TAS_i, bankAngle=bankAngle
+                    )
                 else:
                     # rateOfTurn is defined
                     bankAngle = AC.bankAngle(
@@ -6416,7 +6612,9 @@ def constantSpeedRating_time(
                         0.1 * AC.P0
                     )  # No minimum power model: assume 10% torque
                 else:
-                    Preq_target_i = AC.Pav(rating=rating, theta=theta, delta=delta)
+                    Preq_target_i = AC.Pav(
+                        rating=rating, theta=theta, delta=delta
+                    )
 
                 Pav_i = AC.Pav(rating="MTKF", theta=theta, delta=delta)
 
@@ -6441,7 +6639,9 @@ def constantSpeedRating_time(
                 Pelc_i = Preq_target_i / AC.eta
                 Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
                 Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
-                Vgbat_i = AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                Vgbat_i = (
+                    AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                )
 
             # BADA4
             elif AC.BADAFamily.BADA4:
@@ -6498,7 +6698,9 @@ def constantSpeedRating_time(
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
                 # compute ROCD
                 ROCD_i = (
                     conv.m2ft(
@@ -6536,7 +6738,9 @@ def constantSpeedRating_time(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
@@ -6722,12 +6926,18 @@ def constantSpeedRating_time(
                 [theta, delta, sigma] = atm.atmosphereProperties(
                     h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
                 )
-                temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+                temp_const = (theta * const.temp_0) / (
+                    theta * const.temp_0 - DeltaTemp
+                )
                 if AC.BADAFamily.BADAE:
-                    gamma_i = degrees(atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
                 else:
                     # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                    gamma_i = degrees(asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                    gamma_i = degrees(
+                        asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
 
             # ground speed can be calcualted as TAS projected on the ground minus wind
             GS_i = cos(radians(gamma_i)) * TAS_i - wS
@@ -7120,7 +7330,9 @@ def accDec(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # iteratin step of speed loop
     if speedType == "M":
@@ -7131,7 +7343,9 @@ def accDec(
     # number of iteration of mass/altitude loop
     # BADAE
     if AC.BADAFamily.BADAE:
-        m_iter = kwargs.get("m_iter", 5)  # number of iterations for integration loop[-]
+        m_iter = kwargs.get(
+            "m_iter", 5
+        )  # number of iterations for integration loop[-]
     # BADA3 or BADA4 or BADAH
     else:
         m_iter = kwargs.get(
@@ -7288,9 +7502,9 @@ def accDec(
         maxRating = utils.checkArgument("maxRating", **kwargs)
 
     # Determine engine rating
-    if (control.ROCDtarget is not None or control.slopetarget is not None) and (
-        control.ESFtarget is not None or control.acctarget is not None
-    ):
+    if (
+        control.ROCDtarget is not None or control.slopetarget is not None
+    ) and (control.ESFtarget is not None or control.acctarget is not None):
         rating = None
     else:
         if phase == "Climb" or (phase == "Cruise" and speedEvol == "acc"):
@@ -7394,8 +7608,12 @@ def accDec(
         for _ in itertools.repeat(None, m_iter):
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
-            temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
+            temp_const = (theta * const.temp_0) / (
+                theta * const.temp_0 - DeltaTemp
+            )
 
             # aircraft speed
             [M_i, CAS_i, TAS_i] = atm.convertSpeed(
@@ -7409,7 +7627,9 @@ def accDec(
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
                     # bankAngle is defined
-                    rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                    rateOfTurn = AC.rateOfTurn_bankAngle(
+                        TAS=TAS_i, bankAngle=bankAngle
+                    )
                 else:
                     # rateOfTurn is defined
                     bankAngle = AC.bankAngle(
@@ -7437,7 +7657,9 @@ def accDec(
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
 
                 # compute engine power
                 if rating is None:
@@ -7455,11 +7677,17 @@ def accDec(
 
                     # Check that required thrust/power fits in the available thrust/power envelope,
                     # recompute ROCD if necessary and compute fuel coefficient accordingly
-                    Pmin = 0.1 * AC.P0  # No minimum power model: assume 10% torque
+                    Pmin = (
+                        0.1 * AC.P0
+                    )  # No minimum power model: assume 10% torque
 
                     if AC.BADAFamily.BADAH:
-                        Pmax = AC.Pav(rating=maxRating, theta=theta, delta=delta)
-                        Pav_i = AC.Pav(rating=maxRating, theta=theta, delta=delta)
+                        Pmax = AC.Pav(
+                            rating=maxRating, theta=theta, delta=delta
+                        )
+                        Pav_i = AC.Pav(
+                            rating=maxRating, theta=theta, delta=delta
+                        )
                     elif AC.BADAFamily.BADAE:
                         Pmax = AC.Pav(rating=maxRating, SOC=SOC[-1])
                         Pav_i = AC.Pav(rating=maxRating, SOC=SOC[-1])
@@ -7484,7 +7712,11 @@ def accDec(
                         elif control.acctarget is not None:
                             ROCD_i = (
                                 conv.m2ft(
-                                    (P_i - mass_i * TAS_i * control.acctarget - Preq_i)
+                                    (
+                                        P_i
+                                        - mass_i * TAS_i * control.acctarget
+                                        - Preq_i
+                                    )
                                     / (mass_i * const.g * temp_const)
                                 )
                                 * 60
@@ -7510,7 +7742,11 @@ def accDec(
                         elif control.acctarget is not None:
                             ROCD_i = (
                                 conv.m2ft(
-                                    (P_i - mass_i * TAS_i * control.acctarget - Preq_i)
+                                    (
+                                        P_i
+                                        - mass_i * TAS_i * control.acctarget
+                                        - Preq_i
+                                    )
                                     / (mass_i * const.g * temp_const)
                                 )
                                 * 60
@@ -7521,12 +7757,20 @@ def accDec(
                 else:
                     # Compute available power
                     if rating == "UNKNOWN":
-                        P_i = 0.1 * AC.P0  # No minimum power model: assume 10% torque
-                        Pav_i = AC.Pav(rating=maxRating, theta=theta, delta=delta)
+                        P_i = (
+                            0.1 * AC.P0
+                        )  # No minimum power model: assume 10% torque
+                        Pav_i = AC.Pav(
+                            rating=maxRating, theta=theta, delta=delta
+                        )
                     else:
                         if AC.BADAFamily.BADAH:
-                            P_i = AC.Pav(rating=rating, theta=theta, delta=delta)
-                            Pav_i = AC.Pav(rating=rating, theta=theta, delta=delta)
+                            P_i = AC.Pav(
+                                rating=rating, theta=theta, delta=delta
+                            )
+                            Pav_i = AC.Pav(
+                                rating=rating, theta=theta, delta=delta
+                            )
                         elif AC.BADAFamily.BADAE:
                             P_i = AC.Pav(rating=rating, SOC=SOC[-1])
                             Pav_i = AC.Pav(rating=rating, SOC=SOC[-1])
@@ -7549,7 +7793,9 @@ def accDec(
                     Pelc_i = P_i / AC.eta
                     Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
                     Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
-                    Vgbat_i = AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                    Vgbat_i = (
+                        AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                    )
 
             # BADA4
             elif AC.BADAFamily.BADA4:
@@ -7573,12 +7819,16 @@ def accDec(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
-                CD = AC.CD(M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes)
+                CD = AC.CD(
+                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)
 
@@ -7820,7 +8070,10 @@ def accDec(
                 dhdtisu = PC_i / (mass_i * const.g)  # [m/s]
                 ROCDisu = dhdtisu * 1 / temp_const  # [m/s]
                 ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
-            elif control.slopetarget is not None or control.ROCDtarget is not None:
+            elif (
+                control.slopetarget is not None
+                or control.ROCDtarget is not None
+            ):
                 dhdtisu = dh_dt_i  # [m/s]
                 ROCDisu = dh_dt_i * 1 / temp_const  # [m/s]
                 ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
@@ -7923,7 +8176,10 @@ def accDec(
         # BADAH or BADAE
         if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
             check.append(
-                P_i - Preq_i - mass_i * const.g * dhdtisu - mass_i * TAS_i * dVdtisu_i
+                P_i
+                - Preq_i
+                - mass_i * const.g * dhdtisu
+                - mass_i * TAS_i * dVdtisu_i
             )
 
         # BADA3 or BADA4
@@ -7941,12 +8197,18 @@ def accDec(
             [theta, delta, sigma] = atm.atmosphereProperties(
                 h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
             )
-            temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+            temp_const = (theta * const.temp_0) / (
+                theta * const.temp_0 - DeltaTemp
+            )
             if AC.BADAFamily.BADAE:
-                gamma_i = degrees(atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                gamma_i = degrees(
+                    atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                )
             else:
                 # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                gamma_i = degrees(asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                gamma_i = degrees(
+                    asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                )
 
         # ground speed can be calcualted as TAS projected on the ground minus wind
         GS_i = cos(radians(gamma_i)) * TAS_i - wS
@@ -8041,14 +8303,16 @@ def accDec(
 
                     else:
                         # calculate the turn
-                        (Lat_i, Lon_i, HDGTrue_i) = turn.destinationPoint_finalBearing(
-                            LAT_init=LAT[-1],
-                            LON_init=LON[-1],
-                            bearingInit=HDGTrue[-1],
-                            TAS=TAS_i,
-                            rateOfTurn=rateOfTurn,
-                            timeOfTurn=step_time,
-                            directionOfTurn=directionOfTurn,
+                        (Lat_i, Lon_i, HDGTrue_i) = (
+                            turn.destinationPoint_finalBearing(
+                                LAT_init=LAT[-1],
+                                LON_init=LON[-1],
+                                bearingInit=HDGTrue[-1],
+                                TAS=TAS_i,
+                                rateOfTurn=rateOfTurn,
+                                timeOfTurn=step_time,
+                                directionOfTurn=directionOfTurn,
+                            )
                         )
 
                         if magneticDeclinationGrid is not None:
@@ -8086,14 +8350,16 @@ def accDec(
 
                     else:
                         # calculate the turn
-                        (Lat_i, Lon_i, HDGTrue_i) = turn.destinationPoint_finalBearing(
-                            LAT_init=LAT[-1],
-                            LON_init=LON[-1],
-                            bearingInit=HDGTrue[-1],
-                            TAS=TAS_i,
-                            rateOfTurn=rateOfTurn,
-                            timeOfTurn=step_time,
-                            directionOfTurn=directionOfTurn,
+                        (Lat_i, Lon_i, HDGTrue_i) = (
+                            turn.destinationPoint_finalBearing(
+                                LAT_init=LAT[-1],
+                                LON_init=LON[-1],
+                                bearingInit=HDGTrue[-1],
+                                TAS=TAS_i,
+                                rateOfTurn=rateOfTurn,
+                                timeOfTurn=step_time,
+                                directionOfTurn=directionOfTurn,
+                            )
                         )
 
                         if magneticDeclinationGrid is not None:
@@ -8347,7 +8613,9 @@ def accDec_time(
 
     # speed brakes application
     if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get("speedBrakes", {"deployed": False, "value": 0.03})
+        speedBrakes = kwargs.get(
+            "speedBrakes", {"deployed": False, "value": 0.03}
+        )
 
     # step size in [s]
     step_length = kwargs.get("step_length", 1)
@@ -8355,7 +8623,9 @@ def accDec_time(
     # number of iteration of mass/altitude loop
     # BADAE
     if AC.BADAFamily.BADAE:
-        m_iter = kwargs.get("m_iter", 5)  # number of iterations for integration loop[-]
+        m_iter = kwargs.get(
+            "m_iter", 5
+        )  # number of iterations for integration loop[-]
     # BADA3 or BADA4 or BADAH
     else:
         m_iter = kwargs.get(
@@ -8505,9 +8775,9 @@ def accDec_time(
         maxRating = utils.checkArgument("maxRating", **kwargs)
 
     # Determine engine rating
-    if (control.ROCDtarget is not None or control.slopetarget is not None) and (
-        control.ESFtarget is not None or control.acctarget is not None
-    ):
+    if (
+        control.ROCDtarget is not None or control.slopetarget is not None
+    ) and (control.ESFtarget is not None or control.acctarget is not None):
         rating = None
     else:
         if phase == "Climb" or (phase == "Cruise" and speedEvol == "acc"):
@@ -8625,8 +8895,12 @@ def accDec_time(
         for _ in itertools.repeat(None, m_iter):
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
-            temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+            [theta, delta, sigma] = atm.atmosphereProperties(
+                h=H_m, DeltaTemp=DeltaTemp
+            )
+            temp_const = (theta * const.temp_0) / (
+                theta * const.temp_0 - DeltaTemp
+            )
 
             step_time = length_loop - time[-1]
 
@@ -8638,7 +8912,9 @@ def accDec_time(
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
                     # bankAngle is defined
-                    rateOfTurn = AC.rateOfTurn_bankAngle(TAS=TAS_i, bankAngle=bankAngle)
+                    rateOfTurn = AC.rateOfTurn_bankAngle(
+                        TAS=TAS_i, bankAngle=bankAngle
+                    )
                 else:
                     # rateOfTurn is defined
                     bankAngle = AC.bankAngle(
@@ -8665,7 +8941,9 @@ def accDec_time(
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                 # compute Power required
-                Preq_i = AC.Preq(sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle)
+                Preq_i = AC.Preq(
+                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                )
 
                 # compute engine power
                 if rating is None:
@@ -8683,11 +8961,17 @@ def accDec_time(
 
                     # Check that required thrust/power fits in the available thrust/power envelope,
                     # recompute ROCD if necessary and compute fuel coefficient accordingly
-                    Pmin = 0.1 * AC.P0  # No minimum power model: assume 10% torque
+                    Pmin = (
+                        0.1 * AC.P0
+                    )  # No minimum power model: assume 10% torque
 
                     if AC.BADAFamily.BADAH:
-                        Pmax = AC.Pav(rating=maxRating, theta=theta, delta=delta)
-                        Pav_i = AC.Pav(rating=maxRating, theta=theta, delta=delta)
+                        Pmax = AC.Pav(
+                            rating=maxRating, theta=theta, delta=delta
+                        )
+                        Pav_i = AC.Pav(
+                            rating=maxRating, theta=theta, delta=delta
+                        )
                     elif AC.BADAFamily.BADAE:
                         Pmax = AC.Pav(rating=maxRating, SOC=SOC[-1])
                         Pav_i = AC.Pav(rating=maxRating, SOC=SOC[-1])
@@ -8711,7 +8995,11 @@ def accDec_time(
                         elif control.acctarget is not None:
                             ROCD_i = (
                                 conv.m2ft(
-                                    (P_i - mass_i * TAS_i * control.acctarget - Preq_i)
+                                    (
+                                        P_i
+                                        - mass_i * TAS_i * control.acctarget
+                                        - Preq_i
+                                    )
                                     / (mass_i * const.g * temp_const)
                                 )
                                 * 60
@@ -8736,7 +9024,11 @@ def accDec_time(
                         elif control.acctarget is not None:
                             ROCD_i = (
                                 conv.m2ft(
-                                    (P_i - mass_i * TAS_i * control.acctarget - Preq_i)
+                                    (
+                                        P_i
+                                        - mass_i * TAS_i * control.acctarget
+                                        - Preq_i
+                                    )
                                     / (mass_i * const.g * temp_const)
                                 )
                                 * 60
@@ -8747,12 +9039,20 @@ def accDec_time(
                 else:
                     # Compute available power
                     if rating == "UNKNOWN":
-                        P_i = 0.1 * AC.P0  # No minimum power model: assume 10% torque
-                        Pav_i = AC.Pav(rating=maxRating, theta=theta, delta=delta)
+                        P_i = (
+                            0.1 * AC.P0
+                        )  # No minimum power model: assume 10% torque
+                        Pav_i = AC.Pav(
+                            rating=maxRating, theta=theta, delta=delta
+                        )
                     else:
                         if AC.BADAFamily.BADAH:
-                            P_i = AC.Pav(rating=rating, theta=theta, delta=delta)
-                            Pav_i = AC.Pav(rating=rating, theta=theta, delta=delta)
+                            P_i = AC.Pav(
+                                rating=rating, theta=theta, delta=delta
+                            )
+                            Pav_i = AC.Pav(
+                                rating=rating, theta=theta, delta=delta
+                            )
                         elif AC.BADAFamily.BADAE:
                             P_i = AC.Pav(rating=rating, SOC=SOC[-1])
                             Pav_i = AC.Pav(rating=rating, SOC=SOC[-1])
@@ -8775,7 +9075,9 @@ def accDec_time(
                     Pelc_i = P_i / AC.eta
                     Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
                     Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
-                    Vgbat_i = AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                    Vgbat_i = (
+                        AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                    )
 
             # BADA4
             elif AC.BADAFamily.BADA4:
@@ -8799,12 +9101,16 @@ def accDec_time(
                         currentConfig=config_i,
                     )
 
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
 
                 # compute lift coefficient
                 CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                 # compute drag coefficient
-                CD = AC.CD(M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes)
+                CD = AC.CD(
+                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                )
                 # compute drag force
                 Drag = AC.D(M=M_i, delta=delta, CD=CD)
 
@@ -9047,7 +9353,10 @@ def accDec_time(
                 dhdtisu = PC_i / (mass_i * const.g)  # [m/s]
                 ROCDisu = dhdtisu * 1 / temp_const  # [m/s]
                 ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
-            elif control.slopetarget is not None or control.ROCDtarget is not None:
+            elif (
+                control.slopetarget is not None
+                or control.ROCDtarget is not None
+            ):
                 dhdtisu = dh_dt_i  # [m/s]
                 ROCDisu = dh_dt_i * 1 / temp_const  # [m/s]
                 ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
@@ -9148,7 +9457,10 @@ def accDec_time(
         # BADAH or BADAE
         if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
             check.append(
-                P_i - Preq_i - mass_i * const.g * dhdtisu - mass_i * TAS_i * dVdtisu_i
+                P_i
+                - Preq_i
+                - mass_i * const.g * dhdtisu
+                - mass_i * TAS_i * dVdtisu_i
             )
 
         # BADA3 or BADA4
@@ -9166,12 +9478,18 @@ def accDec_time(
             [theta, delta, sigma] = atm.atmosphereProperties(
                 h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
             )
-            temp_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
+            temp_const = (theta * const.temp_0) / (
+                theta * const.temp_0 - DeltaTemp
+            )
             if AC.BADAFamily.BADAE:
-                gamma_i = degrees(atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                gamma_i = degrees(
+                    atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                )
             else:
                 # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                gamma_i = degrees(asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i))
+                gamma_i = degrees(
+                    asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                )
 
         # ground speed can be calcualted as TAS projected on the ground minus wind
         GS_i = cos(radians(gamma_i)) * TAS_i - wS
@@ -9182,7 +9500,9 @@ def accDec_time(
         ROT.append(rateOfTurn)
 
         # integrated data
-        if length_loop != 0:  # exclude first point: initial t/d/m already known
+        if (
+            length_loop != 0
+        ):  # exclude first point: initial t/d/m already known
             if AC.BADAFamily.BADAE:
                 SOC.append(SOC_i)
 
@@ -9270,14 +9590,16 @@ def accDec_time(
 
                     else:
                         # calculate the turn
-                        (Lat_i, Lon_i, HDGTrue_i) = turn.destinationPoint_finalBearing(
-                            LAT_init=LAT[-1],
-                            LON_init=LON[-1],
-                            bearingInit=HDGTrue[-1],
-                            TAS=TAS_i,
-                            rateOfTurn=rateOfTurn,
-                            timeOfTurn=step_time,
-                            directionOfTurn=directionOfTurn,
+                        (Lat_i, Lon_i, HDGTrue_i) = (
+                            turn.destinationPoint_finalBearing(
+                                LAT_init=LAT[-1],
+                                LON_init=LON[-1],
+                                bearingInit=HDGTrue[-1],
+                                TAS=TAS_i,
+                                rateOfTurn=rateOfTurn,
+                                timeOfTurn=step_time,
+                                directionOfTurn=directionOfTurn,
+                            )
                         )
 
                         if magneticDeclinationGrid is not None:
@@ -9315,14 +9637,16 @@ def accDec_time(
 
                     else:
                         # calculate the turn
-                        (Lat_i, Lon_i, HDGTrue_i) = turn.destinationPoint_finalBearing(
-                            LAT_init=LAT[-1],
-                            LON_init=LON[-1],
-                            bearingInit=HDGTrue[-1],
-                            TAS=TAS_i,
-                            rateOfTurn=rateOfTurn,
-                            timeOfTurn=step_time,
-                            directionOfTurn=directionOfTurn,
+                        (Lat_i, Lon_i, HDGTrue_i) = (
+                            turn.destinationPoint_finalBearing(
+                                LAT_init=LAT[-1],
+                                LON_init=LON[-1],
+                                bearingInit=HDGTrue[-1],
+                                TAS=TAS_i,
+                                rateOfTurn=rateOfTurn,
+                                timeOfTurn=step_time,
+                                directionOfTurn=directionOfTurn,
+                            )
                         )
 
                         if magneticDeclinationGrid is not None:

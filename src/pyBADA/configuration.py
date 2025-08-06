@@ -27,7 +27,9 @@ def list_subfolders(folderPath):
 
     # Filter out entries that are directories
     subfolders = [
-        entry for entry in entries if os.path.isdir(os.path.join(folderPath, entry))
+        entry
+        for entry in entries
+        if os.path.isdir(os.path.join(folderPath, entry))
     ]
 
     return subfolders
@@ -126,7 +128,12 @@ def getAircraftList(badaFamily, badaVersion):
             xml = False
             break
 
-    if badaFamily == "BADA4" or badaFamily == "BADAH" or badaFamily == "BADAE" or xml:
+    if (
+        badaFamily == "BADA4"
+        or badaFamily == "BADAH"
+        or badaFamily == "BADAE"
+        or xml
+    ):
         aircraftList = []
         for item in items:
             if os.path.isdir(os.path.join(path, item)):

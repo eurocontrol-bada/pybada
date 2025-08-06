@@ -17,18 +17,27 @@ def run_theta_tests():
     """Test atm.theta with various input types"""
     tests = {
         "float": (1000.0, 2.0),
-        "numpy": (np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+        "numpy": (
+            np.array([0.0, 5000.0, const.h_11]),
+            np.array([0.0, -5.0, 0.0]),
+        ),
         "pandas.Series": (
             pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
             pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
         ),
         "pandas.DataFrame": (
             pd.DataFrame(
-                {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                {
+                    "h": [0.0, 5000.0, const.h_11],
+                    "DeltaTemp": [0.0, -5.0, 0.0],
+                },
                 index=["SL", "5km", "tropo"],
             )["h"],
             pd.DataFrame(
-                {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                {
+                    "h": [0.0, 5000.0, const.h_11],
+                    "DeltaTemp": [0.0, -5.0, 0.0],
+                },
                 index=["SL", "5km", "tropo"],
             )["DeltaTemp"],
         ),
@@ -39,7 +48,9 @@ def run_theta_tests():
                 coords={"z": ["SL", "5km", "tropo"]},
             ),
             xr.DataArray(
-                [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                [0.0, -5.0, 0.0],
+                dims=("z",),
+                coords={"z": ["SL", "5km", "tropo"]},
             ),
         ),
     }
@@ -55,18 +66,27 @@ def run_delta_tests():
     """Test atm.delta with various input types"""
     tests = {
         "float": (1000.0, 2.0),
-        "numpy": (np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+        "numpy": (
+            np.array([0.0, 5000.0, const.h_11]),
+            np.array([0.0, -5.0, 0.0]),
+        ),
         "pandas.Series": (
             pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
             pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
         ),
         "pandas.DataFrame": (
             pd.DataFrame(
-                {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                {
+                    "h": [0.0, 5000.0, const.h_11],
+                    "DeltaTemp": [0.0, -5.0, 0.0],
+                },
                 index=["SL", "5km", "tropo"],
             )["h"],
             pd.DataFrame(
-                {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                {
+                    "h": [0.0, 5000.0, const.h_11],
+                    "DeltaTemp": [0.0, -5.0, 0.0],
+                },
                 index=["SL", "5km", "tropo"],
             )["DeltaTemp"],
         ),
@@ -77,7 +97,9 @@ def run_delta_tests():
                 coords={"z": ["SL", "5km", "tropo"]},
             ),
             xr.DataArray(
-                [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                [0.0, -5.0, 0.0],
+                dims=("z",),
+                coords={"z": ["SL", "5km", "tropo"]},
             ),
         ),
     }
@@ -93,18 +115,27 @@ def run_sigma_tests():
     """Test atm.sigma with two input modes"""
     tests = {
         "float": (1000.0, 2.0),
-        "numpy": (np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+        "numpy": (
+            np.array([0.0, 5000.0, const.h_11]),
+            np.array([0.0, -5.0, 0.0]),
+        ),
         "pandas.Series": (
             pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
             pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
         ),
         "pandas.DataFrame": (
             pd.DataFrame(
-                {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                {
+                    "h": [0.0, 5000.0, const.h_11],
+                    "DeltaTemp": [0.0, -5.0, 0.0],
+                },
                 index=["SL", "5km", "tropo"],
             )["h"],
             pd.DataFrame(
-                {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                {
+                    "h": [0.0, 5000.0, const.h_11],
+                    "DeltaTemp": [0.0, -5.0, 0.0],
+                },
                 index=["SL", "5km", "tropo"],
             )["DeltaTemp"],
         ),
@@ -115,7 +146,9 @@ def run_sigma_tests():
                 coords={"z": ["SL", "5km", "tropo"]},
             ),
             xr.DataArray(
-                [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                [0.0, -5.0, 0.0],
+                dims=("z",),
+                coords={"z": ["SL", "5km", "tropo"]},
             ),
         ),
     }
@@ -130,7 +163,8 @@ def run_sigma_tests():
 
     # Case B: theta and delta
     theta_delta = {
-        name: (atm.theta(h, dT), atm.delta(h, dT)) for name, (h, dT) in tests.items()
+        name: (atm.theta(h, dT), atm.delta(h, dT))
+        for name, (h, dT) in tests.items()
     }
     print("\n*** Sigma Tests: inputs (theta, delta) ***")
     for name, (th, dp) in theta_delta.items():
@@ -154,11 +188,17 @@ def run_aSound_tests():
         ),
         "pandas.DataFrame": atm.theta(
             pd.DataFrame(
-                {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                {
+                    "h": [0.0, 5000.0, const.h_11],
+                    "DeltaTemp": [0.0, -5.0, 0.0],
+                },
                 index=["SL", "5km", "tropo"],
             )["h"],
             pd.DataFrame(
-                {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                {
+                    "h": [0.0, 5000.0, const.h_11],
+                    "DeltaTemp": [0.0, -5.0, 0.0],
+                },
                 index=["SL", "5km", "tropo"],
             )["DeltaTemp"],
         ),
@@ -169,7 +209,9 @@ def run_aSound_tests():
                 coords={"z": ["SL", "5km", "tropo"]},
             ),
             xr.DataArray(
-                [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                [0.0, -5.0, 0.0],
+                dims=("z",),
+                coords={"z": ["SL", "5km", "tropo"]},
             ),
         ),
     }
@@ -187,33 +229,45 @@ def run_mach2Tas_tests():
         "float": (0.8, atm.theta(1000.0, 2.0)),
         "numpy": (
             np.array([0.5, 0.8, 1.0]),
-            atm.theta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+            atm.theta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
         ),
         "pandas.Series": (
             pd.Series([0.5, 0.8, 1.0], index=["low", "med", "high"]),
             atm.theta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
         ),
         "pandas.DataFrame": (
-            pd.DataFrame({"Mach": [0.5, 0.8, 1.0]}, index=["low", "med", "high"])[
-                "Mach"
-            ],
+            pd.DataFrame(
+                {"Mach": [0.5, 0.8, 1.0]}, index=["low", "med", "high"]
+            )["Mach"],
             atm.theta(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
         ),
         "xarray.DataArray": (
             xr.DataArray(
-                [0.5, 0.8, 1.0], dims=("m",), coords={"m": ["low", "med", "high"]}
+                [0.5, 0.8, 1.0],
+                dims=("m",),
+                coords={"m": ["low", "med", "high"]},
             ),
             atm.theta(
                 xr.DataArray(
@@ -222,7 +276,9 @@ def run_mach2Tas_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
         ),
@@ -239,52 +295,74 @@ def run_mach2Tas_tests():
 def run_tas2Mach_tests():
     """Test atm.tas2Mach with TAS and theta inputs"""
     tests = {
-        "float": (atm.mach2Tas(0.8, atm.theta(1000.0, 2.0)), atm.theta(1000.0, 2.0)),
+        "float": (
+            atm.mach2Tas(0.8, atm.theta(1000.0, 2.0)),
+            atm.theta(1000.0, 2.0),
+        ),
         "numpy": (
             atm.mach2Tas(
                 np.array([0.5, 0.8, 1.0]),
                 atm.theta(
-                    np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+                    np.array([0.0, 5000.0, const.h_11]),
+                    np.array([0.0, -5.0, 0.0]),
                 ),
             ),
-            atm.theta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+            atm.theta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
         ),
         "pandas.Series": (
             atm.mach2Tas(
                 pd.Series([0.5, 0.8, 1.0], index=["low", "med", "high"]),
                 atm.theta(
-                    pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                    pd.Series(
+                        [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                    ),
                     pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
                 ),
             ),
             atm.theta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
         ),
         "pandas.DataFrame": (
             atm.mach2Tas(
-                pd.DataFrame({"Mach": [0.5, 0.8, 1.0]}, index=["low", "med", "high"])[
-                    "Mach"
-                ],
+                pd.DataFrame(
+                    {"Mach": [0.5, 0.8, 1.0]}, index=["low", "med", "high"]
+                )["Mach"],
                 atm.theta(
                     pd.DataFrame(
-                        {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                        {
+                            "h": [0.0, 5000.0, const.h_11],
+                            "DeltaTemp": [0.0, -5.0, 0.0],
+                        },
                         index=["SL", "5km", "tropo"],
                     )["h"],
                     pd.DataFrame(
-                        {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                        {
+                            "h": [0.0, 5000.0, const.h_11],
+                            "DeltaTemp": [0.0, -5.0, 0.0],
+                        },
                         index=["SL", "5km", "tropo"],
                     )["DeltaTemp"],
                 ),
             ),
             atm.theta(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
@@ -292,7 +370,9 @@ def run_tas2Mach_tests():
         "xarray.DataArray": (
             atm.mach2Tas(
                 xr.DataArray(
-                    [0.5, 0.8, 1.0], dims=("m",), coords={"m": ["low", "med", "high"]}
+                    [0.5, 0.8, 1.0],
+                    dims=("m",),
+                    coords={"m": ["low", "med", "high"]},
                 ),
                 atm.theta(
                     xr.DataArray(
@@ -314,7 +394,9 @@ def run_tas2Mach_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
         ),
@@ -334,46 +416,70 @@ def run_tas2Cas_tests():
         "float": (300.0, atm.delta(1000.0, 2.0), atm.sigma(1000.0, 2.0)),
         "numpy": (
             np.array([200.0, 300.0, 400.0]),
-            atm.delta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
-            atm.sigma(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+            atm.delta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
+            atm.sigma(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
         ),
         "pandas.Series": (
             pd.Series([200, 300, 400], index=["low", "med", "high"]),
             atm.delta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
             atm.sigma(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
         ),
         "pandas.DataFrame": (
-            pd.DataFrame({"TAS": [200, 300, 400]}, index=["low", "med", "high"])["TAS"],
+            pd.DataFrame(
+                {"TAS": [200, 300, 400]}, index=["low", "med", "high"]
+            )["TAS"],
             atm.delta(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
             atm.sigma(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
         ),
         "xarray.DataArray": (
             xr.DataArray(
-                [200.0, 300.0, 400.0], dims=("t",), coords={"t": ["low", "med", "high"]}
+                [200.0, 300.0, 400.0],
+                dims=("t",),
+                coords={"t": ["low", "med", "high"]},
             ),
             atm.delta(
                 xr.DataArray(
@@ -382,7 +488,9 @@ def run_tas2Cas_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
             atm.sigma(
@@ -392,7 +500,9 @@ def run_tas2Cas_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
         ),
@@ -419,79 +529,117 @@ def run_cas2Tas_tests():
             atm.tas2Cas(
                 np.array([200.0, 300.0, 400.0]),
                 atm.delta(
-                    np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+                    np.array([0.0, 5000.0, const.h_11]),
+                    np.array([0.0, -5.0, 0.0]),
                 ),
                 atm.sigma(
-                    np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+                    np.array([0.0, 5000.0, const.h_11]),
+                    np.array([0.0, -5.0, 0.0]),
                 ),
             ),
-            atm.delta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
-            atm.sigma(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+            atm.delta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
+            atm.sigma(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
         ),
         "pandas.Series": (
             atm.tas2Cas(
                 pd.Series([200, 300, 400], index=["low", "med", "high"]),
                 atm.delta(
-                    pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                    pd.Series(
+                        [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                    ),
                     pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
                 ),
                 atm.sigma(
-                    pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                    pd.Series(
+                        [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                    ),
                     pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
                 ),
             ),
             atm.delta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
             atm.sigma(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
         ),
         "pandas.DataFrame": (
             atm.tas2Cas(
-                pd.DataFrame({"CAS": [200, 300, 400]}, index=["low", "med", "high"])[
-                    "CAS"
-                ],
+                pd.DataFrame(
+                    {"CAS": [200, 300, 400]}, index=["low", "med", "high"]
+                )["CAS"],
                 atm.delta(
                     pd.DataFrame(
-                        {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                        {
+                            "h": [0.0, 5000.0, const.h_11],
+                            "DeltaTemp": [0.0, -5.0, 0.0],
+                        },
                         index=["SL", "5km", "tropo"],
                     )["h"],
                     pd.DataFrame(
-                        {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                        {
+                            "h": [0.0, 5000.0, const.h_11],
+                            "DeltaTemp": [0.0, -5.0, 0.0],
+                        },
                         index=["SL", "5km", "tropo"],
                     )["DeltaTemp"],
                 ),
                 atm.sigma(
                     pd.DataFrame(
-                        {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                        {
+                            "h": [0.0, 5000.0, const.h_11],
+                            "DeltaTemp": [0.0, -5.0, 0.0],
+                        },
                         index=["SL", "5km", "tropo"],
                     )["h"],
                     pd.DataFrame(
-                        {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                        {
+                            "h": [0.0, 5000.0, const.h_11],
+                            "DeltaTemp": [0.0, -5.0, 0.0],
+                        },
                         index=["SL", "5km", "tropo"],
                     )["DeltaTemp"],
                 ),
             ),
             atm.delta(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
             atm.sigma(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
@@ -535,7 +683,9 @@ def run_cas2Tas_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
             atm.sigma(
@@ -545,7 +695,9 @@ def run_cas2Tas_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
         ),
@@ -571,63 +723,95 @@ def run_mach2Cas_tests():
         ),
         "numpy": (
             np.array([0.5, 0.8, 1.2]),
-            atm.theta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
-            atm.delta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
-            atm.sigma(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+            atm.theta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
+            atm.delta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
+            atm.sigma(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
         ),
         "pandas.Series": (
             pd.Series([0.5, 0.8, 1.2], index=["M0.5", "M0.8", "M1.2"]),
             atm.theta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
             atm.delta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
             atm.sigma(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
         ),
         "pandas.DataFrame": (
-            pd.DataFrame({"Mach": [0.5, 0.8, 1.2]}, index=["M0.5", "M0.8", "M1.2"])[
-                "Mach"
-            ],
+            pd.DataFrame(
+                {"Mach": [0.5, 0.8, 1.2]}, index=["M0.5", "M0.8", "M1.2"]
+            )["Mach"],
             atm.theta(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
             atm.delta(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
             atm.sigma(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
         ),
         "xarray.DataArray": (
             xr.DataArray(
-                [0.5, 0.8, 1.2], dims=("m",), coords={"m": ["M0.5", "M0.8", "M1.2"]}
+                [0.5, 0.8, 1.2],
+                dims=("m",),
+                coords={"m": ["M0.5", "M0.8", "M1.2"]},
             ),
             atm.theta(
                 xr.DataArray(
@@ -636,7 +820,9 @@ def run_mach2Cas_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
             atm.delta(
@@ -646,7 +832,9 @@ def run_mach2Cas_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
             atm.sigma(
@@ -656,7 +844,9 @@ def run_mach2Cas_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
         ),
@@ -683,56 +873,89 @@ def run_cas2Mach_tests():
         ),
         "numpy": (
             np.array([200.0, 240.0, 280.0]),
-            atm.theta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
-            atm.delta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
-            atm.sigma(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+            atm.theta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
+            atm.delta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
+            atm.sigma(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
         ),
         "pandas.Series": (
-            pd.Series([200.0, 240.0, 280.0], index=["CAS200", "CAS240", "CAS280"]),
+            pd.Series(
+                [200.0, 240.0, 280.0], index=["CAS200", "CAS240", "CAS280"]
+            ),
             atm.theta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
             atm.delta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
             atm.sigma(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
         ),
         "pandas.DataFrame": (
             pd.DataFrame(
-                {"CAS": [200.0, 240.0, 280.0]}, index=["CAS200", "CAS240", "CAS280"]
+                {"CAS": [200.0, 240.0, 280.0]},
+                index=["CAS200", "CAS240", "CAS280"],
             )["CAS"],
             atm.theta(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
             atm.delta(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
             atm.sigma(
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["h"],
                 pd.DataFrame(
-                    {"h": [0.0, 5000.0, const.h_11], "DeltaTemp": [0.0, -5.0, 0.0]},
+                    {
+                        "h": [0.0, 5000.0, const.h_11],
+                        "DeltaTemp": [0.0, -5.0, 0.0],
+                    },
                     index=["SL", "5km", "tropo"],
                 )["DeltaTemp"],
             ),
@@ -750,7 +973,9 @@ def run_cas2Mach_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
             atm.delta(
@@ -760,7 +985,9 @@ def run_cas2Mach_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
             atm.sigma(
@@ -770,7 +997,9 @@ def run_cas2Mach_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
         ),
@@ -812,7 +1041,10 @@ def run_ISATemperatureDeviation_tests():
     """Test atm.ISATemperatureDeviation with temperature and pressure altitude inputs"""
     tests = {
         "float": (298.15, 0.0),  # Temperature (K), altitude (m)
-        "numpy": (np.array([280.0, 290.0, 300.0]), np.array([0.0, 5000.0, 11000.0])),
+        "numpy": (
+            np.array([280.0, 290.0, 300.0]),
+            np.array([0.0, 5000.0, 11000.0]),
+        ),
         "pandas.Series": (
             pd.Series([280.0, 290.0, 300.0], index=["T280", "T290", "T300"]),
             pd.Series([0.0, 5000.0, 11000.0], index=["SL", "5km", "11km"]),
@@ -824,11 +1056,15 @@ def run_ISATemperatureDeviation_tests():
                 coords={"t": ["T280", "T290", "T300"]},
             ),
             xr.DataArray(
-                [0.0, 5000.0, 11000.0], dims=("h",), coords={"h": ["SL", "5km", "11km"]}
+                [0.0, 5000.0, 11000.0],
+                dims=("h",),
+                coords={"h": ["SL", "5km", "11km"]},
             ),
         ),
     }
-    print("\n*** ISATemperatureDeviation Tests: inputs (temperature, altitude) ***")
+    print(
+        "\n*** ISATemperatureDeviation Tests: inputs (temperature, altitude) ***"
+    )
     for name, (T_in, h_in) in tests.items():
         dev_out = atm.ISATemperatureDeviation(T_in, h_in)
         print(f"\n--- {name} ---")
@@ -843,7 +1079,9 @@ def run_crossOver_tests():
         "float": (150.0, 0.8),
         "numpy": (np.array([200.0, 250.0, 300.0]), np.array([0.5, 0.8, 1.0])),
         "pandas.Series": (
-            pd.Series([200.0, 250.0, 300.0], index=["CAS200", "CAS250", "CAS300"]),
+            pd.Series(
+                [200.0, 250.0, 300.0], index=["CAS200", "CAS250", "CAS300"]
+            ),
             pd.Series([0.5, 0.8, 1.0], index=["M0.5", "M0.8", "M1.0"]),
         ),
         "xarray.DataArray": (
@@ -853,7 +1091,9 @@ def run_crossOver_tests():
                 coords={"cas": ["C200", "C250", "C300"]},
             ),
             xr.DataArray(
-                [0.5, 0.8, 1.0], dims=("m",), coords={"m": ["M0.5", "M0.8", "M1.0"]}
+                [0.5, 0.8, 1.0],
+                dims=("m",),
+                coords={"m": ["M0.5", "M0.8", "M1.0"]},
             ),
         ),
     }
@@ -870,17 +1110,24 @@ def run_atmosphereProperties_tests():
     """Test atm.atmosphereProperties with altitude and DeltaTemp inputs"""
     tests = {
         "float": (1000.0, 10.0),
-        "numpy": (np.array([0.0, 5000.0, 11000.0]), np.array([0.0, -5.0, 10.0])),
+        "numpy": (
+            np.array([0.0, 5000.0, 11000.0]),
+            np.array([0.0, -5.0, 10.0]),
+        ),
         "pandas.Series": (
             pd.Series([0.0, 5000.0, 11000.0], index=["SL", "5km", "11km"]),
             pd.Series([0.0, -5.0, 10.0], index=["SL", "5km", "11km"]),
         ),
         "xarray.DataArray": (
             xr.DataArray(
-                [0.0, 5000.0, 11000.0], dims=("h",), coords={"h": ["SL", "5km", "11km"]}
+                [0.0, 5000.0, 11000.0],
+                dims=("h",),
+                coords={"h": ["SL", "5km", "11km"]},
             ),
             xr.DataArray(
-                [0.0, -5.0, 10.0], dims=("dT",), coords={"dT": ["SL", "5km", "11km"]}
+                [0.0, -5.0, 10.0],
+                dims=("dT",),
+                coords={"dT": ["SL", "5km", "11km"]},
             ),
         ),
     }
@@ -905,23 +1152,35 @@ def run_convertSpeed_tests():
         "numpy": (
             np.array([200.0, 250.0, 300.0]),
             "CAS",
-            atm.theta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
-            atm.delta(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
-            atm.sigma(np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])),
+            atm.theta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
+            atm.delta(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
+            atm.sigma(
+                np.array([0.0, 5000.0, const.h_11]), np.array([0.0, -5.0, 0.0])
+            ),
         ),
         "pandas.Series": (
             pd.Series([200.0, 250.0, 300.0], index=["V200", "V250", "V300"]),
             "MACH",
             atm.theta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
             atm.delta(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
             atm.sigma(
-                pd.Series([0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]),
+                pd.Series(
+                    [0.0, 5000.0, const.h_11], index=["SL", "5km", "tropo"]
+                ),
                 pd.Series([0.0, -5.0, 0.0], index=["SL", "5km", "tropo"]),
             ),
         ),
@@ -939,7 +1198,9 @@ def run_convertSpeed_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
             atm.delta(
@@ -949,7 +1210,9 @@ def run_convertSpeed_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
             atm.sigma(
@@ -959,12 +1222,16 @@ def run_convertSpeed_tests():
                     coords={"z": ["SL", "5km", "tropo"]},
                 ),
                 xr.DataArray(
-                    [0.0, -5.0, 0.0], dims=("z",), coords={"z": ["SL", "5km", "tropo"]}
+                    [0.0, -5.0, 0.0],
+                    dims=("z",),
+                    coords={"z": ["SL", "5km", "tropo"]},
                 ),
             ),
         ),
     }
-    print("\n*** convertSpeed Tests: inputs (v, speedType, theta, delta, sigma) ***")
+    print(
+        "\n*** convertSpeed Tests: inputs (v, speedType, theta, delta, sigma) ***"
+    )
     for name, (v_in, stype, th_in, dp_in, sg_in) in tests.items():
         conv_out = atm.convertSpeed(v_in, stype, th_in, dp_in, sg_in)
         print(f"\n--- {name} ---")
