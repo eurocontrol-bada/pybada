@@ -64,9 +64,7 @@ class Bada:
             raise ValueError(f"No entries found for aircraft(s): {acName}.")
         else:
             # Select the required columns
-            result_df = filtered_df[["acName"] + parameters].reset_index(
-                drop=True
-            )
+            result_df = filtered_df[["acName"] + parameters].reset_index(drop=True)
             return result_df
 
     @staticmethod
@@ -256,14 +254,7 @@ class Airplane:
                 temp = atm.theta(h, DeltaTemp) * const.temp_0
                 ESF = 1 / (
                     1
-                    + (
-                        const.Agamma
-                        * const.R
-                        * (-const.temp_h)
-                        * M
-                        * M
-                        / (2 * const.g)
-                    )
+                    + (const.Agamma * const.R * (-const.temp_h) * M * M / (2 * const.g))
                     * ((temp - DeltaTemp) / temp)
                 )
 
@@ -274,16 +265,9 @@ class Airplane:
 
                 temp = atm.theta(h, DeltaTemp) * const.temp_0
                 A = (
-                    const.Agamma
-                    * const.R
-                    * (-const.temp_h)
-                    * M
-                    * M
-                    / (2 * const.g)
+                    const.Agamma * const.R * (-const.temp_h) * M * M / (2 * const.g)
                 ) * ((temp - DeltaTemp) / temp)
-                B = pow(
-                    1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1)
-                )
+                B = pow(1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1))
                 C = pow(1 + (const.Agamma - 1) * M * M / 2, 1 / const.Amu) - 1
                 ESF = 1 / (1 + A + B * C)
 
@@ -299,10 +283,7 @@ class Airplane:
                             -1 / (const.Agamma - 1),
                         )
                     )
-                    * (
-                        pow(1 + (const.Agamma - 1) * M * M / 2, 1 / const.Amu)
-                        - 1
-                    )
+                    * (pow(1 + (const.Agamma - 1) * M * M / 2, 1 / const.Amu) - 1)
                 )
 
             # contant TAS
@@ -372,16 +353,9 @@ class Helicopter:
                 temp = theta * const.temp_0
 
                 A = (
-                    const.Agamma
-                    * const.R
-                    * (-const.temp_h)
-                    * M
-                    * M
-                    / (2 * const.g)
+                    const.Agamma * const.R * (-const.temp_h) * M * M / (2 * const.g)
                 ) * ((temp - DeltaTemp) / temp)
-                B = pow(
-                    1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1)
-                )
+                B = pow(1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1))
                 C = pow(1 + (const.Agamma - 1) * M * M / 2, 1 / const.Amu) - 1
                 ESF = 1 / (1 + A + B * C)
 

@@ -10,11 +10,11 @@ from math import asin, cos, isnan, pi, pow, radians, sqrt
 import numpy as np
 import pandas as pd
 
-from pyBADA import utils
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const
 from pyBADA import conversions as conv
+from pyBADA import utils
 from pyBADA.aircraft import Bada, BadaFamily, Helicopter
 
 
@@ -349,9 +349,7 @@ class BADAH(Helicopter, Bada):
         CPreq = (
             self.AC.cpr[0]
             + self.AC.cpr[1] * pow(mu, 2)
-            + self.AC.cpr[2]
-            * CT
-            * sqrt(sqrt(pow(mu, 4) + pow(CT, 2)) - pow(mu, 2))
+            + self.AC.cpr[2] * CT * sqrt(sqrt(pow(mu, 4) + pow(CT, 2)) - pow(mu, 2))
             + self.AC.cpr[3] * pow(mu, 3)
             + self.AC.cpr[4] * pow(CT, 2) * pow(mu, 3)
         )
@@ -630,12 +628,7 @@ class BADAH(Helicopter, Bada):
         """
 
         temp = theta * const.temp_0
-        ROCD = (
-            ((temp - DeltaTemp) / temp)
-            * (Peng - Preq)
-            * ESF
-            / (mass * const.g)
-        )
+        ROCD = ((temp - DeltaTemp) / temp) * (Peng - Preq) * ESF / (mass * const.g)
 
         return ROCD
 
@@ -696,9 +689,7 @@ class FlightEnvelope(BADAH):
         :rtype: tuple(float, float)
         """
 
-        [theta, delta, sigma] = atm.atmosphereProperties(
-            h=h, DeltaTemp=DeltaTemp
-        )
+        [theta, delta, sigma] = atm.atmosphereProperties(h=h, DeltaTemp=DeltaTemp)
         Pmax = self.Pav(rating=rating, theta=theta, delta=delta)
         Pmin = 0.1 * self.AC.P0  # No minimum power model: assume 10% torque
 
@@ -706,9 +697,7 @@ class FlightEnvelope(BADAH):
         VmaxCertified = self.VMax()
 
         CASlist = []
-        for CAS in np.linspace(
-            VminCertified, VmaxCertified, num=200, endpoint=True
-        ):
+        for CAS in np.linspace(VminCertified, VmaxCertified, num=200, endpoint=True):
             [M, CAS, TAS] = atm.convertSpeed(
                 v=conv.ms2kt(CAS),
                 speedType="CAS",
@@ -754,9 +743,7 @@ class FlightEnvelope(BADAH):
             speed [m/s].
         :rtype: float
         """
-        [theta, delta, sigma] = atm.atmosphereProperties(
-            h=h, DeltaTemp=DeltaTemp
-        )
+        [theta, delta, sigma] = atm.atmosphereProperties(h=h, DeltaTemp=DeltaTemp)
 
         VminCertified = 0 + 5  # putting some margin to not start at 0 speed
         VmaxCertified = self.VMax()
@@ -764,17 +751,13 @@ class FlightEnvelope(BADAH):
         excessPowerList = []
         VxList = []
 
-        for CAS in np.linspace(
-            VminCertified, VmaxCertified, num=200, endpoint=True
-        ):
+        for CAS in np.linspace(VminCertified, VmaxCertified, num=200, endpoint=True):
             TAS = atm.cas2Tas(cas=CAS, delta=delta, sigma=sigma)
             bankAngle = self.bankAngle(rateOfTurn=rateOfTurn, v=TAS)
             Preq = self.Preq(sigma=sigma, tas=TAS, mass=mass, phi=bankAngle)
             Pav = self.Pav(rating=rating, theta=theta, delta=delta)
 
-            tempConst = (theta * const.temp_0 - DeltaTemp) / (
-                theta * const.temp_0
-            )
+            tempConst = (theta * const.temp_0 - DeltaTemp) / (theta * const.temp_0)
 
             excessPowerList.append(
                 (Pav - Preq) * tempConst / TAS
@@ -839,9 +822,7 @@ class Optimization(BADAH):
         )  # atmosphere properties
 
         # max TAS speed limitation
-        Vmax = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        Vmax = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
 
         epsilon = 0.1
         TAS_list = np.arange(0, Vmax + epsilon, epsilon)
@@ -936,9 +917,7 @@ class Optimization(BADAH):
         SR_LRC = 0.99 * SR
 
         # max TAS speed limitation
-        Vmax = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        Vmax = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
         Pav = self.Pav(rating="MCNT", theta=theta, delta=delta)
 
         # LRC > MRC
@@ -1020,9 +999,7 @@ class Optimization(BADAH):
         )  # atmosphere properties
 
         # max TAS speed limitation
-        Vmax = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        Vmax = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
 
         # def f(TAS):
         # Preq = self.Preq(sigma=sigma, tas=TAS[0], mass=mass)
@@ -1109,9 +1086,7 @@ class Optimization(BADAH):
                     )
                 ]
 
-                for j in range(
-                    startIdx + 3, startIdx + 3 + self.tableDimensionRows, 1
-                ):
+                for j in range(startIdx + 3, startIdx + 3 + self.tableDimensionRows, 1):
                     var_1.append(float(lines[j].split("|")[0].strip()))
 
                     str_list = list(
@@ -1231,21 +1206,17 @@ class Optimization(BADAH):
         # if nearestIdx_1 & nearestIdx_2 [1,2] [1,2]
         if (nearestIdx_1.size == 2) & (nearestIdx_2.size == 2):
             varTemp_1 = var_3_list[
-                nearestIdx_1[0] * (self.tableDimensionColumns)
-                + nearestIdx_2[0]
+                nearestIdx_1[0] * (self.tableDimensionColumns) + nearestIdx_2[0]
             ]
             varTemp_2 = var_3_list[
-                nearestIdx_1[0] * (self.tableDimensionColumns)
-                + nearestIdx_2[1]
+                nearestIdx_1[0] * (self.tableDimensionColumns) + nearestIdx_2[1]
             ]
 
             varTemp_3 = var_3_list[
-                nearestIdx_1[1] * (self.tableDimensionColumns)
-                + nearestIdx_2[0]
+                nearestIdx_1[1] * (self.tableDimensionColumns) + nearestIdx_2[0]
             ]
             varTemp_4 = var_3_list[
-                nearestIdx_1[1] * (self.tableDimensionColumns)
-                + nearestIdx_2[1]
+                nearestIdx_1[1] * (self.tableDimensionColumns) + nearestIdx_2[1]
             ]
 
             # interpolation between the 4 found points
@@ -1303,14 +1274,10 @@ class Optimization(BADAH):
 
         if DeltaTemp in detaTauDict:
             # value of DeltaTemp exist in the OPT file
-            optVal = self.calculateOPTparam(
-                var_1, var_2, detaTauDict[DeltaTemp]
-            )
+            optVal = self.calculateOPTparam(var_1, var_2, detaTauDict[DeltaTemp])
         else:
             # value of DeltaTemp does not exist in OPT file - will be interpolated. But only within the range of <-20;20>
-            nearestIdx = np.array(
-                self.findNearestIdx(DeltaTemp, list(detaTauDict))
-            )
+            nearestIdx = np.array(self.findNearestIdx(DeltaTemp, list(detaTauDict)))
 
             if nearestIdx.size == 1:
                 # DeltaTemp value is either outside of the <-20;20> DeltaTemp range
@@ -1422,9 +1389,7 @@ class ARPM(BADAH):
 
         # check for speed envelope limitations
         eps = 1e-6  # float calculation precision
-        maxSpeed = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        maxSpeed = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
         minSpeed = 0
         limitation = ""
 
@@ -1577,9 +1542,7 @@ class ARPM(BADAH):
         temp = theta * const.temp_0
 
         # MEC = self.OPT.MEC(mass=mass, h=h, DeltaTemp=DeltaTemp, wS=0)
-        MEC = conv.kt2ms(
-            self.OPT.getOPTParam("MEC", conv.m2ft(h), mass, DeltaTemp)
-        )
+        MEC = conv.kt2ms(self.OPT.getOPTParam("MEC", conv.m2ft(h), mass, DeltaTemp))
 
         # control parameters
         if tasDefault is None:
@@ -1594,9 +1557,7 @@ class ARPM(BADAH):
 
         # check for speed envelope limitations
         eps = 1e-6  # float calculation precision
-        maxSpeed = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        maxSpeed = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
         minSpeed = 0
         limitation = ""
 
@@ -1724,9 +1685,7 @@ class ARPM(BADAH):
         sigma = atm.sigma(theta=theta, delta=delta)
 
         # LRC = self.OPT.LRC(mass=mass, h=h, DeltaTemp=DeltaTemp, wS=0)
-        LRC = conv.kt2ms(
-            self.OPT.getOPTParam("LRC", conv.m2ft(h), mass, DeltaTemp)
-        )
+        LRC = conv.kt2ms(self.OPT.getOPTParam("LRC", conv.m2ft(h), mass, DeltaTemp))
 
         # control parameters
         if tasDefault is None:
@@ -1744,9 +1703,7 @@ class ARPM(BADAH):
 
         # check for speed envelope limitations
         eps = 1e-6  # float calculation precision
-        maxSpeed = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        maxSpeed = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
         minSpeed = 0
         limitation = ""
 
@@ -1839,9 +1796,7 @@ class ARPM(BADAH):
         temp = theta * const.temp_0
 
         # LRC = self.OPT.LRC(mass=mass, h=h, DeltaTemp=DeltaTemp, wS=0)
-        LRC = conv.kt2ms(
-            self.OPT.getOPTParam("LRC", conv.m2ft(h), mass, DeltaTemp)
-        )
+        LRC = conv.kt2ms(self.OPT.getOPTParam("LRC", conv.m2ft(h), mass, DeltaTemp))
 
         # control parameters
         if tasDefault is None:
@@ -1862,9 +1817,7 @@ class ARPM(BADAH):
 
         # check for speed envelope limitations
         eps = 1e-6  # float calculation precision
-        maxSpeed = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        maxSpeed = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
         minSpeed = 0
         limitation = ""
 
@@ -1969,9 +1922,7 @@ class ARPM(BADAH):
         temp = theta * const.temp_0
 
         # MEC = self.OPT.MEC(mass=mass, h=h, DeltaTemp=DeltaTemp, wS=0)
-        MEC = conv.kt2ms(
-            self.OPT.getOPTParam("MEC", conv.m2ft(h), mass, DeltaTemp)
-        )
+        MEC = conv.kt2ms(self.OPT.getOPTParam("MEC", conv.m2ft(h), mass, DeltaTemp))
 
         # control parameters
         if tasDefault is None:
@@ -1986,9 +1937,7 @@ class ARPM(BADAH):
 
         # check for speed envelope limitations
         eps = 1e-6  # float calculation precision
-        maxSpeed = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        maxSpeed = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
         minSpeed = 0
         limitation = ""
 
@@ -2107,9 +2056,7 @@ class ARPM(BADAH):
 
         # check for speed envelope limitations
         eps = 1e-6  # float calculation precision
-        maxSpeed = atm.cas2Tas(
-            cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma
-        )
+        maxSpeed = atm.cas2Tas(cas=self.flightEnvelope.VMax(), delta=delta, sigma=sigma)
         minSpeed = 0
         limitation = ""
 
@@ -2401,15 +2348,13 @@ class ARPM(BADAH):
                     tasDefault=tasDefault,
                 )
             elif h < conv.ft2m(150) and h >= conv.ft2m(5):
-                [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
-                    self.finalApproach(
-                        h=h,
-                        mass=mass,
-                        DeltaTemp=DeltaTemp,
-                        speedLimit=speedLimit,
-                        ROCDDefault=ROCDDefault,
-                        tasDefault=tasDefault,
-                    )
+                [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.finalApproach(
+                    h=h,
+                    mass=mass,
+                    DeltaTemp=DeltaTemp,
+                    speedLimit=speedLimit,
+                    ROCDDefault=ROCDDefault,
+                    tasDefault=tasDefault,
                 )
             elif h < conv.ft2m(5):
                 [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.landing(
@@ -2591,9 +2536,7 @@ class PTD(BADAH):
         file = open(filename, "w")
         file.write("BADA PERFORMANCE FILE RESULTS\n")
         file = open(filename, "a")
-        file.write(
-            "=============================\n=============================\n\n"
-        )
+        file.write("=============================\n=============================\n\n")
         file.write("Low mass CLIMB (MTKF)\n")
         file.write("=====================\n\n")
         file.write(
@@ -3253,14 +3196,12 @@ class PTD(BADAH):
             delta = atm.delta(H_m, DeltaTemp)
             sigma = atm.sigma(theta=theta, delta=delta)
 
-            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
-                self.ARPM.ARPMProcedure(
-                    phase=phase,
-                    h=H_m,
-                    DeltaTemp=DeltaTemp,
-                    mass=mass,
-                    rating=rating,
-                )
+            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.ARPM.ARPMProcedure(
+                phase=phase,
+                h=H_m,
+                DeltaTemp=DeltaTemp,
+                mass=mass,
+                rating=rating,
             )
 
             cas = atm.tas2Cas(tas=tas, delta=delta, sigma=sigma)
@@ -3365,10 +3306,8 @@ class PTD(BADAH):
             delta = atm.delta(H_m, DeltaTemp)
             sigma = atm.sigma(theta=theta, delta=delta)
 
-            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
-                self.ARPM.ARPMProcedure(
-                    phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
-                )
+            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.ARPM.ARPMProcedure(
+                phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
             )
 
             cas = atm.tas2Cas(tas=tas, delta=delta, sigma=sigma)
@@ -3470,10 +3409,8 @@ class PTD(BADAH):
             delta = atm.delta(H_m, DeltaTemp)
             sigma = atm.sigma(theta=theta, delta=delta)
 
-            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
-                self.ARPM.ARPMProcedure(
-                    phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
-                )
+            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.ARPM.ARPMProcedure(
+                phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
             )
 
             cas = atm.tas2Cas(tas=tas, delta=delta, sigma=sigma)
@@ -3570,10 +3507,8 @@ class PTD(BADAH):
             delta = atm.delta(H_m, DeltaTemp)
             sigma = atm.sigma(theta=theta, delta=delta)
 
-            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
-                self.ARPM.ARPMProcedure(
-                    phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
-                )
+            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.ARPM.ARPMProcedure(
+                phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
             )
 
             cas = atm.tas2Cas(tas=tas, delta=delta, sigma=sigma)
@@ -3740,8 +3675,7 @@ class PTF(BADAH):
 
         file = open(filename, "w")
         file.write(
-            "BADA PERFORMANCE FILE                                        %s\n\n"
-            % (d3)
+            "BADA PERFORMANCE FILE                                        %s\n\n" % (d3)
         )
         file = open(filename, "a")
         file.write("AC/Type: %s\n\n" % (acICAO))
@@ -3849,10 +3783,8 @@ class PTF(BADAH):
 
             ff = []
             for mass in massList:
-                [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
-                    self.ARPM.ARPMProcedure(
-                        phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
-                    )
+                [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.ARPM.ARPMProcedure(
+                    phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
                 )
 
                 if isnan(tas):
@@ -3935,14 +3867,12 @@ class PTF(BADAH):
 
             ROC = []
             for mass in massList:
-                [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
-                    self.ARPM.ARPMProcedure(
-                        phase=phase,
-                        h=H_m,
-                        DeltaTemp=DeltaTemp,
-                        mass=mass,
-                        rating=rating,
-                    )
+                [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.ARPM.ARPMProcedure(
+                    phase=phase,
+                    h=H_m,
+                    DeltaTemp=DeltaTemp,
+                    mass=mass,
+                    rating=rating,
                 )
 
                 ROC.append(conv.m2ft(ROCD) * 60)
@@ -4007,10 +3937,8 @@ class PTF(BADAH):
             ROD = []
             ff_gamma_list = []
             for mass in massList:
-                [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
-                    self.ARPM.ARPMProcedure(
-                        phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
-                    )
+                [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = self.ARPM.ARPMProcedure(
+                    phase=phase, h=H_m, DeltaTemp=DeltaTemp, mass=mass
                 )
 
                 ROD.append(-conv.m2ft(ROCD) * 60)
@@ -4088,18 +4016,12 @@ class BadaHAircraft(BADAH):
             filtered_df = allData[allData["acName"] == acName]
 
             self.model = configuration.safe_get(filtered_df, "model", None)
-            self.engineType = configuration.safe_get(
-                filtered_df, "engineType", None
-            )
+            self.engineType = configuration.safe_get(filtered_df, "engineType", None)
             self.engines = configuration.safe_get(filtered_df, "engines", None)
             self.WTC = configuration.safe_get(filtered_df, "WTC", None)
             self.ICAO = configuration.safe_get(filtered_df, "ICAO", None)
-            self.MR_radius = configuration.safe_get(
-                filtered_df, "MR_radius", None
-            )
-            self.MR_Speed = configuration.safe_get(
-                filtered_df, "MR_Speed", None
-            )
+            self.MR_radius = configuration.safe_get(filtered_df, "MR_radius", None)
+            self.MR_Speed = configuration.safe_get(filtered_df, "MR_Speed", None)
             self.cpr = configuration.safe_get(filtered_df, "cpr", None)
             self.n_eng = configuration.safe_get(filtered_df, "n_eng", None)
             self.P0 = configuration.safe_get(filtered_df, "P0", None)
@@ -4134,9 +4056,7 @@ class BadaHAircraft(BADAH):
                 self.synonymFileAvailable = True
 
                 # if SYNONYM exist - look for synonym based on defined acName
-                self.SearchedACName = Parser.parseSynonym(
-                    self.filePath, acName
-                )
+                self.SearchedACName = Parser.parseSynonym(self.filePath, acName)
 
                 # if cannot find - look for full name (in sub folder names) based on acName (may not be ICAO designator)
                 if self.SearchedACName is None:
@@ -4162,25 +4082,17 @@ class BadaHAircraft(BADAH):
                 if os.path.isfile(acXmlFile):
                     self.ACModelAvailable = True
 
-                    ACparsed_df = Parser.parseXML(
-                        self.filePath, self.SearchedACName
-                    )
+                    ACparsed_df = Parser.parseXML(self.filePath, self.SearchedACName)
 
                     self.OPTFilePath = OPTFilePath
 
-                    self.model = configuration.safe_get(
-                        ACparsed_df, "model", None
-                    )
+                    self.model = configuration.safe_get(ACparsed_df, "model", None)
                     self.engineType = configuration.safe_get(
                         ACparsed_df, "engineType", None
                     )
-                    self.engines = configuration.safe_get(
-                        ACparsed_df, "engines", None
-                    )
+                    self.engines = configuration.safe_get(ACparsed_df, "engines", None)
                     self.WTC = configuration.safe_get(ACparsed_df, "WTC", None)
-                    self.ICAO = configuration.safe_get(
-                        ACparsed_df, "ICAO", None
-                    )
+                    self.ICAO = configuration.safe_get(ACparsed_df, "ICAO", None)
                     self.MR_radius = configuration.safe_get(
                         ACparsed_df, "MR_radius", None
                     )
@@ -4188,25 +4100,17 @@ class BadaHAircraft(BADAH):
                         ACparsed_df, "MR_Speed", None
                     )
                     self.cpr = configuration.safe_get(ACparsed_df, "cpr", None)
-                    self.n_eng = configuration.safe_get(
-                        ACparsed_df, "n_eng", None
-                    )
+                    self.n_eng = configuration.safe_get(ACparsed_df, "n_eng", None)
                     self.P0 = configuration.safe_get(ACparsed_df, "P0", None)
                     self.cf = configuration.safe_get(ACparsed_df, "cf", None)
-                    self.Pmax_ = configuration.safe_get(
-                        ACparsed_df, "Pmax_", None
-                    )
+                    self.Pmax_ = configuration.safe_get(ACparsed_df, "Pmax_", None)
                     self.cpa = configuration.safe_get(ACparsed_df, "cpa", None)
                     self.hmo = configuration.safe_get(ACparsed_df, "hmo", None)
                     self.vne = configuration.safe_get(ACparsed_df, "vne", None)
-                    self.MTOW = configuration.safe_get(
-                        ACparsed_df, "MTOW", None
-                    )
+                    self.MTOW = configuration.safe_get(ACparsed_df, "MTOW", None)
                     self.OEW = configuration.safe_get(ACparsed_df, "OEW", None)
                     self.MFL = configuration.safe_get(ACparsed_df, "MFL", None)
-                    self.MREF = configuration.safe_get(
-                        ACparsed_df, "MREF", None
-                    )
+                    self.MREF = configuration.safe_get(ACparsed_df, "MREF", None)
                     self.MPL = configuration.safe_get(ACparsed_df, "MPL", None)
                     self.VMO = configuration.safe_get(ACparsed_df, "VMO", None)
                     self.MMO = configuration.safe_get(ACparsed_df, "MMO", None)
@@ -4219,9 +4123,7 @@ class BadaHAircraft(BADAH):
 
                 else:
                     # AC name cannot be found
-                    raise ValueError(
-                        acName + " Cannot be found at: " + self.filePath
-                    )
+                    raise ValueError(acName + " Cannot be found at: " + self.filePath)
 
     def __str__(self):
         return f"(BADAH, AC_name: {self.acName}, searched_AC_name: {self.SearchedACName}, model_ICAO: {self.ICAO}, ID: {id(self.AC)})"

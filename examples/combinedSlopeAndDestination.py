@@ -12,25 +12,25 @@ from pyBADA import geodesic as geo
 
 # ——— Inputs for required–slope example ———
 waypoint1 = {
-    'latitude': 52.2367946579192,
-    'longitude': 20.7129809016565,
-    'altitude': 3500.0       # ft
+    "latitude": 52.2367946579192,
+    "longitude": 20.7129809016565,
+    "altitude": 3500.0,  # ft
 }
 waypoint2 = {
-    'latitude': 52.1697191213371,
-    'longitude': 20.9519554471793,
-    'altitude': 412.0        # ft
+    "latitude": 52.1697191213371,
+    "longitude": 20.9519554471793,
+    "altitude": 412.0,  # ft
 }
 
 # ——— Inputs for destination–point example ———
 initial_waypoint = waypoint1.copy()
-slope_deg       = 3.5        # degrees (positive = climb)
-distance_nm     = 12.0       # nautical miles
-bearing_deg     = 75.0       # degrees from true north
+slope_deg = 3.5  # degrees (positive = climb)
+distance_nm = 12.0  # nautical miles
+bearing_deg = 75.0  # degrees from true north
 
 # ——— Run both examples for each algorithm ———
 for algo_name, Algo in [
-    ("Vincenty",  geo.Vincenty),
+    ("Vincenty", geo.Vincenty),
     ("Haversine", geo.Haversine),
     ("RhumbLine", geo.RhumbLine),
 ]:
@@ -45,10 +45,7 @@ for algo_name, Algo in [
 
     # 2) Destination point given a slope, distance & bearing
     dest_wp = Algo.destinationPointApplyingSlopeForDistance(
-        initial_waypoint,
-        slope_deg,
-        distance_nm,
-        bearing_deg
+        initial_waypoint, slope_deg, distance_nm, bearing_deg
     )
     print("Destination waypoint applying slope & distance:")
     print(f"  Latitude  = {dest_wp['latitude']:.6f}°")

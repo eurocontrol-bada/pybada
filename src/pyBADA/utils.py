@@ -1,13 +1,14 @@
-import numpy as np
-import xarray as xr
-import pandas as pd
 import numbers
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import ROUND_HALF_UP, Decimal
+
+import numpy as np
+import pandas as pd
+import xarray as xr
 
 
 def _round_scalar(x, dec):
     """Round a single scalar value using half-up rounding."""
-    quant = Decimal('1.' + '0'*dec)
+    quant = Decimal("1." + "0" * dec)
     d = Decimal(str(x))
     return float(d.quantize(quant, rounding=ROUND_HALF_UP))
 
@@ -19,6 +20,7 @@ def proper_round(num, dec=0):
     :param dec: Number of decimal places
     :returns: Rounded values with half-up rule; preserves infinities.
     """
+
     # Scalar helper handling infinities
     def _f(v):
         # Preserve infinities
@@ -72,6 +74,7 @@ def _extract(x):
         return x.values
     return np.asarray(x, dtype=float)
 
+
 def _broadcast(*arrays):
     """
     Broadcast any number of array-like inputs to a common shape.
@@ -81,8 +84,10 @@ def _broadcast(*arrays):
     - Otherwise prepend leading singleton dims to match trailing-dims broadcasting.
     """
     # 1) Scalar passthrough
-    if all(isinstance(a, numbers.Real) and not isinstance(a, (np.generic, np.ndarray))
-           for a in arrays):
+    if all(
+        isinstance(a, numbers.Real) and not isinstance(a, (np.generic, np.ndarray))
+        for a in arrays
+    ):
         return tuple(arrays)
 
     # Convert everything up front
@@ -101,15 +106,13 @@ def _broadcast(*arrays):
 
     # Fallback: pad all inputs with leading singleton dims
     max_ndim = max(a.ndim for a in arrs)
-    padded = [
-        a.reshape((1,) * (max_ndim - a.ndim) + a.shape)
-        for a in arrs
-    ]
+    padded = [a.reshape((1,) * (max_ndim - a.ndim) + a.shape) for a in arrs]
     try:
         return np.broadcast_arrays(*padded)
     except ValueError:
         shapes = [a.shape for a in arrs]
         raise ValueError(f"Cannot broadcast input shapes {shapes}")
+
 
 def _align_1d_to_nd(one_d, nd):
     """
@@ -126,27 +129,31 @@ def _align_1d_to_nd(one_d, nd):
     # no matching dimension found
     raise ValueError(f"Cannot align 1D array of length {N} with ND shape {nd.shape}")
 
+
 # def _broadcast(*arrays):
-    # """
-    # Broadcast any number of array-like inputs to a common shape.
-    # Accepts Python scalars, numpy arrays, pandas Series/DataFrame, xarray DataArray (via utils._extract), and returns numpy arrays broadcasted or scalars.
-    # """
+# """
+# Broadcast any number of array-like inputs to a common shape.
+# Accepts Python scalars, numpy arrays, pandas Series/DataFrame, xarray DataArray (via utils._extract), and returns numpy arrays broadcasted or scalars.
+# """
 
-    # If all inputs are Python real scalars, return them unchanged
-    # if all(isinstance(a, numbers.Real) and not isinstance(a, (np.generic, np.ndarray)) for a in arrays):
-        # return tuple(arrays)
+# If all inputs are Python real scalars, return them unchanged
+# if all(isinstance(a, numbers.Real) and not isinstance(a, (np.generic, np.ndarray)) for a in arrays):
+# return tuple(arrays)
 
-    # Convert inputs to numpy arrays and broadcast
-    # arrs = [np.asarray(a) for a in arrays]
-    # try:
-        # return np.broadcast_arrays(*arrs)
-    # except ValueError:
-        # shapes = [a.shape for a in arrs]
-        # raise ValueError(f"Cannot broadcast input shapes {shapes}")
+# Convert inputs to numpy arrays and broadcast
+# arrs = [np.asarray(a) for a in arrays]
+# try:
+# return np.broadcast_arrays(*arrs)
+# except ValueError:
+# shapes = [a.shape for a in arrs]
+# raise ValueError(f"Cannot broadcast input shapes {shapes}")
+
 
 def _wrap(core, original):
     # 1) Plain Python floats
-    if isinstance(original, numbers.Real) and not isinstance(original, (np.generic, np.ndarray)):
+    if isinstance(original, numbers.Real) and not isinstance(
+        original, (np.generic, np.ndarray)
+    ):
         # core might be a 0-d array or numpy scalar
         return float(np.asarray(core).item())
 
@@ -157,7 +164,7 @@ def _wrap(core, original):
             coords=original.coords,
             dims=original.dims,
             name=original.name,
-            attrs=original.attrs
+            attrs=original.attrs,
         )
 
     # pandas Series
@@ -171,6 +178,7 @@ def _wrap(core, original):
     # fallback: NumPy arrays/scalars
     return core
 
+
 def _vectorized_wrapper(core_func, *args):
     """Generic vectorized wrapper for functions with N inputs."""
     # Extract raw arrays or scalars
@@ -179,11 +187,15 @@ def _vectorized_wrapper(core_func, *args):
 
     # If *all* inputs were plain Python real numbers, return a Python float
     first = args[0]
-    if isinstance(first, numbers.Real) and not isinstance(first, (np.generic, np.ndarray)):
+    if isinstance(first, numbers.Real) and not isinstance(
+        first, (np.generic, np.ndarray)
+    ):
         return float(np.asarray(core).item())
 
     # xarray: if every arg was a DataArray, wrap back to DataArray
-    if isinstance(first, xr.DataArray) and all(isinstance(a, xr.DataArray) for a in args):
+    if isinstance(first, xr.DataArray) and all(
+        isinstance(a, xr.DataArray) for a in args
+    ):
         return xr.DataArray(core, coords=first.coords, dims=first.dims)
 
     # pandas Series
@@ -191,11 +203,14 @@ def _vectorized_wrapper(core_func, *args):
         return pd.Series(core, index=first.index, name=first.name)
 
     # pandas DataFrame
-    if isinstance(first, pd.DataFrame) and all(isinstance(a, pd.DataFrame) for a in args):
+    if isinstance(first, pd.DataFrame) and all(
+        isinstance(a, pd.DataFrame) for a in args
+    ):
         return pd.DataFrame(core, index=first.index, columns=first.columns)
 
     # fallback: NumPy array or scalar (leave as-is)
     return core
+
 
 def checkArgument(argument, **kwargs):
     if kwargs.get(argument) is not None:

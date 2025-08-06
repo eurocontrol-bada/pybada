@@ -7,8 +7,8 @@ from math import pi
 from time import mktime
 
 import numpy as np
-import xarray as xr
 import pandas as pd
+import xarray as xr
 
 from pyBADA import utils
 
@@ -18,6 +18,7 @@ def _unit_converter(factor):
     Returns a function that multiplies its input by `factor`,
     vectorized through utils._extract / utils._wrap.
     """
+
     def converter(val):
         # pull out the raw array
         arr = utils._extract(val)
@@ -25,23 +26,25 @@ def _unit_converter(factor):
         core = arr * factor
         # pass both the result and the original to _wrap
         return utils._wrap(core, original=val)
+
     return converter
+
 
 # Linear unit conversions (factor-based)
 _factor_map = {
-    "ft2m":    0.3048,
-    "nm2m":    1852.0,
-    "h2s":     3600.0,
-    "kt2ms":   0.514444,
-    "lb2kg":   0.453592,
+    "ft2m": 0.3048,
+    "nm2m": 1852.0,
+    "h2s": 3600.0,
+    "kt2ms": 0.514444,
+    "lb2kg": 0.453592,
     "deg2rad": pi / 180.0,
     "rad2deg": 180.0 / pi,
-    "m2ft":    1 / 0.3048,
-    "m2nm":    1 / 1852.0,
-    "s2h":     1 / 3600.0,
-    "ms2kt":   1 / 0.514444,
-    "kg2lb":   1 / 0.453592,
-    "hp2W":    745.699872,
+    "m2ft": 1 / 0.3048,
+    "m2nm": 1 / 1852.0,
+    "s2h": 1 / 3600.0,
+    "ms2kt": 1 / 0.514444,
+    "kg2lb": 1 / 0.453592,
+    "hp2W": 745.699872,
 }
 
 # Dynamically create each converter in the module namespace
@@ -61,13 +64,13 @@ def date2posix(val):
     """
     # xarray DataArray of datetime64
     if isinstance(val, xr.DataArray):
-        out = val.astype('datetime64[s]').astype(int)
-        out.attrs.update(units='s', long_name='POSIX timestamp')
+        out = val.astype("datetime64[s]").astype(int)
+        out.attrs.update(units="s", long_name="POSIX timestamp")
         return out
 
     if isinstance(val, (pd.Series, pd.DataFrame)):
         ts = pd.to_datetime(val)
-        arr = ts.values.astype('datetime64[s]').astype(int)
+        arr = ts.values.astype("datetime64[s]").astype(int)
         if isinstance(val, pd.Series):
             return pd.Series(arr, index=val.index, name=val.name)
         return pd.DataFrame(arr, index=val.index, columns=val.columns)
@@ -84,7 +87,7 @@ def date2posix(val):
 
     arr = np.asarray(val)
     try:
-        dt64 = arr.astype('datetime64[s]')
+        dt64 = arr.astype("datetime64[s]")
         return dt64.astype(int)
     except Exception:
         flat = arr.ravel()
@@ -110,11 +113,11 @@ def unix2date(val):
     :returns: Date string(s) in "%Y-%m-%d %H:%M:%S", matching input type.
     """
     if isinstance(val, xr.DataArray):
-        dt64 = val.astype('datetime64[s]')
+        dt64 = val.astype("datetime64[s]")
         return dt64.dt.strftime("%Y-%m-%d %H:%M:%S")
 
     if isinstance(val, (pd.Series, pd.DataFrame)):
-        ts = pd.to_datetime(val, unit='s')
+        ts = pd.to_datetime(val, unit="s")
         return ts.dt.strftime("%Y-%m-%d %H:%M:%S")
 
     arr = np.asarray(val, dtype=float)
@@ -127,6 +130,7 @@ def unix2date(val):
     if res_arr.ndim == 0:
         return res_arr.item()
     return res_arr.reshape(arr.shape)
+
 
 convertFrom = {
     "unix": unix2date,

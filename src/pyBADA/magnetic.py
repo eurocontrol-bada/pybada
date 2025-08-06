@@ -25,8 +25,7 @@ class Grid:
 
         if inputJSON is None:
             inputJSON = (
-                configuration.getDataPath()
-                + "/magneticDeclinationGridData.json"
+                configuration.getDataPath() + "/magneticDeclinationGridData.json"
             )
 
         f = open(inputJSON)
@@ -69,9 +68,7 @@ class Grid:
         else:
             before = latitudeList[index - 1]
             after = latitudeList[index]
-            closest = (
-                before if after - LAT_target > LAT_target - before else after
-            )
+            closest = before if after - LAT_target > LAT_target - before else after
 
         return closest
 
@@ -98,9 +95,7 @@ class Grid:
         else:
             before = longitudeList[index - 1]
             after = longitudeList[index]
-            closest = (
-                before if after - LON_target > LON_target - before else after
-            )
+            closest = before if after - LON_target > LON_target - before else after
 
         return closest
 

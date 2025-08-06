@@ -1,14 +1,10 @@
 """Atmosphere module."""
 
-from math import pow, sqrt
-
 import numpy as np
-import xarray as xr
-import pandas as pd
 
-from pyBADA import utils
 from pyBADA import constants as const
 from pyBADA import conversions as conv
+from pyBADA import utils
 
 
 def _theta_core(arr_h, arr_dT):
@@ -16,7 +12,7 @@ def _theta_core(arr_h, arr_dT):
     return np.where(
         arr_h < const.h_11,
         1 - const.temp_h * arr_h / const.temp_0 + arr_dT / const.temp_0,
-        (const.temp_11 + arr_dT) / const.temp_0
+        (const.temp_11 + arr_dT) / const.temp_0,
     )
 
 
@@ -33,7 +29,7 @@ def theta(h, DeltaTemp):
     :returns: Normalized temperature [-].
     """
 
-    arr_h  = utils._extract(h)
+    arr_h = utils._extract(h)
     arr_dT = utils._extract(DeltaTemp)
     arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
@@ -59,15 +55,9 @@ def _delta_core(arr_h, arr_dT):
     base = arr_theta - (arr_dT / const.temp_0)
     p = np.power(base, exponent)
 
-    strato_factor = np.exp(
-        - const.g / (const.R * const.temp_11) * (arr_h - const.h_11)
-    )
+    strato_factor = np.exp(-const.g / (const.R * const.temp_11) * (arr_h - const.h_11))
 
-    return np.where(
-        arr_h <= const.h_11,
-        p,
-        p * strato_factor
-    )
+    return np.where(arr_h <= const.h_11, p, p * strato_factor)
 
 
 def delta(h, DeltaTemp):
@@ -83,7 +73,7 @@ def delta(h, DeltaTemp):
     :returns: Normalized pressure [-].
     """
 
-    arr_h  = utils._extract(h)
+    arr_h = utils._extract(h)
     arr_dT = utils._extract(DeltaTemp)
     arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
@@ -130,12 +120,12 @@ def sigma(h=None, DeltaTemp=None, theta=None, delta=None):
         return utils._wrap(core, original=theta)
 
     elif h is not None or DeltaTemp is not None:
-        arr_h  = utils._extract(h)
+        arr_h = utils._extract(h)
         arr_dT = utils._extract(DeltaTemp)
         arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
-        arr_t  = _theta_core(arr_h_b, arr_dT_b)
-        arr_d  = _delta_core(arr_h_b, arr_dT_b)
-        core   = _sigma_core(arr_t, arr_d)
+        arr_t = _theta_core(arr_h_b, arr_dT_b)
+        arr_d = _delta_core(arr_h_b, arr_dT_b)
+        core = _sigma_core(arr_t, arr_d)
 
         return utils._wrap(core, original=h)
 
@@ -234,7 +224,13 @@ def _cas2Tas_core(arr_cas, arr_delta, arr_sigma):
     """
     rho = arr_sigma * const.rho_0
     p = arr_delta * const.p_0
-    A = np.power(1 + const.Amu * const.rho_0 * arr_cas**2 / (2 * const.p_0), 1 / const.Amu) - 1
+    A = (
+        np.power(
+            1 + const.Amu * const.rho_0 * arr_cas**2 / (2 * const.p_0),
+            1 / const.Amu,
+        )
+        - 1
+    )
     B = np.power(1 + (1 / arr_delta) * A, const.Amu) - 1
     return np.sqrt(2 * p * B / (const.Amu * rho))
 
@@ -342,8 +338,12 @@ def _pressureAltitude_core(arr_p, QNH):
     Core pressure altitude computation using ISA:
     """
 
-    part1 = (const.temp_0/const.temp_h) * (1 - np.power(arr_p/QNH, const.R*const.temp_h/const.g))
-    part2 = const.h_11 + (const.R*const.temp_11/const.g) * np.log(const.p_11/arr_p)
+    part1 = (const.temp_0 / const.temp_h) * (
+        1 - np.power(arr_p / QNH, const.R * const.temp_h / const.g)
+    )
+    part2 = const.h_11 + (const.R * const.temp_11 / const.g) * np.log(
+        const.p_11 / arr_p
+    )
     return np.where(arr_p > const.p_11, part1, part2)
 
 
@@ -402,19 +402,24 @@ def _crossOver_core(arr_cas, arr_mach):
 
     p_trans = const.p_0 * (
         (
-            np.power(1 + ((const.Agamma - 1.0)/2.0) * ((arr_cas/const.a_0)**2), 1/const.Amu) - 1.0
-        ) /
-        (
-            np.power(1 + ((const.Agamma - 1.0)/2.0) * (arr_mach**2), 1/const.Amu) - 1.0
+            np.power(
+                1 + ((const.Agamma - 1.0) / 2.0) * ((arr_cas / const.a_0) ** 2),
+                1 / const.Amu,
+            )
+            - 1.0
+        )
+        / (
+            np.power(1 + ((const.Agamma - 1.0) / 2.0) * (arr_mach**2), 1 / const.Amu)
+            - 1.0
         )
     )
 
-    theta_trans = np.power(p_trans/const.p_0, (const.temp_h*const.R)/const.g)
+    theta_trans = np.power(p_trans / const.p_0, (const.temp_h * const.R) / const.g)
 
     h = np.where(
         p_trans < const.p_11,
-        const.h_11 - (const.R*const.temp_11/const.g)*np.log(p_trans/const.p_11),
-        (const.temp_0/-const.temp_h)*(theta_trans - 1)
+        const.h_11 - (const.R * const.temp_11 / const.g) * np.log(p_trans / const.p_11),
+        (const.temp_0 / -const.temp_h) * (theta_trans - 1),
     )
     return h
 
@@ -450,7 +455,7 @@ def atmosphereProperties(h, DeltaTemp):
     :returns: List of [theta_norm, delta_norm, sigma_norm], each matching the type of input.
     """
 
-    arr_h  = utils._extract(h)
+    arr_h = utils._extract(h)
     arr_dT = utils._extract(DeltaTemp)
     arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
@@ -481,25 +486,27 @@ def convertSpeed(v, speedType, theta, delta, sigma):
     :returns: [Mach number, CAS (m/s), TAS (m/s)] each matching the type of input.
     """
 
-    arr_v     = utils._extract(v)
+    arr_v = utils._extract(v)
     arr_theta = utils._extract(theta)
     arr_delta = utils._extract(delta)
     arr_sigma = utils._extract(sigma)
 
-    arr_v_b, arr_theta_b, arr_delta_b, arr_sigma_b = utils._broadcast(arr_v, arr_theta, arr_delta, arr_sigma)
+    arr_v_b, arr_theta_b, arr_delta_b, arr_sigma_b = utils._broadcast(
+        arr_v, arr_theta, arr_delta, arr_sigma
+    )
 
     if speedType.upper() == "TAS":
         arr_TAS = conv.kt2ms(arr_v_b)
         arr_CAS = _tas2Cas_core(arr_TAS, arr_delta_b, arr_sigma_b)
-        arr_M   = _tas2Mach_core(arr_TAS, arr_theta_b)
+        arr_M = _tas2Mach_core(arr_TAS, arr_theta_b)
 
     elif speedType.upper() == "CAS":
         arr_CAS = conv.kt2ms(arr_v_b)
         arr_TAS = _cas2Tas_core(arr_CAS, arr_delta_b, arr_sigma_b)
-        arr_M   = _tas2Mach_core(arr_TAS, arr_theta_b)
+        arr_M = _tas2Mach_core(arr_TAS, arr_theta_b)
 
     elif speedType.upper() == "M" or speedType.upper() == "MACH":
-        arr_M   = arr_v_b
+        arr_M = arr_v_b
         arr_CAS = _mach2Cas_core(arr_M, arr_theta_b, arr_delta_b, arr_sigma_b)
         arr_TAS = _cas2Tas_core(arr_CAS, arr_delta_b, arr_sigma_b)
 

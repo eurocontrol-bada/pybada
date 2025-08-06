@@ -17,22 +17,22 @@ from pyBADA.badaH import BadaHAircraft
 AC = Bada3Aircraft(badaVersion="DUMMY", acName="J2M")
 
 # Common inputs
-DeltaTemp           = 0                 # deviation from ISA temperature [K]
-M                   = 0.7               # Mach number [-]
-altitude            = conv.ft2m(30000)  # cruise altitude [m]
-distance            = conv.nm2m(100)    # flown distance [m]
-payload             = 80                # payload mass [% of max payload]
-fuelReserve         = 3600              # fuel reserve [s]
-flightPlanInitMass  = None              # planned takeoff mass [kg]
+DeltaTemp = 0  # deviation from ISA temperature [K]
+M = 0.7  # Mach number [-]
+altitude = conv.ft2m(30000)  # cruise altitude [m]
+distance = conv.nm2m(100)  # flown distance [m]
+payload = 80  # payload mass [% of max payload]
+fuelReserve = 3600  # fuel reserve [s]
+flightPlanInitMass = None  # planned takeoff mass [kg]
 
 # Precompute atmosphere & speed inputs
 theta, delta, sigma = atm.atmosphereProperties(h=altitude, DeltaTemp=DeltaTemp)
-TAS                  = atm.mach2Tas(Mach=M, theta=theta)
-GS                   = TAS  # assume no wind
+TAS = atm.mach2Tas(Mach=M, theta=theta)
+GS = TAS  # assume no wind
 
 # Specify acName per model
 for model_name, ACClass, acName in [
-    ("BADA3", Bada3Aircraft,        "J2M"),
+    ("BADA3", Bada3Aircraft, "J2M"),
     ("BADA4", Bada4Aircraft, "Dummy-TWIN-plus"),
     ("BADAH", BadaHAircraft, "DUMH"),
 ]:

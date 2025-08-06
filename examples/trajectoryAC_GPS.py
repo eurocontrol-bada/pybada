@@ -33,9 +33,7 @@ allData = Bada4Parser.parseAll(badaVersion=badaVersion)
 print(allData)
 
 # AC = Bada3Aircraft(badaVersion=badaVersion, acName='J2H', allData=allData)
-AC = Bada4Aircraft(
-    badaVersion=badaVersion, acName="Dummy-TWIN", allData=allData
-)
+AC = Bada4Aircraft(badaVersion=badaVersion, acName="Dummy-TWIN", allData=allData)
 
 # get magnetic declination data
 magneticDeclinationGrid = Grid()
@@ -110,9 +108,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     AC, ["Hp", "mass", "CAS", "LAT", "LON", "HDGTrue"]
 )
 
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(2999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(2999), DeltaTemp=DeltaTemp)
 [cas_cl2, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(2999),
     mass=m_final,
@@ -180,9 +176,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     AC, ["Hp", "mass", "CAS", "LAT", "LON", "HDGTrue"]
 )
 
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(3999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(3999), DeltaTemp=DeltaTemp)
 [cas_cl3, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(3999),
     mass=m_final,
@@ -250,9 +244,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     AC, ["Hp", "mass", "CAS", "LAT", "LON", "HDGTrue"]
 )
 
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(4999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(4999), DeltaTemp=DeltaTemp)
 [cas_cl4, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(4999),
     mass=m_final,
@@ -320,9 +312,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     AC, ["Hp", "mass", "CAS", "LAT", "LON", "HDGTrue"]
 )
 
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(5999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(5999), DeltaTemp=DeltaTemp)
 [cas_cl5, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(5999),
     mass=m_final,
@@ -390,9 +380,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     AC, ["Hp", "mass", "CAS", "LAT", "LON", "HDGTrue"]
 )
 
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(9999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(9999), DeltaTemp=DeltaTemp)
 [cas_cl6, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(9999),
     mass=m_final,
@@ -728,9 +716,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(9999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(9999), DeltaTemp=DeltaTemp)
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(9999),
     mass=m_final,
@@ -797,9 +783,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(5999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(5999), DeltaTemp=DeltaTemp)
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(5999),
     mass=m_final,
@@ -922,9 +906,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(2999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(2999), DeltaTemp=DeltaTemp)
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(2999),
     mass=m_final,
@@ -1000,9 +982,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(1999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(1999), DeltaTemp=DeltaTemp)
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(1999),
     mass=m_final,
@@ -1078,9 +1058,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(1499), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(1499), DeltaTemp=DeltaTemp)
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(1499),
     mass=m_final,
@@ -1179,9 +1157,7 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
-[theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(999), DeltaTemp=DeltaTemp
-)
+[theta, delta, sigma] = atm.atmosphereProperties(h=conv.ft2m(999), DeltaTemp=DeltaTemp)
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(999),
     mass=m_final,

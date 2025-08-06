@@ -8,11 +8,11 @@ from math import asin, atan, isnan, sqrt
 import numpy as np
 import pandas as pd
 
-from pyBADA import utils
 from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const
 from pyBADA import conversions as conv
+from pyBADA import utils
 from pyBADA.aircraft import Airplane, Bada, BadaFamily
 
 
@@ -119,9 +119,7 @@ class Parser:
                     Clbo = float(CL_clean.find("Clbo").text)
                     k = float(CL_clean.find("k").text)
 
-            if (
-                LGDN is not None
-            ):  # Landing gear NOT allowed in clean configuration
+            if LGDN is not None:  # Landing gear NOT allowed in clean configuration
                 d[HLid]["LGDN"] = []
                 for i in LGDN.find("DPM").find("CD").findall("d"):
                     d[HLid]["LGDN"].append(float(i.text))
@@ -366,9 +364,7 @@ class Parser:
 
                 if idx == 13:
                     if "with" in line:
-                        engines = (
-                            line.split("with")[1].split("engines")[0].strip()
-                        )
+                        engines = line.split("with")[1].split("engines")[0].strip()
                     else:
                         engines = "unknown"
                 idx += 1
@@ -586,9 +582,7 @@ class Parser:
                 if line.startswith("CC"):
                     if "Modification_date" in line:
                         data = line.split(":")[1].strip().split(" ")
-                        modificationDateAPF = " ".join(
-                            [data[0], data[1], data[2]]
-                        )
+                        modificationDateAPF = " ".join([data[0], data[1], data[2]])
                 if line.startswith("CD"):
                     line = " ".join(line.split())
                     line = line.strip().split(" ")
@@ -603,9 +597,7 @@ class Parser:
                     dataLines.append(line)
                 elif "THE END" in line:
                     break
-        dataLines.pop(
-            0
-        )  # remove first line that does not contain usefull data
+        dataLines.pop(0)  # remove first line that does not contain usefull data
 
         # AV - average - line with average data
         AVLine = dataLines[1]
@@ -861,9 +853,7 @@ class Parser:
             GPFparamList.append(
                 {
                     "name": "ang_bank_nom",
-                    "value": float(
-                        AngBank.find("Nom").find("Civ").find("ToLd").text
-                    ),
+                    "value": float(AngBank.find("Nom").find("Civ").find("ToLd").text),
                     "engine": allEngines,
                     "phase": ["to", "ld"],
                     "flight": ["civ"],
@@ -872,9 +862,7 @@ class Parser:
             GPFparamList.append(
                 {
                     "name": "ang_bank_nom",
-                    "value": float(
-                        AngBank.find("Nom").find("Civ").find("Others").text
-                    ),
+                    "value": float(AngBank.find("Nom").find("Civ").find("Others").text),
                     "engine": allEngines,
                     "phase": ["ic", "cl", "cr", "des", "hold", "app"],
                     "flight": ["civ"],
@@ -892,9 +880,7 @@ class Parser:
             GPFparamList.append(
                 {
                     "name": "ang_bank_max",
-                    "value": float(
-                        AngBank.find("Max").find("Civ").find("ToLd").text
-                    ),
+                    "value": float(AngBank.find("Max").find("Civ").find("ToLd").text),
                     "engine": allEngines,
                     "phase": ["to", "ld"],
                     "flight": ["civ"],
@@ -903,9 +889,7 @@ class Parser:
             GPFparamList.append(
                 {
                     "name": "ang_bank_max",
-                    "value": float(
-                        AngBank.find("Max").find("Civ").find("Hold").text
-                    ),
+                    "value": float(AngBank.find("Max").find("Civ").find("Hold").text),
                     "engine": allEngines,
                     "phase": ["hold"],
                     "flight": ["civ"],
@@ -914,9 +898,7 @@ class Parser:
             GPFparamList.append(
                 {
                     "name": "ang_bank_max",
-                    "value": float(
-                        AngBank.find("Max").find("Civ").find("Others").text
-                    ),
+                    "value": float(AngBank.find("Max").find("Civ").find("Others").text),
                     "engine": allEngines,
                     "phase": ["ic", "cl", "cr", "des", "app"],
                     "flight": ["civ"],
@@ -980,9 +962,7 @@ class Parser:
 
             HmaxList = {}
             for phase in root.find("HmaxList").findall("HmaxPhase"):
-                HmaxList[phase.find("Phase").text] = float(
-                    phase.find("Hmax").text
-                )
+                HmaxList[phase.find("Phase").text] = float(phase.find("Hmax").text)
 
                 if phase.find("Phase").text == "TO":
                     GPFparamList.append(
@@ -1500,9 +1480,7 @@ class Parser:
                 combined_df = Parser.combineACDATA_GPF(df, GPFparsedDataframe)
 
                 # Merge DataFrames
-                merged_df = pd.concat(
-                    [merged_df, combined_df], ignore_index=True
-                )
+                merged_df = pd.concat([merged_df, combined_df], ignore_index=True)
 
             return merged_df
 
@@ -1524,14 +1502,10 @@ class Parser:
                     df.at[0, "acName"] = synonym
 
                     # Combine data with GPF data (temporary solution)
-                    combined_df = Parser.combineACDATA_GPF(
-                        df, GPFparsedDataframe
-                    )
+                    combined_df = Parser.combineACDATA_GPF(df, GPFparsedDataframe)
 
                     # Merge DataFrames
-                    merged_df = pd.concat(
-                        [merged_df, combined_df], ignore_index=True
-                    )
+                    merged_df = pd.concat([merged_df, combined_df], ignore_index=True)
 
             return merged_df
 
@@ -1564,13 +1538,7 @@ class BADA3(Airplane, Bada):
         :rtype: float
         """
 
-        return (
-            2
-            * mass
-            * const.g
-            * nz
-            / (sigma * const.rho_0 * tas * tas * self.AC.S)
-        )
+        return 2 * mass * const.g * nz / (sigma * const.rho_0 * tas * tas * self.AC.S)
 
     def CD(
         self,
@@ -1613,9 +1581,9 @@ class BADA3(Airplane, Bada):
                 and self.AC.CD2[HLid_LD][LG_LD] == 0.0
                 and self.AC.DeltaCD == 0.0
             ):
-                CD = self.AC.CD0[HLid_CR][LG_CR] + self.AC.CD2[HLid_CR][
-                    LG_CR
-                ] * (CL * CL)
+                CD = self.AC.CD0[HLid_CR][LG_CR] + self.AC.CD2[HLid_CR][LG_CR] * (
+                    CL * CL
+                )
             else:
                 if config == "CR" or config == "IC" or config == "TO":
                     CD = (
@@ -1670,9 +1638,7 @@ class BADA3(Airplane, Bada):
         # expedite descent
         C_des_exp = 1.0
         if expedite:
-            C_des_exp = Parser.getGPFValue(
-                self.AC.GPFdata, "C_des_exp", phase="des"
-            )
+            C_des_exp = Parser.getGPFValue(self.AC.GPFdata, "C_des_exp", phase="des")
             CD = CD * C_des_exp
 
         return CD
@@ -1851,9 +1817,7 @@ class BADA3(Airplane, Bada):
             return TMax
 
         elif rating == "MCRZ":
-            return TMax * Parser.getGPFValue(
-                self.AC.GPFdata, "C_th_cr", phase="cr"
-            )
+            return TMax * Parser.getGPFValue(self.AC.GPFdata, "C_th_cr", phase="cr")
 
     def TDes(self, h, DeltaTemp, v, config):
         """Computes descent thrust based on altitude, temperature deviation,
@@ -1872,9 +1836,7 @@ class BADA3(Airplane, Bada):
         :rtype: float
         """
 
-        H_max_app = Parser.getGPFValue(
-            self.AC.GPFdata, "H_max_app", phase="app"
-        )
+        H_max_app = Parser.getGPFValue(self.AC.GPFdata, "H_max_app", phase="app")
 
         if (
             self.AC.engineType == "PISTON"
@@ -1940,11 +1902,7 @@ class BADA3(Airplane, Bada):
         """
 
         if self.AC.engineType == "JET":
-            eta = (
-                self.AC.Cf[0]
-                * (1 + conv.ms2kt(v) / self.AC.Cf[1])
-                / (1000 * 60)
-            )
+            eta = self.AC.Cf[0] * (1 + conv.ms2kt(v) / self.AC.Cf[1]) / (1000 * 60)
             ffnom = eta * T
 
         elif self.AC.engineType == "TURBOPROP":
@@ -1956,9 +1914,7 @@ class BADA3(Airplane, Bada):
             )
             ffnom = eta * T
 
-        elif (
-            self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC"
-        ):
+        elif self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
             ffnom = self.AC.Cf[0] / 60
 
         return ffnom
@@ -1973,12 +1929,8 @@ class BADA3(Airplane, Bada):
         """
 
         if self.AC.engineType == "JET" or self.AC.engineType == "TURBOPROP":
-            ffmin = (
-                self.AC.CfDes[0] * (1 - (conv.m2ft(h)) / self.AC.CfDes[1]) / 60
-            )
-        elif (
-            self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC"
-        ):
+            ffmin = self.AC.CfDes[0] * (1 - (conv.m2ft(h)) / self.AC.CfDes[1]) / 60
+        elif self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
             ffmin = self.AC.CfDes[0] / 60  # Cf3 param
 
         return ffmin
@@ -2120,12 +2072,7 @@ class BADA3(Airplane, Bada):
             CPowRed = self.reducedPower(h=h, mass=mass, DeltaTemp=DeltaTemp)
 
         ROCD = (
-            ((temp - DeltaTemp) / temp)
-            * (T - D)
-            * v
-            * ESF
-            * CPowRed
-            / (mass * const.g)
+            ((temp - DeltaTemp) / temp) * (T - D) * v * ESF * CPowRed / (mass * const.g)
         )
 
         return ROCD
@@ -2176,9 +2123,7 @@ class FlightEnvelope(BADA3):
         if self.AC.Hmax == 0:
             hMax = self.AC.hmo
         else:
-            hMax = min(
-                self.AC.hmo, self.AC.Hmax + Gt * var + Gw * (mMax - mass)
-            )
+            hMax = min(self.AC.hmo, self.AC.Hmax + Gt * var + Gw * (mMax - mass))
 
         return conv.ft2m(hMax)
 
@@ -2206,9 +2151,7 @@ class FlightEnvelope(BADA3):
 
         return vStall
 
-    def VMin(
-        self, h, mass, config, DeltaTemp, nz=1.2, envelopeType="OPERATIONAL"
-    ):
+    def VMin(self, h, mass, config, DeltaTemp, nz=1.2, envelopeType="OPERATIONAL"):
         """Computes the minimum speed for a given configuration and
         conditions.
 
@@ -2248,10 +2191,7 @@ class FlightEnvelope(BADA3):
                 Vmin = VminStall
             elif h >= conv.ft2m(15000):
                 # low speed buffeting limit applies only for JET and TURBOPROP
-                if (
-                    self.AC.engineType == "JET"
-                    or self.AC.engineType == "TURBOPROP"
-                ):
+                if self.AC.engineType == "JET" or self.AC.engineType == "TURBOPROP":
                     [theta, delta, sigma] = atm.atmosphereProperties(
                         h=h, DeltaTemp=DeltaTemp
                     )
@@ -2270,10 +2210,7 @@ class FlightEnvelope(BADA3):
                                 sigma=sigma,
                             ),
                         )
-                elif (
-                    self.AC.engineType == "PISTON"
-                    or self.AC.engineType == "ELECTRIC"
-                ):
+                elif self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
                     Vmin = VminStall
 
         return Vmin
@@ -2296,9 +2233,7 @@ class FlightEnvelope(BADA3):
         :rtype: float
         """
 
-        [theta, delta, sigma] = atm.atmosphereProperties(
-            h=h, DeltaTemp=DeltaTemp
-        )
+        [theta, delta, sigma] = atm.atmosphereProperties(h=h, DeltaTemp=DeltaTemp)
 
         VmaxCertified = self.VMax(h=h, DeltaTemp=DeltaTemp)
         VminCertified = self.VMin(
@@ -2316,9 +2251,7 @@ class FlightEnvelope(BADA3):
         CDvalue = None
         CASValue = None
         MValue = None
-        for CAS in np.linspace(
-            VminCertified, VmaxCertified, num=200, endpoint=True
-        ):
+        for CAS in np.linspace(VminCertified, VmaxCertified, num=200, endpoint=True):
             TAS = atm.cas2Tas(cas=CAS, delta=delta, sigma=sigma)
             M = atm.cas2Mach(cas=CAS, theta=theta, delta=delta, sigma=sigma)
             maxThrust = self.Thrust(
@@ -2358,9 +2291,7 @@ class FlightEnvelope(BADA3):
         :rtype: float
         """
 
-        [theta, delta, sigma] = atm.atmosphereProperties(
-            h=h, DeltaTemp=DeltaTemp
-        )
+        [theta, delta, sigma] = atm.atmosphereProperties(h=h, DeltaTemp=DeltaTemp)
 
         VmaxCertified = self.VMax(h=h, DeltaTemp=DeltaTemp)
         VminCertified = self.VMin(
@@ -2375,9 +2306,7 @@ class FlightEnvelope(BADA3):
         excessThrustList = []
         VxList = []
 
-        for CAS in np.linspace(
-            VminCertified, VmaxCertified, num=200, endpoint=True
-        ):
+        for CAS in np.linspace(VminCertified, VmaxCertified, num=200, endpoint=True):
             TAS = atm.cas2Tas(cas=CAS, delta=delta, sigma=sigma)
             maxThrust = self.Thrust(
                 h=h, DeltaTemp=DeltaTemp, rating=rating, v=TAS, config=config
@@ -2405,17 +2334,11 @@ class FlightEnvelope(BADA3):
         :rtype: float
         """
 
-        crossoverAlt = atm.crossOver(
-            cas=conv.kt2ms(self.AC.VMO), Mach=self.AC.MMO
-        )
+        crossoverAlt = atm.crossOver(cas=conv.kt2ms(self.AC.VMO), Mach=self.AC.MMO)
 
         if h >= crossoverAlt:
-            [theta, delta, sigma] = atm.atmosphereProperties(
-                h=h, DeltaTemp=DeltaTemp
-            )
-            VMax = atm.mach2Cas(
-                Mach=self.AC.MMO, theta=theta, delta=delta, sigma=sigma
-            )
+            [theta, delta, sigma] = atm.atmosphereProperties(h=h, DeltaTemp=DeltaTemp)
+            VMax = atm.mach2Cas(Mach=self.AC.MMO, theta=theta, delta=delta, sigma=sigma)
         else:
             VMax = conv.kt2ms(self.AC.VMO)
 
@@ -2484,27 +2407,19 @@ class FlightEnvelope(BADA3):
         h_AGL = h - hRWY
 
         HmaxTO_AGL = (
-            conv.ft2m(
-                Parser.getGPFValue(self.AC.GPFdata, "H_max_to", phase="to")
-            )
+            conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "H_max_to", phase="to"))
             - hRWY
         )
         HmaxIC_AGL = (
-            conv.ft2m(
-                Parser.getGPFValue(self.AC.GPFdata, "H_max_ic", phase="ic")
-            )
+            conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "H_max_ic", phase="ic"))
             - hRWY
         )
         HmaxAPP_AGL = (
-            conv.ft2m(
-                Parser.getGPFValue(self.AC.GPFdata, "H_max_app", phase="app")
-            )
+            conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "H_max_app", phase="app"))
             - hRWY
         )
         HmaxLD_AGL = (
-            conv.ft2m(
-                Parser.getGPFValue(self.AC.GPFdata, "H_max_ld", phase="lnd")
-            )
+            conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "H_max_ld", phase="lnd"))
             - hRWY
         )
 
@@ -2513,12 +2428,8 @@ class FlightEnvelope(BADA3):
         elif phase == "Climb" and (h_AGL > HmaxTO_AGL and h_AGL <= HmaxIC_AGL):
             config = "IC"
         else:
-            vMinCR = self.VMin(
-                h=h, mass=mass, config="CR", DeltaTemp=DeltaTemp, nz=nz
-            )
-            vMinAPP = self.VMin(
-                h=h, mass=mass, config="AP", DeltaTemp=DeltaTemp, nz=nz
-            )
+            vMinCR = self.VMin(h=h, mass=mass, config="CR", DeltaTemp=DeltaTemp, nz=nz)
+            vMinAPP = self.VMin(h=h, mass=mass, config="AP", DeltaTemp=DeltaTemp, nz=nz)
             ep = 1e-6
             if (
                 phase == "Descent"
@@ -2593,21 +2504,13 @@ class FlightEnvelope(BADA3):
         """
 
         if h <= conv.ft2m(14000):
-            vHold = Parser.getGPFValue(
-                self.AC.GPFdata, "V_hold_1", phase="hold"
-            )
+            vHold = Parser.getGPFValue(self.AC.GPFdata, "V_hold_1", phase="hold")
         elif h > conv.ft2m(14000) and h <= conv.ft2m(20000):
-            vHold = Parser.getGPFValue(
-                self.AC.GPFdata, "V_hold_2", phase="hold"
-            )
+            vHold = Parser.getGPFValue(self.AC.GPFdata, "V_hold_2", phase="hold")
         elif h > conv.ft2m(20000) and h <= conv.ft2m(34000):
-            vHold = Parser.getGPFValue(
-                self.AC.GPFdata, "V_hold_3", phase="hold"
-            )
+            vHold = Parser.getGPFValue(self.AC.GPFdata, "V_hold_3", phase="hold")
         elif h > conv.ft2m(34000):
-            MHold = Parser.getGPFValue(
-                self.AC.GPFdata, "V_hold_4", phase="hold"
-            )
+            MHold = Parser.getGPFValue(self.AC.GPFdata, "V_hold_4", phase="hold")
             vHold = atm.mach2Cas(Mach=M, theta=theta, delta=delta, sigma=sigma)
 
         return conv.kt2ms(vHold)
@@ -2624,21 +2527,13 @@ class FlightEnvelope(BADA3):
         """
 
         if pos == "backtrack":
-            vGround = Parser.getGPFValue(
-                self.AC.GPFdata, "V_backtrack", phase="gnd"
-            )
+            vGround = Parser.getGPFValue(self.AC.GPFdata, "V_backtrack", phase="gnd")
         elif pos == "taxi":
-            vGround = Parser.getGPFValue(
-                self.AC.GPFdata, "V_taxi", phase="gnd"
-            )
+            vGround = Parser.getGPFValue(self.AC.GPFdata, "V_taxi", phase="gnd")
         elif pos == "apron":
-            vGround = Parser.getGPFValue(
-                self.AC.GPFdata, "V_apron", phase="gnd"
-            )
+            vGround = Parser.getGPFValue(self.AC.GPFdata, "V_apron", phase="gnd")
         elif pos == "gate":
-            vGround = Parser.getGPFValue(
-                self.AC.GPFdata, "V_gate", phase="gnd"
-            )
+            vGround = Parser.getGPFValue(self.AC.GPFdata, "V_gate", phase="gnd")
 
         return conv.kt2ms(vGround)
 
@@ -2699,9 +2594,7 @@ class FlightEnvelope(BADA3):
             if type == "long":
                 if (
                     abs(v2 - v1)
-                    <= conv.ft2m(
-                        Parser.getGPFValue(self.AC.GPFdata, "acc_long_max")
-                    )
+                    <= conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "acc_long_max"))
                     * deltaTime
                 ):
                     OK = True
@@ -2709,9 +2602,7 @@ class FlightEnvelope(BADA3):
         elif type == "norm":
             if (
                 abs(v2 - v1)
-                <= conv.ft2m(
-                    Parser.getGPFValue(self.AC.GPFdata, "acc_norm_max")
-                )
+                <= conv.ft2m(Parser.getGPFValue(self.AC.GPFdata, "acc_norm_max"))
                 * deltaTime
             ):
                 OK = True
@@ -2745,9 +2636,7 @@ class FlightEnvelope(BADA3):
 
         return [CAS1, CAS2, M]
 
-    def checkConfigurationContinuity(
-        self, phase, previousConfig, currentConfig
-    ):
+    def checkConfigurationContinuity(self, phase, previousConfig, currentConfig):
         """Ensures the continuity of aerodynamic configuration changes based
         on the phase of flight.
 
@@ -2894,41 +2783,31 @@ class ARPM:
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_5", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_5", phase=phase)
                     )
                 )
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_4", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_4", phase=phase)
                     )
                 )
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_3", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_3", phase=phase)
                     )
                 )
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_2", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
                     )
                 )
                 speed.append(
                     Cvmin * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_1", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_1", phase=phase)
                     )
                 )
 
@@ -2953,15 +2832,9 @@ class ARPM:
                 elif h >= conv.ft2m(10000) and h < crossOverAlt:
                     cas = Vcl2
                 elif h >= crossOverAlt:
-                    cas = atm.mach2Cas(
-                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
-                    )
+                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
 
-            elif (
-                acModel == "TURBOPROP"
-                or acModel == "PISTON"
-                or acModel == "ELECTRIC"
-            ):
+            elif acModel == "TURBOPROP" or acModel == "PISTON" or acModel == "ELECTRIC":
                 speed = list()
                 speed.append(min(Vcl1, conv.kt2ms(250)))
                 speed.append(
@@ -3015,9 +2888,7 @@ class ARPM:
                 elif h >= conv.ft2m(10000) and h < crossOverAlt:
                     cas = Vcl2
                 elif h >= crossOverAlt:
-                    cas = atm.mach2Cas(
-                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
-                    )
+                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
 
         elif procedure == "NADP1":
             if acModel == "JET":
@@ -3026,9 +2897,7 @@ class ARPM:
                 speed.append(
                     CvminTO * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_2", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
                     )
                 )
                 n = 1
@@ -3045,9 +2914,7 @@ class ARPM:
                     cas = Vcl2
                 elif h >= crossOverAlt:
                     sigma = atm.sigma(theta=theta, delta=delta)
-                    cas = atm.mach2Cas(
-                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
-                    )
+                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
 
             elif acModel == "TURBOPROP" or acModel == "PISTON":
                 speed = list()
@@ -3055,9 +2922,7 @@ class ARPM:
                 speed.append(
                     CvminTO * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_1", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_1", phase=phase)
                     )
                 )
 
@@ -3075,9 +2940,7 @@ class ARPM:
                     cas = Vcl2
                 elif h >= crossOverAlt:
                     sigma = atm.sigma(theta=theta, delta=delta)
-                    cas = atm.mach2Cas(
-                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
-                    )
+                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
 
         elif procedure == "NADP2":
             if acModel == "JET":
@@ -3086,17 +2949,13 @@ class ARPM:
                 speed.append(
                     Cvmin * VstallCR
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_2", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
                     )
                 )
                 speed.append(
                     CvminTO * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_2", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
                     )
                 )
 
@@ -3108,9 +2967,7 @@ class ARPM:
 
                 if h < conv.ft2m(NADP2_ALT[0]):
                     cas = speed[2]
-                elif h >= conv.ft2m(NADP2_ALT[0]) and h < conv.ft2m(
-                    NADP2_ALT[1]
-                ):
+                elif h >= conv.ft2m(NADP2_ALT[0]) and h < conv.ft2m(NADP2_ALT[1]):
                     cas = speed[1]
                 elif h >= conv.ft2m(NADP2_ALT[1]) and h < conv.ft2m(10000):
                     cas = speed[0]
@@ -3118,9 +2975,7 @@ class ARPM:
                     cas = Vcl2
                 elif h >= crossOverAlt:
                     sigma = atm.sigma(theta=theta, delta=delta)
-                    cas = atm.mach2Cas(
-                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
-                    )
+                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
 
             elif acModel == "TURBOPROP" or acModel == "PISTON":
                 speed = list()
@@ -3128,17 +2983,13 @@ class ARPM:
                 speed.append(
                     Cvmin * VstallCR
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_2", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_2", phase=phase)
                     )
                 )
                 speed.append(
                     CvminTO * VstallTO
                     + conv.kt2ms(
-                        Parser.getGPFValue(
-                            self.AC.GPFdata, "V_cl_1", phase=phase
-                        )
+                        Parser.getGPFValue(self.AC.GPFdata, "V_cl_1", phase=phase)
                     )
                 )
 
@@ -3150,9 +3001,7 @@ class ARPM:
 
                 if h < conv.ft2m(NADP2_ALT[0]):
                     cas = speed[2]
-                elif h >= conv.ft2m(NADP2_ALT[0]) and h < conv.ft2m(
-                    NADP2_ALT[1]
-                ):
+                elif h >= conv.ft2m(NADP2_ALT[0]) and h < conv.ft2m(NADP2_ALT[1]):
                     cas = speed[1]
                 elif h >= conv.ft2m(NADP2_ALT[1]) and h < conv.ft2m(10000):
                     cas = speed[0]
@@ -3160,9 +3009,7 @@ class ARPM:
                     cas = Vcl2
                 elif h >= crossOverAlt:
                     sigma = atm.sigma(theta=theta, delta=delta)
-                    cas = atm.mach2Cas(
-                        Mach=Mcl, theta=theta, delta=delta, sigma=sigma
-                    )
+                    cas = atm.mach2Cas(Mach=Mcl, theta=theta, delta=delta, sigma=sigma)
 
         if applyLimits:
             # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
@@ -3261,15 +3108,9 @@ class ARPM:
             elif h >= conv.ft2m(14000) and h < crossOverAlt:
                 cas = Vcr2
             elif h >= crossOverAlt:
-                cas = atm.mach2Cas(
-                    Mach=Mcr, theta=theta, delta=delta, sigma=sigma
-                )
+                cas = atm.mach2Cas(Mach=Mcr, theta=theta, delta=delta, sigma=sigma)
 
-        elif (
-            acModel == "TURBOPROP"
-            or acModel == "PISTON"
-            or acModel == "ELECTRIC"
-        ):
+        elif acModel == "TURBOPROP" or acModel == "PISTON" or acModel == "ELECTRIC":
             if h < conv.ft2m(3000):
                 cas = min(Vcr1, conv.kt2ms(150))
             elif h >= conv.ft2m(3000) and h < conv.ft2m(6000):
@@ -3279,9 +3120,7 @@ class ARPM:
             elif h >= conv.ft2m(10000) and h < crossOverAlt:
                 cas = Vcr2
             elif h >= crossOverAlt:
-                cas = atm.mach2Cas(
-                    Mach=Mcr, theta=theta, delta=delta, sigma=sigma
-                )
+                cas = atm.mach2Cas(Mach=Mcr, theta=theta, delta=delta, sigma=sigma)
 
         if applyLimits:
             # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
@@ -3422,9 +3261,7 @@ class ARPM:
             elif h >= conv.ft2m(10000) and h < crossOverAlt:
                 cas = Vdes2
             elif h >= crossOverAlt:
-                cas = atm.mach2Cas(
-                    Mach=Mdes, theta=theta, delta=delta, sigma=sigma
-                )
+                cas = atm.mach2Cas(Mach=Mdes, theta=theta, delta=delta, sigma=sigma)
 
         elif acModel == "PISTON" or acModel == "ELECTRIC":
             speed = list()
@@ -3480,9 +3317,7 @@ class ARPM:
             elif h >= conv.ft2m(10000) and h < crossOverAlt:
                 cas = Vdes2
             elif h >= crossOverAlt:
-                cas = atm.mach2Cas(
-                    Mach=Mdes, theta=theta, delta=delta, sigma=sigma
-                )
+                cas = atm.mach2Cas(Mach=Mdes, theta=theta, delta=delta, sigma=sigma)
 
         if applyLimits:
             # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
@@ -3654,9 +3489,7 @@ class PTD(BADA3):
         file = open(filename, "w")
         file.write("BADA PERFORMANCE FILE RESULTS\n")
         file = open(filename, "a")
-        file.write(
-            "=============================\n=============================\n\n"
-        )
+        file.write("=============================\n=============================\n\n")
         file.write("Low mass CLIMBS\n")
         file.write("===============\n\n")
         file.write(
@@ -3823,9 +3656,7 @@ class PTD(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
-            )
+            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
             [cas, speedUpdated] = self.ARPM.climbSpeed(
                 theta=theta,
                 delta=delta,
@@ -3885,19 +3716,19 @@ class PTD(BADA3):
             FL_complet.append(utils.proper_round(FL))
             T_complet.append(utils.proper_round(theta * const.temp_0))
             p_complet.append(utils.proper_round(delta * const.p_0))
-            rho_complet.append(utils.proper_round(sigma * const.rho_0,3))
+            rho_complet.append(utils.proper_round(sigma * const.rho_0, 3))
             a_complet.append(utils.proper_round(a))
-            TAS_complet.append(utils.proper_round(conv.ms2kt(tas),2))
-            CAS_complet.append(utils.proper_round(conv.ms2kt(cas),2))
-            M_complet.append(utils.proper_round(M,2))
+            TAS_complet.append(utils.proper_round(conv.ms2kt(tas), 2))
+            CAS_complet.append(utils.proper_round(conv.ms2kt(cas), 2))
+            M_complet.append(utils.proper_round(M, 2))
             mass_complet.append(utils.proper_round(mass))
             Thrust_complet.append(utils.proper_round(Thrust))
             Drag_complet.append(utils.proper_round(Drag))
-            ff_comlet.append(utils.proper_round(ff,1))
-            ESF_complet.append(utils.proper_round(ESF,2))
+            ff_comlet.append(utils.proper_round(ff, 1))
+            ESF_complet.append(utils.proper_round(ESF, 2))
             ROCD_complet.append(utils.proper_round(ROCD))
             TDC_complet.append(utils.proper_round(TDC))
-            PWC_complet.append(utils.proper_round(CPowRed,2))
+            PWC_complet.append(utils.proper_round(CPowRed, 2))
 
         CLList = [
             FL_complet,
@@ -3965,9 +3796,7 @@ class PTD(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
-            )
+            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
             [cas, speedUpdated] = self.ARPM.descentSpeed(
                 theta=theta,
                 delta=delta,
@@ -3989,10 +3818,7 @@ class PTD(BADA3):
             CD = self.CD(CL=CL, config=config)
             Drag = self.D(tas=tas, sigma=sigma, CD=CD)
 
-            if (
-                self.AC.engineType == "PISTON"
-                or self.AC.engineType == "ELECTRIC"
-            ):
+            if self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
                 # PISTON  and ELECTRIC uses LIDL throughout the whole descent phase
                 Thrust = self.Thrust(
                     rating="LIDL",
@@ -4059,9 +3885,7 @@ class PTD(BADA3):
                 * 60
             )
 
-            tau_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
-            )
+            tau_const = (theta * const.temp_0) / (theta * const.temp_0 - DeltaTemp)
             dhdt = (conv.ft2m(ROCD / 60)) * tau_const
 
             if self.AC.drone:
@@ -4072,19 +3896,19 @@ class PTD(BADA3):
             FL_complet.append(utils.proper_round(FL))
             T_complet.append(utils.proper_round(theta * const.temp_0))
             p_complet.append(utils.proper_round(delta * const.p_0))
-            rho_complet.append(utils.proper_round(sigma * const.rho_0,3))
+            rho_complet.append(utils.proper_round(sigma * const.rho_0, 3))
             a_complet.append(utils.proper_round(a))
-            TAS_complet.append(utils.proper_round(conv.ms2kt(tas),2))
-            CAS_complet.append(utils.proper_round(conv.ms2kt(cas),2))
-            M_complet.append(utils.proper_round(M,2))
+            TAS_complet.append(utils.proper_round(conv.ms2kt(tas), 2))
+            CAS_complet.append(utils.proper_round(conv.ms2kt(cas), 2))
+            M_complet.append(utils.proper_round(M, 2))
             mass_complet.append(utils.proper_round(mass))
             Thrust_complet.append(utils.proper_round(Thrust))
             Drag_complet.append(utils.proper_round(Drag))
-            ff_comlet.append(utils.proper_round(ff,1))
-            ESF_complet.append(utils.proper_round(ESF,2))
+            ff_comlet.append(utils.proper_round(ff, 1))
+            ESF_complet.append(utils.proper_round(ESF, 2))
             ROCD_complet.append(utils.proper_round(-1 * ROCD))
             TDC_complet.append(utils.proper_round(TDC))
-            gamma_complet.append(utils.proper_round(gamma,2))
+            gamma_complet.append(utils.proper_round(gamma, 2))
 
         DESList = [
             FL_complet,
@@ -4254,8 +4078,7 @@ class PTF(BADA3):
 
         file = open(filename, "w")
         file.write(
-            "BADA PERFORMANCE FILE                                        %s\n\n"
-            % (d3)
+            "BADA PERFORMANCE FILE                                        %s\n\n" % (d3)
         )
         file = open(filename, "a")
         file.write("AC/Type: %s\n" % (acName))
@@ -4381,9 +4204,7 @@ class PTF(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
-            )
+            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
             [cas, speedUpdated] = self.ARPM.cruiseSpeed(
                 theta=theta,
                 delta=delta,
@@ -4411,14 +4232,12 @@ class PTF(BADA3):
                 CD = self.CD(CL=CL, config="CR")
                 Drag = self.D(tas=tas, sigma=sigma, CD=CD)
                 Thrust = Drag
-                ff.append(
-                    self.ff(flightPhase="Cruise", v=tas, h=H_m, T=Thrust) * 60
-                )
+                ff.append(self.ff(flightPhase="Cruise", v=tas, h=H_m, T=Thrust) * 60)
 
             TAS_CR_complet.append(utils.proper_round(conv.ms2kt(tas_nominal)))
-            FF_CR_LO_complet.append(utils.proper_round(ff[0],1))
-            FF_CR_NOM_complet.append(utils.proper_round(ff[1],1))
-            FF_CR_HI_complet.append(utils.proper_round(ff[2],1))
+            FF_CR_LO_complet.append(utils.proper_round(ff[0], 1))
+            FF_CR_NOM_complet.append(utils.proper_round(ff[1], 1))
+            FF_CR_HI_complet.append(utils.proper_round(ff[2], 1))
 
         CRList = [
             TAS_CR_complet,
@@ -4461,9 +4280,7 @@ class PTF(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
-            )
+            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
             FL = h / 100
 
             ROC = []
@@ -4543,7 +4360,7 @@ class PTF(BADA3):
             ROCD_CL_LO_complet.append(utils.proper_round(ROC[0]))
             ROCD_CL_NOM_complet.append(utils.proper_round(ROC[1]))
             ROCD_CL_HI_complet.append(utils.proper_round(ROC[2]))
-            FF_CL_NOM_complet.append(utils.proper_round(ff_list[1],1))
+            FF_CL_NOM_complet.append(utils.proper_round(ff_list[1], 1))
 
         CLList = [
             TAS_CL_complet,
@@ -4585,9 +4402,7 @@ class PTF(BADA3):
 
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
-            )
+            [theta, delta, sigma] = atm.atmosphereProperties(h=H_m, DeltaTemp=DeltaTemp)
             [cas, speedUpdated] = self.ARPM.descentSpeed(
                 theta=theta,
                 delta=delta,
@@ -4613,10 +4428,7 @@ class PTF(BADA3):
             CD = self.CD(CL=CL, config=config)
             Drag = self.D(tas=tas_nominal, sigma=sigma, CD=CD)
 
-            if (
-                self.AC.engineType == "PISTON"
-                or self.AC.engineType == "ELECTRIC"
-            ):
+            if self.AC.engineType == "PISTON" or self.AC.engineType == "ELECTRIC":
                 # PISTON  and ELECTRIC uses LIDL throughout the whole descent phase
                 Thrust_nominal = self.Thrust(
                     rating="LIDL",
@@ -4682,7 +4494,7 @@ class PTF(BADA3):
 
             TAS_DES_complet.append(utils.proper_round(conv.ms2kt(tas_nominal)))
             ROCD_DES_NOM_complet.append(utils.proper_round(ROCD))
-            FF_DES_NOM_complet.append(utils.proper_round(ff_nominal,1))
+            FF_DES_NOM_complet.append(utils.proper_round(ff_nominal, 1))
 
         DESList = [TAS_DES_complet, ROCD_DES_NOM_complet, FF_DES_NOM_complet]
 
@@ -4736,9 +4548,7 @@ class Bada3Aircraft(BADA3):
             filtered_df = allData[allData["acName"] == acName]
 
             self.acName = configuration.safe_get(filtered_df, "acName", None)
-            self.xmlFiles = configuration.safe_get(
-                filtered_df, "xmlFiles", None
-            )
+            self.xmlFiles = configuration.safe_get(filtered_df, "xmlFiles", None)
 
             self.modificationDateOPF = configuration.safe_get(
                 filtered_df, "modificationDateOPF", None
@@ -4751,9 +4561,7 @@ class Bada3Aircraft(BADA3):
             self.numberOfEngines = configuration.safe_get(
                 filtered_df, "numberOfEngines", None
             )
-            self.engineType = configuration.safe_get(
-                filtered_df, "engineType", None
-            )
+            self.engineType = configuration.safe_get(filtered_df, "engineType", None)
             self.engines = configuration.safe_get(filtered_df, "engines", None)
             self.WTC = configuration.safe_get(filtered_df, "WTC", None)
             self.mass = configuration.safe_get(filtered_df, "mass", None)
@@ -4766,9 +4574,7 @@ class Bada3Aircraft(BADA3):
             self.MMO = configuration.safe_get(filtered_df, "MMO", None)
             self.hmo = configuration.safe_get(filtered_df, "hmo", None)
             self.Hmax = configuration.safe_get(filtered_df, "Hmax", None)
-            self.tempGrad = configuration.safe_get(
-                filtered_df, "tempGrad", None
-            )
+            self.tempGrad = configuration.safe_get(filtered_df, "tempGrad", None)
 
             self.S = configuration.safe_get(filtered_df, "S", None)
             self.Clbo = configuration.safe_get(filtered_df, "Clbo", None)
@@ -4778,15 +4584,9 @@ class Bada3Aircraft(BADA3):
             self.CD2 = configuration.safe_get(filtered_df, "CD2", None)
             self.HLids = configuration.safe_get(filtered_df, "HLids", None)
             self.Ct = configuration.safe_get(filtered_df, "Ct", None)
-            self.CTdeslow = configuration.safe_get(
-                filtered_df, "CTdeslow", None
-            )
-            self.CTdeshigh = configuration.safe_get(
-                filtered_df, "CTdeshigh", None
-            )
-            self.CTdesapp = configuration.safe_get(
-                filtered_df, "CTdesapp", None
-            )
+            self.CTdeslow = configuration.safe_get(filtered_df, "CTdeslow", None)
+            self.CTdeshigh = configuration.safe_get(filtered_df, "CTdeshigh", None)
+            self.CTdesapp = configuration.safe_get(filtered_df, "CTdesapp", None)
             self.CTdesld = configuration.safe_get(filtered_df, "CTdesld", None)
             self.HpDes = configuration.safe_get(filtered_df, "HpDes", None)
             self.Cf = configuration.safe_get(filtered_df, "Cf", None)
@@ -4809,9 +4609,7 @@ class Bada3Aircraft(BADA3):
             self.speedSchedule = configuration.safe_get(
                 filtered_df, "speedSchedule", None
             )
-            self.aeroConfig = configuration.safe_get(
-                filtered_df, "aeroConfig", None
-            )
+            self.aeroConfig = configuration.safe_get(filtered_df, "aeroConfig", None)
 
             self.flightEnvelope = FlightEnvelope(self)
             self.ARPM = ARPM(self)
@@ -4829,9 +4627,7 @@ class Bada3Aircraft(BADA3):
             if os.path.isfile(synonymFile) or os.path.isfile(synonymFileXML):
                 self.synonymFileAvailable = True
 
-                self.SearchedACName = Parser.parseSynonym(
-                    self.filePath, acName
-                )
+                self.SearchedACName = Parser.parseSynonym(self.filePath, acName)
 
                 if self.SearchedACName is None:
                     # look for file name directly, which consists of added "_" at the end of file
@@ -4870,12 +4666,8 @@ class Bada3Aircraft(BADA3):
                 if self.OPFavailable and self.APFavailable:
                     self.ACModelAvailable = True
 
-                    OPFDataFrame = Parser.parseOPF(
-                        self.filePath, self.SearchedACName
-                    )
-                    APFDataFrame = Parser.parseAPF(
-                        self.filePath, self.SearchedACName
-                    )
+                    OPFDataFrame = Parser.parseOPF(self.filePath, self.SearchedACName)
+                    APFDataFrame = Parser.parseAPF(self.filePath, self.SearchedACName)
 
                     OPF_APF_combined_df = Parser.combineOPF_APF(
                         OPFDataFrame, APFDataFrame
@@ -4884,9 +4676,7 @@ class Bada3Aircraft(BADA3):
                         OPF_APF_combined_df, GPFDataFrame
                     )
 
-                    self.acName = configuration.safe_get(
-                        combined_df, "acName", None
-                    )
+                    self.acName = configuration.safe_get(combined_df, "acName", None)
                     self.xmlFiles = configuration.safe_get(
                         combined_df, "xmlFiles", None
                     )
@@ -4898,54 +4688,36 @@ class Bada3Aircraft(BADA3):
                         combined_df, "modificationDateAPF", None
                     )
 
-                    self.ICAO = configuration.safe_get(
-                        combined_df, "ICAO", None
-                    )
+                    self.ICAO = configuration.safe_get(combined_df, "ICAO", None)
                     self.numberOfEngines = configuration.safe_get(
                         combined_df, "numberOfEngines", None
                     )
                     self.engineType = configuration.safe_get(
                         combined_df, "engineType", None
                     )
-                    self.engines = configuration.safe_get(
-                        combined_df, "engines", None
-                    )
+                    self.engines = configuration.safe_get(combined_df, "engines", None)
                     self.WTC = configuration.safe_get(combined_df, "WTC", None)
-                    self.mass = configuration.safe_get(
-                        combined_df, "mass", None
-                    )
+                    self.mass = configuration.safe_get(combined_df, "mass", None)
 
-                    self.MTOW = configuration.safe_get(
-                        combined_df, "MTOW", None
-                    )
+                    self.MTOW = configuration.safe_get(combined_df, "MTOW", None)
                     self.OEW = configuration.safe_get(combined_df, "OEW", None)
                     self.MPL = configuration.safe_get(combined_df, "MPL", None)
-                    self.MREF = configuration.safe_get(
-                        combined_df, "MREF", None
-                    )
+                    self.MREF = configuration.safe_get(combined_df, "MREF", None)
                     self.VMO = configuration.safe_get(combined_df, "VMO", None)
                     self.MMO = configuration.safe_get(combined_df, "MMO", None)
                     self.hmo = configuration.safe_get(combined_df, "hmo", None)
-                    self.Hmax = configuration.safe_get(
-                        combined_df, "Hmax", None
-                    )
+                    self.Hmax = configuration.safe_get(combined_df, "Hmax", None)
                     self.tempGrad = configuration.safe_get(
                         combined_df, "tempGrad", None
                     )
 
                     self.S = configuration.safe_get(combined_df, "S", None)
-                    self.Clbo = configuration.safe_get(
-                        combined_df, "Clbo", None
-                    )
+                    self.Clbo = configuration.safe_get(combined_df, "Clbo", None)
                     self.k = configuration.safe_get(combined_df, "k", None)
-                    self.Vstall = configuration.safe_get(
-                        combined_df, "Vstall", None
-                    )
+                    self.Vstall = configuration.safe_get(combined_df, "Vstall", None)
                     self.CD0 = configuration.safe_get(combined_df, "CD0", None)
                     self.CD2 = configuration.safe_get(combined_df, "CD2", None)
-                    self.HLids = configuration.safe_get(
-                        combined_df, "HLids", None
-                    )
+                    self.HLids = configuration.safe_get(combined_df, "HLids", None)
                     self.Ct = configuration.safe_get(combined_df, "Ct", None)
                     self.CTdeslow = configuration.safe_get(
                         combined_df, "CTdeslow", None
@@ -4956,43 +4728,25 @@ class Bada3Aircraft(BADA3):
                     self.CTdesapp = configuration.safe_get(
                         combined_df, "CTdesapp", None
                     )
-                    self.CTdesld = configuration.safe_get(
-                        combined_df, "CTdesld", None
-                    )
-                    self.HpDes = configuration.safe_get(
-                        combined_df, "HpDes", None
-                    )
+                    self.CTdesld = configuration.safe_get(combined_df, "CTdesld", None)
+                    self.HpDes = configuration.safe_get(combined_df, "HpDes", None)
                     self.Cf = configuration.safe_get(combined_df, "Cf", None)
-                    self.CfDes = configuration.safe_get(
-                        combined_df, "CfDes", None
-                    )
-                    self.CfCrz = configuration.safe_get(
-                        combined_df, "CfCrz", None
-                    )
+                    self.CfDes = configuration.safe_get(combined_df, "CfDes", None)
+                    self.CfCrz = configuration.safe_get(combined_df, "CfCrz", None)
                     self.TOL = configuration.safe_get(combined_df, "TOL", None)
                     self.LDL = configuration.safe_get(combined_df, "LDL", None)
-                    self.span = configuration.safe_get(
-                        combined_df, "span", None
-                    )
-                    self.length = configuration.safe_get(
-                        combined_df, "length", None
-                    )
+                    self.span = configuration.safe_get(combined_df, "span", None)
+                    self.length = configuration.safe_get(combined_df, "length", None)
 
                     self.V1 = configuration.safe_get(combined_df, "V1", None)
                     self.V2 = configuration.safe_get(combined_df, "V2", None)
                     self.M = configuration.safe_get(combined_df, "M", None)
 
-                    self.GPFdata = configuration.safe_get(
-                        combined_df, "GPFdata", None
-                    )
+                    self.GPFdata = configuration.safe_get(combined_df, "GPFdata", None)
 
-                    self.drone = configuration.safe_get(
-                        combined_df, "drone", None
-                    )
+                    self.drone = configuration.safe_get(combined_df, "drone", None)
 
-                    self.DeltaCD = configuration.safe_get(
-                        combined_df, "DeltaCD", None
-                    )
+                    self.DeltaCD = configuration.safe_get(combined_df, "DeltaCD", None)
                     self.speedSchedule = configuration.safe_get(
                         combined_df, "speedSchedule", None
                     )
@@ -5008,17 +4762,11 @@ class Bada3Aircraft(BADA3):
                 elif not self.OPFavailable and not self.APFavailable:
                     # search for xml files
 
-                    XMLDataFrame = Parser.parseXML(
-                        self.filePath, self.SearchedACName
-                    )
+                    XMLDataFrame = Parser.parseXML(self.filePath, self.SearchedACName)
 
-                    combined_df = Parser.combineACDATA_GPF(
-                        XMLDataFrame, GPFDataFrame
-                    )
+                    combined_df = Parser.combineACDATA_GPF(XMLDataFrame, GPFDataFrame)
 
-                    self.acName = configuration.safe_get(
-                        combined_df, "acName", None
-                    )
+                    self.acName = configuration.safe_get(combined_df, "acName", None)
                     self.xmlFiles = configuration.safe_get(
                         combined_df, "xmlFiles", None
                     )
@@ -5030,54 +4778,36 @@ class Bada3Aircraft(BADA3):
                         combined_df, "modificationDateAPF", None
                     )
 
-                    self.ICAO = configuration.safe_get(
-                        combined_df, "ICAO", None
-                    )
+                    self.ICAO = configuration.safe_get(combined_df, "ICAO", None)
                     self.numberOfEngines = configuration.safe_get(
                         combined_df, "numberOfEngines", None
                     )
                     self.engineType = configuration.safe_get(
                         combined_df, "engineType", None
                     )
-                    self.engines = configuration.safe_get(
-                        combined_df, "engines", None
-                    )
+                    self.engines = configuration.safe_get(combined_df, "engines", None)
                     self.WTC = configuration.safe_get(combined_df, "WTC", None)
-                    self.mass = configuration.safe_get(
-                        combined_df, "mass", None
-                    )
+                    self.mass = configuration.safe_get(combined_df, "mass", None)
 
-                    self.MTOW = configuration.safe_get(
-                        combined_df, "MTOW", None
-                    )
+                    self.MTOW = configuration.safe_get(combined_df, "MTOW", None)
                     self.OEW = configuration.safe_get(combined_df, "OEW", None)
                     self.MPL = configuration.safe_get(combined_df, "MPL", None)
-                    self.MREF = configuration.safe_get(
-                        combined_df, "MREF", None
-                    )
+                    self.MREF = configuration.safe_get(combined_df, "MREF", None)
                     self.VMO = configuration.safe_get(combined_df, "VMO", None)
                     self.MMO = configuration.safe_get(combined_df, "MMO", None)
                     self.hmo = configuration.safe_get(combined_df, "hmo", None)
-                    self.Hmax = configuration.safe_get(
-                        combined_df, "Hmax", None
-                    )
+                    self.Hmax = configuration.safe_get(combined_df, "Hmax", None)
                     self.tempGrad = configuration.safe_get(
                         combined_df, "tempGrad", None
                     )
 
                     self.S = configuration.safe_get(combined_df, "S", None)
-                    self.Clbo = configuration.safe_get(
-                        combined_df, "Clbo", None
-                    )
+                    self.Clbo = configuration.safe_get(combined_df, "Clbo", None)
                     self.k = configuration.safe_get(combined_df, "k", None)
-                    self.Vstall = configuration.safe_get(
-                        combined_df, "Vstall", None
-                    )
+                    self.Vstall = configuration.safe_get(combined_df, "Vstall", None)
                     self.CD0 = configuration.safe_get(combined_df, "CD0", None)
                     self.CD2 = configuration.safe_get(combined_df, "CD2", None)
-                    self.HLids = configuration.safe_get(
-                        combined_df, "HLids", None
-                    )
+                    self.HLids = configuration.safe_get(combined_df, "HLids", None)
                     self.Ct = configuration.safe_get(combined_df, "Ct", None)
                     self.CTdeslow = configuration.safe_get(
                         combined_df, "CTdeslow", None
@@ -5088,43 +4818,25 @@ class Bada3Aircraft(BADA3):
                     self.CTdesapp = configuration.safe_get(
                         combined_df, "CTdesapp", None
                     )
-                    self.CTdesld = configuration.safe_get(
-                        combined_df, "CTdesld", None
-                    )
-                    self.HpDes = configuration.safe_get(
-                        combined_df, "HpDes", None
-                    )
+                    self.CTdesld = configuration.safe_get(combined_df, "CTdesld", None)
+                    self.HpDes = configuration.safe_get(combined_df, "HpDes", None)
                     self.Cf = configuration.safe_get(combined_df, "Cf", None)
-                    self.CfDes = configuration.safe_get(
-                        combined_df, "CfDes", None
-                    )
-                    self.CfCrz = configuration.safe_get(
-                        combined_df, "CfCrz", None
-                    )
+                    self.CfDes = configuration.safe_get(combined_df, "CfDes", None)
+                    self.CfCrz = configuration.safe_get(combined_df, "CfCrz", None)
                     self.TOL = configuration.safe_get(combined_df, "TOL", None)
                     self.LDL = configuration.safe_get(combined_df, "LDL", None)
-                    self.span = configuration.safe_get(
-                        combined_df, "span", None
-                    )
-                    self.length = configuration.safe_get(
-                        combined_df, "length", None
-                    )
+                    self.span = configuration.safe_get(combined_df, "span", None)
+                    self.length = configuration.safe_get(combined_df, "length", None)
 
                     self.V1 = configuration.safe_get(combined_df, "V1", None)
                     self.V2 = configuration.safe_get(combined_df, "V2", None)
                     self.M = configuration.safe_get(combined_df, "M", None)
 
-                    self.GPFdata = configuration.safe_get(
-                        combined_df, "GPFdata", None
-                    )
+                    self.GPFdata = configuration.safe_get(combined_df, "GPFdata", None)
 
-                    self.drone = configuration.safe_get(
-                        combined_df, "drone", None
-                    )
+                    self.drone = configuration.safe_get(combined_df, "drone", None)
 
-                    self.DeltaCD = configuration.safe_get(
-                        combined_df, "DeltaCD", None
-                    )
+                    self.DeltaCD = configuration.safe_get(combined_df, "DeltaCD", None)
                     self.speedSchedule = configuration.safe_get(
                         combined_df, "speedSchedule", None
                     )
