@@ -5,6 +5,7 @@
 <a href="https://pypi.org/project/pyBADA"><img alt="Released on PyPi" src="https://img.shields.io/pypi/v/pyBADA.svg"></a> <img alt="PyPI - Downloads" src="https://img.shields.io/pypi/dw/pybada"> ![Python 3.12](https://img.shields.io/badge/Python-3.12-3776AB.svg?logo=python&logoColor=white)
 <a href="https://github.com/eurocontrol-bada/pybada"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 [![Run unit tests](https://github.com/eurocontrol-bada/pybada/actions/workflows/pytest.yml/badge.svg)](https://github.com/eurocontrol-bada/pybada/actions/workflows/pytest.yml)
+![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/pyBADA_dev?style=social&label=Follow%20%40pyBADA_dev)
 
 This package provides aircraft performance modelling, trajectory prediction and optimisation, and visualisation with [BADA](https://www.eurocontrol.int/model/bada) in Python.
 
