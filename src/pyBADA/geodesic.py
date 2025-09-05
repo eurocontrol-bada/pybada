@@ -4,6 +4,7 @@ Geodesic calculation module
 
 from math import (
     asin,
+    atan,
     atan2,
     cos,
     degrees,
@@ -17,10 +18,114 @@ from math import (
 )
 
 from pyBADA import constants as const
+from pyBADA import conversions as conv
 from pyBADA.aircraft import Airplane as airplane
 
 
-class Haversine:
+class GeodesicCommon:
+    @classmethod
+    def requiredSlope(cls, waypoint_init, waypoint_final):
+        """
+        Calculate the climb/descent slope and horizontal distance between
+        two WGS84 waypoints with pressure altitude.
+
+        :param waypoint_init: dict with keys 'latitude', 'longitude', 'altitude' (ft)
+        :param waypoint_final: dict with keys 'latitude', 'longitude', 'altitude' (ft)
+        :type waypoint_init: dict[str, float]
+        :type waypoint_final: dict[str, float]
+        :return: (slope_degrees, distance_meters)
+        :rtype: (float, float)
+        """
+
+        dist = cls.distance(
+            waypoint_init["latitude"],
+            waypoint_init["longitude"],
+            waypoint_final["latitude"],
+            waypoint_final["longitude"],
+        )
+        if dist == 0:
+            raise ValueError("Waypoints must be distinct (distance = 0)")
+
+        delta_h = conv.ft2m(
+            waypoint_final["altitude"] - waypoint_init["altitude"]
+        )
+        slope = degrees(atan(delta_h / dist))
+        return slope, dist
+
+    @staticmethod
+    def finalAltitudeApplyingSlopeForDistance(
+        altitude: float, slope: float, distance: float
+    ) -> float:
+        """
+        Calculate the final pressure altitude after applying a constant
+        climb/descent slope over a horizontal distance.
+
+        :param delta_h_ft: Initial pressure altitude in feet
+        :param slope:   Flight‐path angle in degrees
+                             (positive for climb, negative for descent)
+        :param distance: Horizontal distance to travel in nautical miles
+        :type altitude: float
+        :type slope: float
+        :type distance: float
+        :return: Final pressure altitude in feet
+        :rtype: float
+        """
+
+        horizontal_m = conv.nm2m(distance)
+        delta_h_ft = conv.m2ft(tan(radians(slope)) * horizontal_m)
+        return altitude + delta_h_ft
+
+    @classmethod
+    def destinationPointApplyingSlopeForDistance(
+        cls, waypoint_init: dict, slope: float, distance: float, bearing: float
+    ) -> dict:
+        """
+        Calculate the destination waypoint after traveling a horizontal
+        distance from an initial WGS84 waypoint on a given bearing and
+        applying a constant climb/descent slope.
+
+        :param waypoint_init: Initial waypoint, as a dict containing:
+            - 'latitude': Latitude in decimal degrees
+            - 'longitude': Longitude in decimal degrees
+            - 'altitude':  Pressure altitude in feet
+        :param slope: Flight‐path angle in degrees
+                             (positive for climb, negative for descent)
+        :param distance: Horizontal distance to travel from the initial
+                             point in nautical miles
+        :param bearing: Initial bearing (direction) in degrees from
+                             true north
+        :type waypoint_init: dict[str, float]
+        :type slope: float
+        :type distance: float
+        :type bearing: float
+        :return: Destination waypoint with keys:
+            - 'latitude': Destination latitude in decimal degrees
+            - 'longitude': Destination longitude in decimal degrees
+            - 'altitude': Final pressure altitude in feet
+        :rtype: dict[str, float]
+        """
+
+        horizontal_dist_m = conv.nm2m(distance)
+
+        dest_lat, dest_lon = cls.destinationPoint(
+            waypoint_init["latitude"],
+            waypoint_init["longitude"],
+            horizontal_dist_m,
+            bearing,
+        )
+
+        final_alt_ft = cls.finalAltitudeApplyingSlopeForDistance(
+            waypoint_init["altitude"], slope, distance
+        )
+
+        return {
+            "latitude": dest_lat,
+            "longitude": dest_lon,
+            "altitude": final_alt_ft,
+        }
+
+
+class Haversine(GeodesicCommon):
     """This class implements the geodesic calculations on sherical earth
     (ignoring ellipsoidal effects).
 
@@ -147,7 +252,7 @@ class Haversine:
         return bearing
 
 
-class Vincenty:
+class Vincenty(GeodesicCommon):
     """This class implements the vincenty calculations of geodesics on the
     ellipsoid-model earth.
 
@@ -493,7 +598,7 @@ class Vincenty:
         return (dest[0], dest[1])
 
 
-class RhumbLine:
+class RhumbLine(GeodesicCommon):
     """This class implements the rhumb line (loxodrome) calculations of
     geodesics on the ellipsoid-model earth.
 

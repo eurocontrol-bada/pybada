@@ -11,6 +11,7 @@ import numpy as np
 from pyBADA import atmosphere as atm
 from pyBADA import constants as const
 from pyBADA import conversions as conv
+from pyBADA import utils
 from pyBADA.flightTrajectory import FlightTrajectory as FT
 from pyBADA.geodesic import RhumbLine as rhumb
 from pyBADA.geodesic import Turn as turn
@@ -23,13 +24,6 @@ class target:
     slopetarget: float = None
     acctarget: float = None
     ESFtarget: float = None
-
-
-def checkArgument(argument, **kwargs):
-    if kwargs.get(argument) is not None:
-        return kwargs.get(argument)
-    else:
-        raise TypeError("Missing " + argument + " argument")
 
 
 def constantSpeedLevel(
@@ -7505,7 +7499,7 @@ def accDec(
         else:
             maxRating = "MCMB"
     else:
-        maxRating = checkArgument("maxRating", **kwargs)
+        maxRating = utils.checkArgument("maxRating", **kwargs)
 
     # Determine engine rating
     if (
@@ -8778,7 +8772,7 @@ def accDec_time(
         else:
             maxRating = "MCMB"
     else:
-        maxRating = checkArgument("maxRating", **kwargs)
+        maxRating = utils.checkArgument("maxRating", **kwargs)
 
     # Determine engine rating
     if (

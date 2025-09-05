@@ -7,24 +7,24 @@ from math import exp
 from pyBADA import atmosphere as atm
 
 
-def cruiseFuelConsumption(AC, altitude, M, deltaTemp):
+def cruiseFuelConsumption(AC, altitude, M, DeltaTemp):
     """
     Calculate the cruise fuel consumption for an aircraft during cruise flight using BADA.
 
     :param AC: Aircraft object (instance of Bada3Aircraft, Bada4Aircraft, or BadaHAircraft).
     :param altitude: Altitude in meters.
     :param M: Mach number at cruising altitude.
-    :param deltaTemp: Temperature deviation from standard atmosphere.
+    :param DeltaTemp: Temperature deviation from standard atmosphere.
     :type AC: object
     :type altitude: float
     :type M: float
-    :type deltaTemp: float
+    :type DeltaTemp: float
     :return: Fuel flow in kg/s.
     :rtype: float
     """
 
     [theta, delta, sigma] = atm.atmosphereProperties(
-        h=altitude, DeltaTemp=deltaTemp
+        h=altitude, DeltaTemp=DeltaTemp
     )
     TAS = atm.mach2Tas(Mach=M, theta=theta)
 
@@ -63,7 +63,7 @@ def cruiseFuelConsumption(AC, altitude, M, deltaTemp):
         CT = AC.CT(Thrust=THR, delta=delta)
 
         fuelFlow = AC.ff(
-            CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp
+            CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp
         )  # [kg/s]
 
     elif AC.BADAFamily.BADAH:
@@ -132,7 +132,7 @@ def getInitialMass(
     payload=60,
     fuelReserve=3600,
     flightPlanInitialMass=None,
-    deltaTemp=0,
+    DeltaTemp=0,
 ):
     """Calculates the estimated initial aircraft mass assumig cruise phase,
     combining flight plan data, aircraft envelope constraints, and an
@@ -148,7 +148,7 @@ def getInitialMass(
         or 1 hour).
     :param flightPlanInitialMass: Optional initial mass from a flight plan, in
         kg.
-    :param deltaTemp: Temperature deviation from standard atmosphere.
+    :param DeltaTemp: Temperature deviation from standard atmosphere.
     :type AC: object
     :type distance: float
     :type altitude: float
@@ -156,7 +156,7 @@ def getInitialMass(
     :type payload: float, optional
     :type fuelReserve: float, optional
     :type flightPlanInitialMass: float, optional
-    :type deltaTemp: float, optional
+    :type DeltaTemp: float, optional
     :return: Estimated initial aircraft mass in kg.
     :rtype: float
     """
@@ -167,7 +167,7 @@ def getInitialMass(
     else:
         # in case of no wind, the ground speed is the same as true airspeed
         [theta, delta, sigma] = atm.atmosphereProperties(
-            h=altitude, DeltaTemp=deltaTemp
+            h=altitude, DeltaTemp=DeltaTemp
         )
         TAS = atm.mach2Tas(Mach=M, theta=theta)
         GS = TAS
@@ -180,7 +180,7 @@ def getInitialMass(
                 initialMass = AC.MREF
             else:
                 cruiseFuelFlow = cruiseFuelConsumption(
-                    AC=AC, altitude=altitude, M=M, deltaTemp=deltaTemp
+                    AC=AC, altitude=altitude, M=M, DeltaTemp=DeltaTemp
                 )
                 initialMass = breguetLeducInitialMass(
                     AC=AC,
@@ -197,7 +197,7 @@ def getInitialMass(
                 initialMass = AC.MREF
             else:
                 cruiseFuelFlow = cruiseFuelConsumption(
-                    AC=AC, altitude=altitude, M=M, deltaTemp=deltaTemp
+                    AC=AC, altitude=altitude, M=M, DeltaTemp=DeltaTemp
                 )
                 initialMass = breguetLeducInitialMass(
                     AC=AC,

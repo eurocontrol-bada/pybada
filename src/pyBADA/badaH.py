@@ -14,21 +14,8 @@ from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const
 from pyBADA import conversions as conv
+from pyBADA import utils
 from pyBADA.aircraft import Bada, BadaFamily, Helicopter
-
-
-def proper_round(num, dec=0):
-    num = str(num)[: str(num).index(".") + dec + 2]
-    if num[-1] >= "5":
-        return float(num[: -2 - (not dec)] + str(int(num[-2 - (not dec)]) + 1))
-    return float(num[:-1])
-
-
-def checkArgument(argument, **kwargs):
-    if kwargs.get(argument) is not None:
-        return kwargs.get(argument)
-    else:
-        raise TypeError("Missing " + argument + " argument")
 
 
 class Parser:
@@ -390,7 +377,7 @@ class BADAH(Helicopter, Bada):
         :rtype: float
         """
 
-        # gamma = checkArgument('gamma', **kwargs)
+        # gamma = utils.checkArgument('gamma', **kwargs)
 
         rho = sigma * const.rho_0
 
@@ -3295,7 +3282,7 @@ class PTD(BADAH):
             else:
                 gamma = conv.rad2deg(asin(dhdt / tas))
 
-            FL_complet.append(proper_round(FL))
+            FL_complet.append(utils.proper_round(FL))
             T_complet.append(temp)
             p_complet.append(delta * const.p_0)
             rho_complet.append(sigma * const.rho_0)
@@ -3303,7 +3290,7 @@ class PTD(BADAH):
             TAS_complet.append(conv.ms2kt(tas))
             CAS_complet.append(conv.ms2kt(cas))
             M_complet.append(M)
-            mass_complet.append(proper_round(mass))
+            mass_complet.append(utils.proper_round(mass))
             Peng_complet.append(Peng)
             Preq_complet.append(Preq)
             ff_complet.append(ff)
@@ -3400,7 +3387,7 @@ class PTD(BADAH):
             else:
                 gamma = conv.rad2deg(asin(dhdt / tas))
 
-            FL_complet.append(proper_round(FL))
+            FL_complet.append(utils.proper_round(FL))
             T_complet.append(temp)
             p_complet.append(delta * const.p_0)
             rho_complet.append(sigma * const.rho_0)
@@ -3408,7 +3395,7 @@ class PTD(BADAH):
             TAS_complet.append(conv.ms2kt(tas))
             CAS_complet.append(conv.ms2kt(cas))
             M_complet.append(M)
-            mass_complet.append(proper_round(mass))
+            mass_complet.append(utils.proper_round(mass))
             Peng_complet.append(Peng)
             Preq_complet.append(Preq)
             ff_comlet.append(ff)
@@ -3500,7 +3487,7 @@ class PTD(BADAH):
             temp = theta * const.temp_0
             gamma = 0
 
-            FL_complet.append(proper_round(FL))
+            FL_complet.append(utils.proper_round(FL))
             T_complet.append(temp)
             p_complet.append(delta * const.p_0)
             rho_complet.append(sigma * const.rho_0)
@@ -3508,7 +3495,7 @@ class PTD(BADAH):
             TAS_complet.append(conv.ms2kt(tas))
             CAS_complet.append(conv.ms2kt(cas))
             M_complet.append(M)
-            mass_complet.append(proper_round(mass))
+            mass_complet.append(utils.proper_round(mass))
             Peng_complet.append(Peng)
             Preq_complet.append(Preq)
             ff_complet.append(ff)
@@ -3600,7 +3587,7 @@ class PTD(BADAH):
             temp = theta * const.temp_0
             gamma = 0
 
-            FL_complet.append(proper_round(FL))
+            FL_complet.append(utils.proper_round(FL))
             T_complet.append(temp)
             p_complet.append(delta * const.p_0)
             rho_complet.append(sigma * const.rho_0)
@@ -3608,7 +3595,7 @@ class PTD(BADAH):
             TAS_complet.append(conv.ms2kt(tas))
             CAS_complet.append(conv.ms2kt(cas))
             M_complet.append(M)
-            mass_complet.append(proper_round(mass))
+            mass_complet.append(utils.proper_round(mass))
             Peng_complet.append(Peng)
             Preq_complet.append(Preq)
             ff_comlet.append(ff)
@@ -3764,15 +3751,15 @@ class PTF(BADAH):
         )
         file.write(
             " climb   - MEC                low     -    %.0f\n"
-            % (proper_round(massList[0]))
+            % (utils.proper_round(massList[0]))
         )
         file.write(
             " cruise  - LRC                nominal -    %-4.0f        Max Alt. [ft]:%7d\n"
-            % (proper_round(massList[1]), altitudeList[-1])
+            % (utils.proper_round(massList[1]), altitudeList[-1])
         )
         file.write(
             " descent - LRC                high    -    %0.f\n"
-            % (proper_round(massList[2]))
+            % (utils.proper_round(massList[2]))
         )
         file.write(
             "======================================================================================================\n"
@@ -3794,7 +3781,7 @@ class PTF(BADAH):
         )
 
         for k in range(0, len(altitudeList)):
-            FL = proper_round(altitudeList[k] / 100)
+            FL = utils.proper_round(altitudeList[k] / 100)
             file.write(
                 "%3.0f |  %s   %s %s %s  |  %3.0f   %5.0f %5.0f %5.0f   %5.1f  |  %3.0f   %5.0f %5.0f %5.0f   %5.1f\n"
                 % (

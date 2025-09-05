@@ -18,21 +18,8 @@ from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const
 from pyBADA import conversions as conv
+from pyBADA import utils
 from pyBADA.aircraft import Airplane, Bada, BadaFamily
-
-
-def proper_round(num, dec=0):
-    num = str(num)[: str(num).index(".") + dec + 2]
-    if num[-1] >= "5":
-        return float(num[: -2 - (not dec)] + str(int(num[-2 - (not dec)]) + 1))
-    return float(num[:-1])
-
-
-def checkArgument(argument, **kwargs):
-    if kwargs.get(argument) is not None:
-        return kwargs.get(argument)
-    else:
-        raise TypeError("Missing " + argument + " argument")
 
 
 class Parser:
@@ -926,7 +913,7 @@ class BADA4(Airplane, Bada):
         """
 
         if self.AC.engineType == "JET":
-            M = checkArgument("M", **kwargs)
+            M = utils.checkArgument("M", **kwargs)
 
             # when idle rating is used
             CF_idle = self.CF_idle(delta=delta, theta=theta, M=M)
@@ -946,7 +933,7 @@ class BADA4(Airplane, Bada):
 
             # rating as input parameter
             elif "rating" in kwargs:
-                rating = checkArgument("rating", **kwargs)
+                rating = utils.checkArgument("rating", **kwargs)
 
                 # in case MCRZ rating is not defined, we switch to MCMB
                 if rating == "MCRZ" and rating not in self.AC.kink.keys():
@@ -996,7 +983,7 @@ class BADA4(Airplane, Bada):
                 CF = max(CF_gen_deltaT, CF_idle)
 
         elif self.AC.engineType == "TURBOPROP":
-            M = checkArgument("M", **kwargs)
+            M = utils.checkArgument("M", **kwargs)
 
             # when idle rating is used
             CF_idle = self.CF_idle(delta=delta, theta=theta, M=M)
@@ -1017,7 +1004,7 @@ class BADA4(Airplane, Bada):
 
             # rating as input parameter
             elif "rating" in kwargs:
-                rating = checkArgument("rating", **kwargs)
+                rating = utils.checkArgument("rating", **kwargs)
 
                 # in case MCRZ rating is not defined, we switch to MCMB
                 if rating == "MCRZ" and rating not in self.AC.max_power.keys():
@@ -1070,7 +1057,7 @@ class BADA4(Airplane, Bada):
             # for adaptive thrust calcualation if CT is an input
             if "CT" in kwargs:
                 CT = kwargs.get("CT")
-                M = checkArgument("M", **kwargs)
+                M = utils.checkArgument("M", **kwargs)
 
                 deltaT_vec = np.arange(0.01, 1.01, 0.01)
 
@@ -1098,7 +1085,7 @@ class BADA4(Airplane, Bada):
 
             # rating as input parameter
             elif "rating" in kwargs:
-                rating = checkArgument("rating", **kwargs)
+                rating = utils.checkArgument("rating", **kwargs)
 
                 CP = self.CP(
                     rating=rating,
@@ -1139,14 +1126,14 @@ class BADA4(Airplane, Bada):
             return CT
 
         else:
-            theta = checkArgument("theta", **kwargs)
-            DeltaTemp = checkArgument("DeltaTemp", **kwargs)
-            M = checkArgument("M", **kwargs)
+            theta = utils.checkArgument("theta", **kwargs)
+            DeltaTemp = utils.checkArgument("DeltaTemp", **kwargs)
+            M = utils.checkArgument("M", **kwargs)
 
         if self.AC.engineType == "JET":
             # rating as input parameter
             if "rating" in kwargs:
-                rating = checkArgument("rating", **kwargs)
+                rating = utils.checkArgument("rating", **kwargs)
 
                 # in case MCRZ rating is not defined, we switch to MCMB
                 if rating == "MCRZ" and rating not in self.AC.kink.keys():
@@ -1172,7 +1159,7 @@ class BADA4(Airplane, Bada):
 
             # deltaT - direct throttle as input parameter
             elif "deltaT" in kwargs:
-                deltaT = checkArgument("deltaT", **kwargs)
+                deltaT = utils.checkArgument("deltaT", **kwargs)
 
                 CT = 0.0
                 for i in range(0, 6):
@@ -1200,7 +1187,7 @@ class BADA4(Airplane, Bada):
         elif self.AC.engineType == "TURBOPROP":
             # rating as input parameter
             if "rating" in kwargs:
-                rating = checkArgument("rating", **kwargs)
+                rating = utils.checkArgument("rating", **kwargs)
 
                 # in case MCRZ rating is not defined, we switch to MCMB
                 if rating == "MCRZ" and rating not in self.AC.max_power.keys():
@@ -1222,7 +1209,7 @@ class BADA4(Airplane, Bada):
 
             # deltaT - direct throttle as input parameter
             elif "deltaT" in kwargs:
-                deltaT = checkArgument("deltaT", **kwargs)
+                deltaT = utils.checkArgument("deltaT", **kwargs)
 
                 CP = self.CP(deltaT=deltaT, M=M)
                 CT = CP / M
@@ -1245,7 +1232,7 @@ class BADA4(Airplane, Bada):
 
             # rating as input parameter
             if "rating" in kwargs:
-                rating = checkArgument("rating", **kwargs)
+                rating = utils.checkArgument("rating", **kwargs)
                 if rating not in ["MCMB", "MCRZ"] and rating != "LIDL":
                     raise ValueError("Unknown engine rating " + rating)
 
@@ -1259,7 +1246,7 @@ class BADA4(Airplane, Bada):
 
             # deltaT - direct throttle as input parameter
             elif "deltaT" in kwargs:
-                deltaT = checkArgument("deltaT", **kwargs)
+                deltaT = utils.checkArgument("deltaT", **kwargs)
 
                 CP = self.CP(
                     theta=theta,
@@ -1289,8 +1276,8 @@ class BADA4(Airplane, Bada):
         """
 
         if self.AC.engineType == "JET":
-            delta = checkArgument("delta", **kwargs)
-            M = checkArgument("M", **kwargs)
+            delta = utils.checkArgument("delta", **kwargs)
+            M = utils.checkArgument("M", **kwargs)
 
             CT = 0.0
             for i in range(0, 3):
@@ -1298,9 +1285,9 @@ class BADA4(Airplane, Bada):
                     CT += self.AC.ti[i * 4 + j] * pow(delta, j - 1) * (M**i)
 
         elif self.AC.engineType == "TURBOPROP":
-            theta = checkArgument("theta", **kwargs)
-            delta = checkArgument("delta", **kwargs)
-            M = checkArgument("M", **kwargs)
+            theta = utils.checkArgument("theta", **kwargs)
+            delta = utils.checkArgument("delta", **kwargs)
+            M = utils.checkArgument("M", **kwargs)
 
             CT = 0.0
             for i in range(0, 3):
@@ -1339,10 +1326,10 @@ class BADA4(Airplane, Bada):
             )
 
         elif self.AC.engineType == "PISTON":
-            theta = checkArgument("theta", **kwargs)
-            delta = checkArgument("delta", **kwargs)
-            CP = checkArgument("CP", **kwargs)
-            M = checkArgument("M", **kwargs)
+            theta = utils.checkArgument("theta", **kwargs)
+            delta = utils.checkArgument("delta", **kwargs)
+            CP = utils.checkArgument("CP", **kwargs)
+            M = utils.checkArgument("M", **kwargs)
 
             CT = self.CT_nonLIDL(theta=theta, delta=delta, M=M, CP=CP)
 
@@ -1365,8 +1352,8 @@ class BADA4(Airplane, Bada):
         """
 
         if self.AC.engineType == "JET":
-            rating = checkArgument("rating", **kwargs)
-            DeltaTemp = checkArgument("DeltaTemp", **kwargs)
+            rating = utils.checkArgument("rating", **kwargs)
+            DeltaTemp = utils.checkArgument("DeltaTemp", **kwargs)
 
             # deltaT below kink point -> flat-rated area
             deltaTFlat = 0.0
@@ -1405,13 +1392,13 @@ class BADA4(Airplane, Bada):
                     CT += self.AC.a[i * 6 + j] * (M**j) * (deltaT**i)
 
         elif self.AC.engineType == "TURBOPROP":
-            rating = checkArgument("rating", **kwargs)
+            rating = utils.checkArgument("rating", **kwargs)
 
             CP = self.CP(rating=rating, theta=theta, delta=delta, M=M)
             CT = CP / M
 
         elif self.AC.engineType == "PISTON":
-            CP = checkArgument("CP", **kwargs)
+            CP = utils.checkArgument("CP", **kwargs)
 
             sigma = atm.sigma(theta=theta, delta=delta)
             Wp = self.AC.WREF * const.a_0 * CP
@@ -1479,7 +1466,7 @@ class BADA4(Airplane, Bada):
         """
 
         if self.AC.engineType == "TURBOPROP":
-            M = checkArgument("M", **kwargs)
+            M = utils.checkArgument("M", **kwargs)
 
             # CT as input parameter
             # computes the power coefficient from thrust coefficient assuming efficiency of 1
@@ -1490,14 +1477,14 @@ class BADA4(Airplane, Bada):
 
             # rating as input parameter
             elif "rating" in kwargs:
-                rating = checkArgument("rating", **kwargs)
+                rating = utils.checkArgument("rating", **kwargs)
 
                 # in case MCRZ rating is not defined, we switch to MCMB
                 if rating == "MCRZ" and rating not in self.AC.max_power.keys():
                     rating = "MCMB"
 
-                delta = checkArgument("delta", **kwargs)
-                theta = checkArgument("theta", **kwargs)
+                delta = utils.checkArgument("delta", **kwargs)
+                theta = utils.checkArgument("theta", **kwargs)
 
                 deltaT = 0.0
                 for i in range(0, 6):
@@ -1518,7 +1505,7 @@ class BADA4(Airplane, Bada):
 
             # deltaT - direct throttle as input parameter
             elif "deltaT" in kwargs:
-                deltaT = checkArgument("deltaT", **kwargs)
+                deltaT = utils.checkArgument("deltaT", **kwargs)
 
                 CP = 0.0
                 for i in range(0, 6):
@@ -1526,10 +1513,10 @@ class BADA4(Airplane, Bada):
                         CP += self.AC.a[i * 6 + j] * (M**j) * (deltaT**i)
 
         elif self.AC.engineType == "PISTON":
-            delta = checkArgument("delta", **kwargs)
-            theta = checkArgument("theta", **kwargs)
-            sigma = checkArgument("sigma", **kwargs)
-            DeltaTemp = checkArgument("DeltaTemp", **kwargs)
+            delta = utils.checkArgument("delta", **kwargs)
+            theta = utils.checkArgument("theta", **kwargs)
+            sigma = utils.checkArgument("sigma", **kwargs)
+            DeltaTemp = utils.checkArgument("DeltaTemp", **kwargs)
 
             if self.AC.Hd_turbo <= 0:
                 theta_turbo = atm.theta(
@@ -1553,11 +1540,11 @@ class BADA4(Airplane, Bada):
 
             # deltaT - direct throttle as input parameter
             if "deltaT" in kwargs:
-                deltaT = checkArgument("deltaT", **kwargs)
+                deltaT = utils.checkArgument("deltaT", **kwargs)
 
             # rating as input parameter
             elif "rating" in kwargs:
-                rating = checkArgument("rating", **kwargs)
+                rating = utils.checkArgument("rating", **kwargs)
 
                 if rating == "LIDL":
                     if self.AC.BADAVersion == "4.2":
@@ -1693,8 +1680,8 @@ class BADA4(Airplane, Bada):
 
         # calculation of drag coefficient in transition for HLid assuming LG is not changing
         if "HLid_init" in kwargs and "HLid_final" in kwargs:
-            HLid_init = checkArgument("HLid_init", **kwargs)
-            HLid_final = checkArgument("HLid_final", **kwargs)
+            HLid_init = utils.checkArgument("HLid_init", **kwargs)
+            HLid_final = utils.checkArgument("HLid_final", **kwargs)
             LG_init = LG
             LG_final = LG
 
@@ -1723,8 +1710,8 @@ class BADA4(Airplane, Bada):
 
         # calculation of drag coefficient in transition for LG assuming HLid is not changing
         if "LG_init" in kwargs and "LG_final" in kwargs:
-            LG_init = checkArgument("LG_init", **kwargs)
-            LG_final = checkArgument("LG_final", **kwargs)
+            LG_init = utils.checkArgument("LG_init", **kwargs)
+            LG_final = utils.checkArgument("LG_final", **kwargs)
             HLid_init = HLid
             HLid_final = HLid
 
@@ -1851,7 +1838,7 @@ class BADA4(Airplane, Bada):
         """
 
         if "rating" in kwargs:
-            rating = checkArgument("rating", **kwargs)
+            rating = utils.checkArgument("rating", **kwargs)
             if rating == "TAXI":
                 if self.AC.TFA is not None:
                     return self.AC.TFA / 60
@@ -2383,12 +2370,12 @@ class FlightEnvelope(BADA4):
 
         if "h" in kwargs:
             h = kwargs.get("h")
-            DeltaTemp = checkArgument("DeltaTemp", **kwargs)
+            DeltaTemp = utils.checkArgument("DeltaTemp", **kwargs)
             delta = atm.delta(h, DeltaTemp)
             theta = atm.theta(h, DeltaTemp)
         else:
-            theta = checkArgument("theta", **kwargs)
-            delta = checkArgument("delta", **kwargs)
+            theta = utils.checkArgument("theta", **kwargs)
+            delta = utils.checkArgument("delta", **kwargs)
 
         sigma = atm.sigma(theta=theta, delta=delta)
         minM = self.minMbuffet(
@@ -3510,7 +3497,7 @@ class Optimization(BADA4):
 
         econM = M_econ[cost_econ.index(max(cost_econ))]
 
-        return proper_round(econM, 10)
+        return utils.proper_round(econM, 10)
 
         # def f(M):
         #     CL = self.CL(M=M[0], delta=delta, mass=mass)
@@ -3757,7 +3744,7 @@ class Optimization(BADA4):
 
         mecM = M_mec[CF_mec.index(min(CF_mec))]
 
-        return proper_round(mecM, 10)
+        return utils.proper_round(mecM, 10)
 
         # def f(M):
         #     CL = self.CL(M=M[0], delta=delta, mass=mass)
@@ -3863,7 +3850,7 @@ class Optimization(BADA4):
         if optH < 2000.0:
             return 2000.0
 
-        return proper_round(optH, 10)
+        return utils.proper_round(optH, 10)
 
         # def f(H):
         #     theta = atm.theta(h=H[0],DeltaTemp=DeltaTemp)
@@ -4717,21 +4704,21 @@ class PTD(BADA4):
             dhdt = (conv.ft2m(ROCD / 60)) * temp_const
             gamma = conv.rad2deg(asin(dhdt / tas))
 
-            FL_complet.append(proper_round(FL))
-            T_complet.append(theta * const.temp_0)
-            p_complet.append(delta * const.p_0)
-            rho_complet.append(sigma * const.rho_0)
-            a_complet.append(a)
-            TAS_complet.append(conv.ms2kt(tas))
-            CAS_complet.append(conv.ms2kt(cas))
-            M_complet.append(M)
-            mass_complet.append(mass)
-            Thrust_complet.append(Thrust)
-            Drag_complet.append(Drag)
-            ff_comlet.append(ff)
-            ESF_complet.append(ESF)
-            ROCD_complet.append(ROCD)
-            gamma_complet.append(gamma)
+            FL_complet.append(utils.proper_round(FL))
+            T_complet.append(utils.proper_round(theta * const.temp_0, 2))
+            p_complet.append(utils.proper_round(delta * const.p_0))
+            rho_complet.append(utils.proper_round(sigma * const.rho_0, 3))
+            a_complet.append(utils.proper_round(a, 1))
+            TAS_complet.append(utils.proper_round(conv.ms2kt(tas), 2))
+            CAS_complet.append(utils.proper_round(conv.ms2kt(cas), 2))
+            M_complet.append(utils.proper_round(M, 3))
+            mass_complet.append(utils.proper_round(mass))
+            Thrust_complet.append(utils.proper_round(Thrust))
+            Drag_complet.append(utils.proper_round(Drag))
+            ff_comlet.append(utils.proper_round(ff, 2))
+            ESF_complet.append(utils.proper_round(ESF, 3))
+            ROCD_complet.append(utils.proper_round(ROCD))
+            gamma_complet.append(utils.proper_round(gamma, 2))
             conf_complet.append(config)
             Lim_complet.append(limitation)
 
@@ -4920,21 +4907,29 @@ class PTD(BADA4):
                     * 60
                 )
 
-            FL_complet = [proper_round(FL)] + FL_complet
-            T_complet = [theta * const.temp_0] + T_complet
-            p_complet = [delta * const.p_0] + p_complet
-            rho_complet = [sigma * const.rho_0] + rho_complet
-            a_complet = [a] + a_complet
-            TAS_complet = [conv.ms2kt(tas)] + TAS_complet
-            CAS_complet = [conv.ms2kt(cas)] + CAS_complet
-            M_complet = [M] + M_complet
-            mass_complet = [mass] + mass_complet
-            Thrust_complet = [Thrust] + Thrust_complet
-            Drag_complet = [Drag] + Drag_complet
-            ff_complet = [ff] + ff_complet
-            ESF_complet = [ESF] + ESF_complet
-            ROCD_complet = [-1 * ROCD] + ROCD_complet
-            gamma_complet = [gamma] + gamma_complet
+            FL_complet = [utils.proper_round(FL)] + FL_complet
+            T_complet = [
+                utils.proper_round(theta * const.temp_0, 2)
+            ] + T_complet
+            p_complet = [utils.proper_round(delta * const.p_0)] + p_complet
+            rho_complet = [
+                utils.proper_round(sigma * const.rho_0, 3)
+            ] + rho_complet
+            a_complet = [utils.proper_round(a, 1)] + a_complet
+            TAS_complet = [
+                utils.proper_round(conv.ms2kt(tas), 2)
+            ] + TAS_complet
+            CAS_complet = [
+                utils.proper_round(conv.ms2kt(cas), 2)
+            ] + CAS_complet
+            M_complet = [utils.proper_round(M, 3)] + M_complet
+            mass_complet = [utils.proper_round(mass)] + mass_complet
+            Thrust_complet = [utils.proper_round(Thrust)] + Thrust_complet
+            Drag_complet = [utils.proper_round(Drag)] + Drag_complet
+            ff_complet = [utils.proper_round(ff, 2)] + ff_complet
+            ESF_complet = [utils.proper_round(ESF, 3)] + ESF_complet
+            ROCD_complet = [utils.proper_round(-1 * ROCD)] + ROCD_complet
+            gamma_complet = [utils.proper_round(gamma, 2)] + gamma_complet
             conf_complet = [config] + conf_complet
             Lim_complet = [limitation] + Lim_complet
 
@@ -5049,21 +5044,21 @@ class PTD(BADA4):
             ROCD = 0.0
             gamma = 0.0
 
-            FL_complet.append(proper_round(FL))
-            T_complet.append(theta * const.temp_0)
-            p_complet.append(delta * const.p_0)
-            rho_complet.append(sigma * const.rho_0)
-            a_complet.append(a)
-            TAS_complet.append(conv.ms2kt(tas))
-            CAS_complet.append(conv.ms2kt(cas))
-            M_complet.append(M)
-            mass_complet.append(mass)
-            Thrust_complet.append(Thrust)
-            Drag_complet.append(Drag)
-            ff_comlet.append(ff)
-            ESF_complet.append(ESF)
-            ROCD_complet.append(ROCD)
-            gamma_complet.append(gamma)
+            FL_complet.append(utils.proper_round(FL))
+            T_complet.append(utils.proper_round(theta * const.temp_0, 2))
+            p_complet.append(utils.proper_round(delta * const.p_0))
+            rho_complet.append(utils.proper_round(sigma * const.rho_0, 3))
+            a_complet.append(utils.proper_round(a, 1))
+            TAS_complet.append(utils.proper_round(conv.ms2kt(tas), 2))
+            CAS_complet.append(utils.proper_round(conv.ms2kt(cas), 2))
+            M_complet.append(utils.proper_round(M, 3))
+            mass_complet.append(utils.proper_round(mass))
+            Thrust_complet.append(utils.proper_round(Thrust))
+            Drag_complet.append(utils.proper_round(Drag))
+            ff_comlet.append(utils.proper_round(ff, 2))
+            ESF_complet.append(utils.proper_round(ESF, 3))
+            ROCD_complet.append(utils.proper_round(ROCD))
+            gamma_complet.append(utils.proper_round(gamma, 2))
             conf_complet.append(config)
             Lim_complet.append(limitation)
 
@@ -5280,7 +5275,7 @@ class PTF(BADA4):
         DESList = Nan2Zero(DESList)
 
         for k in range(0, len(altitudeList)):
-            FL = proper_round(altitudeList[k] / 100)
+            FL = utils.proper_round(altitudeList[k] / 100)
             file.write(
                 "%3.0f |  %s   %s %s %s  |  %3.0f   %5.0f %5.0f %5.0f   %5.1f  |  %3.0f   %5.0f %5.0f %5.0f   %5.1f\n"
                 % (
@@ -5408,15 +5403,17 @@ class PTF(BADA4):
             if isinstance(ff[0], str):
                 FF_CR_LO_complet.append(" " + ff[0] + " ")
             else:
-                FF_CR_LO_complet.append(f"{ff[0]:5.1f}")
+                FF_CR_LO_complet.append(f"{utils.proper_round(ff[0], 1):5.1f}")
             if isinstance(ff[1], str):
                 FF_CR_NOM_complet.append(" " + ff[1] + " ")
             else:
-                FF_CR_NOM_complet.append(f"{ff[1]:5.1f}")
+                FF_CR_NOM_complet.append(
+                    f"{utils.proper_round(ff[1], 1):5.1f}"
+                )
             if isinstance(ff[2], str):
                 FF_CR_HI_complet.append(" " + ff[2] + " ")
             else:
-                FF_CR_HI_complet.append(f"{ff[2]:5.1f}")
+                FF_CR_HI_complet.append(f"{utils.proper_round(ff[2], 1):5.1f}")
 
         CRList = [
             TAS_CR_complet,
@@ -5568,10 +5565,10 @@ class PTF(BADA4):
                 conf_complet[str(mass)].append(config)
 
             TAS_CL_complet.append(conv.ms2kt(tas_nominal))
-            ROCD_CL_LO_complet.append(ROC[0])
-            ROCD_CL_NOM_complet.append(ROC[1])
-            ROCD_CL_HI_complet.append(ROC[2])
-            FF_CL_NOM_complet.append(ff_nominal)
+            ROCD_CL_LO_complet.append(utils.proper_round(ROC[0]))
+            ROCD_CL_NOM_complet.append(utils.proper_round(ROC[1]))
+            ROCD_CL_HI_complet.append(utils.proper_round(ROC[2]))
+            FF_CL_NOM_complet.append(utils.proper_round(ff_nominal, 1))
 
         CLList = [
             TAS_CL_complet,
@@ -5758,11 +5755,21 @@ class PTF(BADA4):
             if not isnan(ff_gamma_list[1]):
                 ff_nominal = ff_gamma_list[1]
 
-            TAS_DES_complet = [conv.ms2kt(tas_nominal)] + TAS_DES_complet
-            ROCD_DES_LO_complet = [-1 * ROD[0]] + ROCD_DES_LO_complet
-            ROCD_DES_NOM_complet = [-1 * ROD[1]] + ROCD_DES_NOM_complet
-            ROCD_DES_HI_complet = [-1 * ROD[2]] + ROCD_DES_HI_complet
-            FF_DES_NOM_complet = [ff_nominal] + FF_DES_NOM_complet
+            TAS_DES_complet = [
+                utils.proper_round(conv.ms2kt(tas_nominal))
+            ] + TAS_DES_complet
+            ROCD_DES_LO_complet = [
+                utils.proper_round(-1 * ROD[0])
+            ] + ROCD_DES_LO_complet
+            ROCD_DES_NOM_complet = [
+                utils.proper_round(-1 * ROD[1])
+            ] + ROCD_DES_NOM_complet
+            ROCD_DES_HI_complet = [
+                utils.proper_round(-1 * ROD[2])
+            ] + ROCD_DES_HI_complet
+            FF_DES_NOM_complet = [
+                utils.proper_round(ff_nominal, 1)
+            ] + FF_DES_NOM_complet
 
         DESList = [
             TAS_DES_complet,
