@@ -6,14 +6,15 @@ Example calculation of aircraft fuel flow in descent
 
 """
 
-import numpy as np
 from math import sin
-import matplotlib.pyplot as plt
 
-from pyBADA import utils
+import matplotlib.pyplot as plt
+import numpy as np
+
 from pyBADA import atmosphere as atm
-from pyBADA import conversions as conv
 from pyBADA import constants as const
+from pyBADA import conversions as conv
+from pyBADA import utils
 from pyBADA.bada3 import Bada3Aircraft
 from pyBADA.bada4 import Bada4Aircraft
 
@@ -27,7 +28,7 @@ ACList = [
 deltaTemp = 0
 
 # definition of altitude range
-fl_array = np.arange(0, 401, 5)
+fl_array = np.arange(0, 401, 10)
 altitude_array = conv.ft2m(fl_array * 100)
 
 # --- collect per-aircraft series here ---
@@ -43,9 +44,7 @@ for AC in ACList:
     # crossover altitude
     crossAlt = atm.crossOver(cas=Vdes2, Mach=Mdes)
 
-    label = (
-        f"({AC.BADAFamilyName}) {AC.acName.strip('_')} (BADA {getattr(AC, 'BADAVersion')}) {mass} kg"
-    )
+    label = f"({AC.BADAFamilyName}) {AC.acName.strip('_')} (BADA {getattr(AC, 'BADAVersion')}) {mass} kg"
 
     alt_ft_vals = []
     ff_vals = []
