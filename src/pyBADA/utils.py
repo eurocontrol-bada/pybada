@@ -135,25 +135,6 @@ def _align_1d_to_nd(one_d, nd):
     )
 
 
-# def _broadcast(*arrays):
-# """
-# Broadcast any number of array-like inputs to a common shape.
-# Accepts Python scalars, numpy arrays, pandas Series/DataFrame, xarray DataArray (via utils._extract), and returns numpy arrays broadcasted or scalars.
-# """
-
-# If all inputs are Python real scalars, return them unchanged
-# if all(isinstance(a, numbers.Real) and not isinstance(a, (np.generic, np.ndarray)) for a in arrays):
-# return tuple(arrays)
-
-# Convert inputs to numpy arrays and broadcast
-# arrs = [np.asarray(a) for a in arrays]
-# try:
-# return np.broadcast_arrays(*arrs)
-# except ValueError:
-# shapes = [a.shape for a in arrs]
-# raise ValueError(f"Cannot broadcast input shapes {shapes}")
-
-
 def _wrap(core, original):
     # 1) Plain Python floats
     if isinstance(original, numbers.Real) and not isinstance(

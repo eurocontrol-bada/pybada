@@ -1740,14 +1740,13 @@ class BADA3(Airplane, Bada):
             T = self.TMax(h=h, DeltaTemp=DeltaTemp, rating=rating, v=v)
 
         elif rating == "LIDL":
-            # LIDL
+            # Descent Thrust
             T = self.TDes(h=h, DeltaTemp=DeltaTemp, v=v, config=config)
 
         elif rating == "ADAPTED":
             # ADAPTED
             ROCD = utils.checkArgument("ROCD", **kwargs)
             mass = utils.checkArgument("mass", **kwargs)
-            v = utils.checkArgument("v", **kwargs)
             acc = utils.checkArgument("acc", **kwargs)
             Drag = utils.checkArgument("Drag", **kwargs)
             T = self.TAdapted(
