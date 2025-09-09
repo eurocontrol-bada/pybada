@@ -896,18 +896,18 @@ class BADA4(Airplane, Bada):
 
         return CF_idle
 
-    def CF(self, delta, theta, DeltaTemp, **kwargs):
+    def CF(self, delta, theta, deltaTemp, **kwargs):
         """Computes the fuel flow coefficient (CF) for JET, TURBOPROP, and
         PISTON engines.
 
         :param delta: Normalized pressure [-].
         :param theta: Normalized temperature [-].
-        :param DeltaTemp: Temperature deviation from ISA [K].
+        :param deltaTemp: Temperature deviation from ISA [K].
         :param kwargs: Optional parameters including 'rating', 'deltaT', 'CT',
             or 'M'.
         :type delta: float
         :type theta: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :return: Fuel flow coefficient [-].
         :rtype: float
         """
@@ -953,7 +953,7 @@ class BADA4(Airplane, Bada):
                         theta=theta,
                         delta=delta,
                         M=M,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                     for i in range(0, 5):
                         for j in range(0, 5):
@@ -972,7 +972,7 @@ class BADA4(Airplane, Bada):
                     theta=theta,
                     delta=delta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 for i in range(0, 5):
                     for j in range(0, 5):
@@ -1041,7 +1041,7 @@ class BADA4(Airplane, Bada):
                     theta=theta,
                     delta=delta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 for i in range(0, 5):
                     for j in range(0, 5):
@@ -1068,7 +1068,7 @@ class BADA4(Airplane, Bada):
                         delta=delta,
                         deltaT=deltaT_vec[k],
                         M=M,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                     CT_diff.append(abs(CT_k - CT))
 
@@ -1080,7 +1080,7 @@ class BADA4(Airplane, Bada):
                     delta=delta,
                     sigma=sigma,
                     deltaT=deltaT,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
 
             # rating as input parameter
@@ -1092,7 +1092,7 @@ class BADA4(Airplane, Bada):
                     theta=theta,
                     delta=delta,
                     sigma=sigma,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
 
             CF = self.AC.CPSFC * CP / (delta * sqrt(theta))
@@ -1113,7 +1113,7 @@ class BADA4(Airplane, Bada):
             - 'Thrust': Direct thrust value [N].
             - 'M': Mach number [-].
             - 'theta': Normalized temperature [-].
-            - 'DeltaTemp': Deviation from the standard ISA temperature [K].
+            - 'deltaTemp': Deviation from the standard ISA temperature [K].
         :return: Thrust coefficient (CT) [-].
         :rtype: float
         :raises: ValueError: If an invalid rating is provided.
@@ -1127,7 +1127,7 @@ class BADA4(Airplane, Bada):
 
         else:
             theta = utils.checkArgument("theta", **kwargs)
-            DeltaTemp = utils.checkArgument("DeltaTemp", **kwargs)
+            deltaTemp = utils.checkArgument("deltaTemp", **kwargs)
             M = utils.checkArgument("M", **kwargs)
 
         if self.AC.engineType == "JET":
@@ -1154,7 +1154,7 @@ class BADA4(Airplane, Bada):
                         theta=theta,
                         delta=delta,
                         M=M,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
 
             # deltaT - direct throttle as input parameter
@@ -1172,7 +1172,7 @@ class BADA4(Airplane, Bada):
                     theta=theta,
                     delta=delta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 ):
                     raise ValueError(
                         "Throttle parameter value result in CT > CT_MCMB"
@@ -1241,7 +1241,7 @@ class BADA4(Airplane, Bada):
                     theta=theta,
                     delta=delta,
                     sigma=sigma,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
 
             # deltaT - direct throttle as input parameter
@@ -1253,7 +1253,7 @@ class BADA4(Airplane, Bada):
                     delta=delta,
                     sigma=sigma,
                     deltaT=deltaT,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
 
             CT = self.CT_nonLIDL(theta=theta, delta=delta, M=M, CP=CP)
@@ -1353,7 +1353,7 @@ class BADA4(Airplane, Bada):
 
         if self.AC.engineType == "JET":
             rating = utils.checkArgument("rating", **kwargs)
-            DeltaTemp = utils.checkArgument("DeltaTemp", **kwargs)
+            deltaTemp = utils.checkArgument("deltaTemp", **kwargs)
 
             # deltaT below kink point -> flat-rated area
             deltaTFlat = 0.0
@@ -1380,8 +1380,8 @@ class BADA4(Airplane, Bada):
                         * (delta ** (i - 4))
                     )
 
-            # compute deltaT according to DeltaTemp with respect to kink point
-            if DeltaTemp <= self.AC.kink[rating]:
+            # compute deltaT according to deltaTemp with respect to kink point
+            if deltaTemp <= self.AC.kink[rating]:
                 deltaT = deltaTFlat
             else:
                 deltaT = deltaTTemp
@@ -1516,14 +1516,14 @@ class BADA4(Airplane, Bada):
             delta = utils.checkArgument("delta", **kwargs)
             theta = utils.checkArgument("theta", **kwargs)
             sigma = utils.checkArgument("sigma", **kwargs)
-            DeltaTemp = utils.checkArgument("DeltaTemp", **kwargs)
+            deltaTemp = utils.checkArgument("deltaTemp", **kwargs)
 
             if self.AC.Hd_turbo <= 0:
                 theta_turbo = atm.theta(
-                    conv.ft2m(self.AC.Hd_turbo), DeltaTemp=DeltaTemp
+                    conv.ft2m(self.AC.Hd_turbo), deltaTemp=deltaTemp
                 )
                 delta_turbo = atm.delta(
-                    conv.ft2m(self.AC.Hd_turbo), DeltaTemp=DeltaTemp
+                    conv.ft2m(self.AC.Hd_turbo), deltaTemp=deltaTemp
                 )
 
                 # ensure that all real sigmas are smaller than sigma_turbo
@@ -1765,13 +1765,13 @@ class BADA4(Airplane, Bada):
         :param delta: Normalized air pressure [-].
         :param theta: Normalized temperature [-].
         :param M: Mach number [-].
-        :param DeltaTemp: Temperature deviation with respect to ISA [K].
+        :param deltaTemp: Temperature deviation with respect to ISA [K].
         :type rating: string.
         :type deltaT: float.
         :type delta: float.
         :type theta: float.
         :type M: float.
-        :type DeltaTemp: float.
+        :type deltaTemp: float.
         :returns: Thrust [N].
         :rtype: float.
         """
@@ -1793,14 +1793,14 @@ class BADA4(Airplane, Bada):
             (ISA) [-].
         :param M: Mach number, the ratio of the aircraft's speed to the speed
             of sound [-].
-        :param DeltaTemp: Temperature deviation from the International
+        :param deltaTemp: Temperature deviation from the International
             Standard Atmosphere (ISA) [K].
         :type rating: string (optional).
         :type deltaT: float (optional).
         :type delta: float.
         :type theta: float (optional).
         :type M: float (optional).
-        :type DeltaTemp: float (optional).
+        :type deltaTemp: float (optional).
         :returns: Thrust force produced by the engine [N].
         :rtype: float.
         """
@@ -1809,7 +1809,7 @@ class BADA4(Airplane, Bada):
 
         return delta * self.AC.WREF * CT
 
-    def ff(self, delta, theta, DeltaTemp, **kwargs):
+    def ff(self, delta, theta, deltaTemp, **kwargs):
         """Computes the fuel flow (FF) of the aircraft based on engine
         throttle settings, normalized air pressure (delta), normalized
         temperature (theta), and other relevant parameters.
@@ -1825,14 +1825,14 @@ class BADA4(Airplane, Bada):
             (ISA) [-].
         :param M: Mach number, the ratio of the aircraft's speed to the speed
             of sound [-].
-        :param DeltaTemp: Temperature deviation from the International
+        :param deltaTemp: Temperature deviation from the International
             Standard Atmosphere (ISA) [K].
         :type rating: string (optional).
         :type deltaT: float (optional).
         :type delta: float.
         :type theta: float.
         :type M: float.
-        :type DeltaTemp: float.
+        :type deltaTemp: float.
         :returns: Fuel flow rate in kilograms per second [kg s^-1].
         :rtype: float.
         """
@@ -1845,7 +1845,7 @@ class BADA4(Airplane, Bada):
                 else:
                     return None
 
-        CF = self.CF(delta=delta, theta=theta, DeltaTemp=DeltaTemp, **kwargs)
+        CF = self.CF(delta=delta, theta=theta, deltaTemp=deltaTemp, **kwargs)
 
         if self.AC.BADAVersion == "4.2":
             return (
@@ -1867,7 +1867,7 @@ class BADA4(Airplane, Bada):
                 / self.AC.LHV
             )
 
-    def ROCD(self, T, D, v, mass, ESF, h, DeltaTemp):
+    def ROCD(self, T, D, v, mass, ESF, h, deltaTemp):
         """Computes the Rate of Climb or Descent (ROCD) of the aircraft based
         on the provided thrust, drag, true airspeed, mass, and Energy Share
         Factor (ESF).
@@ -1879,7 +1879,7 @@ class BADA4(Airplane, Bada):
         :param ESF: Energy Share Factor, which controls the allocation of
             excess thrust between climb/descent and acceleration [-].
         :param h: Altitude of the aircraft above sea level [m].
-        :param DeltaTemp: Temperature deviation from the International
+        :param deltaTemp: Temperature deviation from the International
             Standard Atmosphere (ISA) [K].
         :type T: float.
         :type D: float.
@@ -1887,21 +1887,21 @@ class BADA4(Airplane, Bada):
         :type mass: float.
         :type ESF: float.
         :type h: float.
-        :type DeltaTemp: float.
+        :type deltaTemp: float.
         :returns: Rate of climb or descent (ROCD) in meters per second [m/s].
         :rtype: float.
         """
 
-        theta = atm.theta(h=h, DeltaTemp=DeltaTemp)
+        theta = atm.theta(h=h, deltaTemp=deltaTemp)
         temp = theta * const.temp_0
 
         ROCD = (
-            ((temp - DeltaTemp) / temp) * (T - D) * v * ESF / (mass * const.g)
+            ((temp - deltaTemp) / temp) * (T - D) * v * ESF / (mass * const.g)
         )
 
         return ROCD
 
-    def controlLawThrust(self, ROCD, D, v, mass, ESF, h, DeltaTemp):
+    def controlLawThrust(self, ROCD, D, v, mass, ESF, h, deltaTemp):
         """Computes the required thrust based on the TEM (Thrust-Equilibrium
         Method) control law. This calculation takes into account the
         aircraft's rate of climb/descent (ROCD), drag (D), true airspeed (v),
@@ -1916,7 +1916,7 @@ class BADA4(Airplane, Bada):
         :param mass: Current aircraft mass [kg].
         :param ESF: Energy Share Factor, determining the fraction of excess
             thrust used for acceleration or climb/descent [-].
-        :param DeltaTemp: Temperature deviation from the International
+        :param deltaTemp: Temperature deviation from the International
             Standard Atmosphere (ISA) [K].
         :type h: float.
         :type ROCD: float.
@@ -1924,21 +1924,21 @@ class BADA4(Airplane, Bada):
         :type v: float.
         :type mass: float.
         :type ESF: float.
-        :type DeltaTemp: float.
+        :type deltaTemp: float.
         :returns: Thrust required to maintain the specified rate of climb or
             descent [N].
         :rtype: float.
         """
 
-        theta = atm.theta(h=h, DeltaTemp=DeltaTemp)
+        theta = atm.theta(h=h, deltaTemp=deltaTemp)
         temp = theta * const.temp_0
 
         if ROCD == 0.0 or ESF == 0.0:
-            thrust = (temp / (temp - DeltaTemp)) * (
+            thrust = (temp / (temp - deltaTemp)) * (
                 ROCD * mass * const.g
             ) / v + D
         else:
-            thrust = (temp / (temp - DeltaTemp)) * (ROCD * mass * const.g) / (
+            thrust = (temp / (temp - deltaTemp)) * (ROCD * mass * const.g) / (
                 ESF * v
             ) + D
 
@@ -2116,21 +2116,21 @@ class FlightEnvelope(BADA4):
 
         return VMax
 
-    def Vmax_thrustLimited(self, h, mass, DeltaTemp, rating, config):
+    def Vmax_thrustLimited(self, h, mass, deltaTemp, rating, config):
         """Computes the maximum speed (CAS) within the certified flight
         envelope while accounting for thrust limitations at a given altitude,
         temperature deviation, and configuration.
 
         :param h: Altitude in meters [m].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :param rating: Engine rating, options include "MTKF", "MCMB", "MCRZ"
             [-].
         :param config: Aircraft aerodynamic configuration, such as "TO", "IC",
             "CR" [-].
         :type h: float.
         :type mass: float.
-        :type DeltaTemp: float.
+        :type deltaTemp: float.
         :type rating: str.
         :type config: str.
         :return: Maximum thrust-limited calibrated airspeed (CAS) in meters
@@ -2141,7 +2141,7 @@ class FlightEnvelope(BADA4):
         [HLid, LG] = self.getAeroConfig(config=config)
 
         [theta, delta, sigma] = atm.atmosphereProperties(
-            h=h, DeltaTemp=DeltaTemp
+            h=h, deltaTemp=deltaTemp
         )
 
         VmaxCertified = self.VMax(
@@ -2171,7 +2171,7 @@ class FlightEnvelope(BADA4):
                 theta=theta,
                 M=M,
                 rating=rating,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
             CL = self.CL(delta=delta, mass=mass, M=M, nz=1.0)
             CD = self.CD(HLid=HLid, LG=LG, CL=CL, M=M)
@@ -2355,7 +2355,7 @@ class FlightEnvelope(BADA4):
         :param mass: Aircraft mass in kilograms [kg].
         :param nz: Load factor [-], default is 1.0.
         :param h: Altitude above mean sea level (AMSL) in meters [m].
-        :param DeltaTemp: Temperature deviation from ISA in Kelvin [K].
+        :param deltaTemp: Temperature deviation from ISA in Kelvin [K].
         :type HLid: float.
         :type LG: str.
         :type delta: float.
@@ -2363,16 +2363,16 @@ class FlightEnvelope(BADA4):
         :type mass: float.
         :type nz: float.
         :type h: float, optional.
-        :type DeltaTemp: float, optional.
+        :type deltaTemp: float, optional.
         :returns: Stall speed in calibrated airspeed (CAS) [m/s].
         :rtype: float.
         """
 
         if "h" in kwargs:
             h = kwargs.get("h")
-            DeltaTemp = utils.checkArgument("DeltaTemp", **kwargs)
-            delta = atm.delta(h, DeltaTemp)
-            theta = atm.theta(h, DeltaTemp)
+            deltaTemp = utils.checkArgument("deltaTemp", **kwargs)
+            delta = atm.delta(h, deltaTemp)
+            theta = atm.theta(h, deltaTemp)
         else:
             theta = utils.checkArgument("theta", **kwargs)
             delta = utils.checkArgument("delta", **kwargs)
@@ -2389,18 +2389,18 @@ class FlightEnvelope(BADA4):
 
         return minCAS
 
-    def Vx(self, h, mass, DeltaTemp, rating, HLid, LG):
+    def Vx(self, h, mass, deltaTemp, rating, HLid, LG):
         """Computes the best angle of climb (Vx) speed.
 
         :param h: Altitude in meters [m].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :param rating: Aircraft engine rating (e.g., 'MTKF', 'MCMB', 'MCRZ').
         :param HLid: High-lift device configuration identifier.
         :param LG: Landing gear configuration identifier.
         :type h: float
         :type mass: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :type rating: str
         :type HLid: str
         :type LG: str
@@ -2409,7 +2409,7 @@ class FlightEnvelope(BADA4):
         """
 
         [theta, delta, sigma] = atm.atmosphereProperties(
-            h=h, DeltaTemp=DeltaTemp
+            h=h, deltaTemp=deltaTemp
         )
 
         VmaxCertified = self.VMax(
@@ -2432,7 +2432,7 @@ class FlightEnvelope(BADA4):
                 delta=delta,
                 theta=theta,
                 M=M,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
             CL = self.CL(M=M, delta=delta, mass=mass, nz=1.0)
             CD = self.CD(M=M, CL=CL, HLid=HLid, LG=LG)
@@ -2445,7 +2445,7 @@ class FlightEnvelope(BADA4):
 
         return VxList[idx]
 
-    def maxAltitude(self, HLid, LG, M, DeltaTemp, mass, nz=1.0):
+    def maxAltitude(self, HLid, LG, M, deltaTemp, mass, nz=1.0):
         """Computes the maximum altitude taking into account buffet
         limitations. The altitude is calculated based on the aerodynamic
         configuration and the available buffet boundary conditions.
@@ -2456,13 +2456,13 @@ class FlightEnvelope(BADA4):
         :param M: Mach airspeed [-].
         :param mass: Aircraft mass [kg].
         :param nz: Load factor [-], default is 1.0.
-        :param DeltaTemp: Temperature deviation from ISA [K].
+        :param deltaTemp: Temperature deviation from ISA [K].
         :type HLid: float.
         :type LG: str.
         :type M: float.
         :type mass: float.
         :type nz: float.
-        :type DeltaTemp: float.
+        :type deltaTemp: float.
         :returns: Maximum altitude [m].
         :rtype: float.
         """
@@ -2478,7 +2478,7 @@ class FlightEnvelope(BADA4):
         if self.AC.CL_clean is not None:
 
             def f(H):
-                delta = atm.delta(h=H[0], DeltaTemp=DeltaTemp)
+                delta = atm.delta(h=H[0], deltaTemp=deltaTemp)
                 CL = self.CL(delta=delta, mass=mass, M=M, nz=nz)
                 CL_max = self.CLmax(M=M, HLid=HLid, LG=LG)
                 return -CL - CL_max
@@ -2494,7 +2494,7 @@ class FlightEnvelope(BADA4):
 
         return hMax
 
-    def getConfig(self, phase, h, mass, v, DeltaTemp=0.0, hRWY=0.0):
+    def getConfig(self, phase, h, mass, v, deltaTemp=0.0, hRWY=0.0):
         """Returns the aircraft's aerodynamic configuration based on altitude,
         speed, and phase of flight.
 
@@ -2502,7 +2502,7 @@ class FlightEnvelope(BADA4):
         :param h: Altitude above mean sea level (AMSL) [m].
         :param mass: Aircraft mass [kg].
         :param v: Calibrated airspeed (CAS) [m/s].
-        :param DeltaTemp: Deviation from ISA temperature [K], default is
+        :param deltaTemp: Deviation from ISA temperature [K], default is
             0.0.
         :param hRWY: Runway elevation above mean sea level (AMSL) [m],
             default is 0.0.
@@ -2510,7 +2510,7 @@ class FlightEnvelope(BADA4):
         :type h: float.
         :type mass: float.
         :type v: float.
-        :type DeltaTemp: float.
+        :type deltaTemp: float.
         :type hRWY: float.
         :returns: Aircraft aerodynamic configuration [TO/IC/CR/AP/LD]
             [-].
@@ -2521,7 +2521,7 @@ class FlightEnvelope(BADA4):
         config = None
 
         [theta, delta, sigma] = atm.atmosphereProperties(
-            h=h, DeltaTemp=DeltaTemp
+            h=h, deltaTemp=deltaTemp
         )
 
         # aircraft AGL altitude assuming being close to the RWY [m]
@@ -2702,7 +2702,7 @@ class ARPM(BADA4):
         config=None,
         NADP1_ALT=3000,
         NADP2_ALT=[1000, 3000],
-        DeltaTemp=0.0,
+        deltaTemp=0.0,
     ):
         """Computes the climb speed schedule (CAS) for the given altitude
         based on various procedures and aircraft parameters.
@@ -2717,7 +2717,7 @@ class ARPM(BADA4):
         :param config: Optional, current aircraft aerodynamic configuration (TO/IC/CR/AP/LD).
         :param NADP1_ALT: Altitude in feet for NADP1 procedure. Default is 3000 feet.
         :param NADP2_ALT: Altitude range in feet for NADP2 procedure. Default is [1000, 3000].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type theta: float
         :type delta: float
         :type mass: float
@@ -2728,7 +2728,7 @@ class ARPM(BADA4):
         :type config: str, optional
         :type NADP1_ALT: float, optional
         :type NADP2_ALT: list[float], optional
-        :type DeltaTemp: float, optional
+        :type deltaTemp: float, optional
         :returns: A tuple containing the climb calibrated airspeed (CAS) in meters per second [m/s] and a status flag indicating whether the calculated CAS is constrained ('C'), unconstrained ('V' or 'v'), or not altered ('').
         :rtype: tuple[float, str]
 
@@ -2760,7 +2760,7 @@ class ARPM(BADA4):
             HLid=HLidTO,
             LG=LGTO,
             nz=1.0,
-            DeltaTemp=DeltaTemp,
+            deltaTemp=deltaTemp,
         )
 
         [HLidCR, LGCR] = self.flightEnvelope.getAeroConfig(config="CR")
@@ -2770,7 +2770,7 @@ class ARPM(BADA4):
             HLid=HLidCR,
             LG=LGCR,
             nz=1.0,
-            DeltaTemp=DeltaTemp,
+            deltaTemp=deltaTemp,
         )
         [Vcl1, Vcl2, Mcl] = self.flightEnvelope.getSpeedSchedule(phase=phase)
 
@@ -2985,7 +2985,7 @@ class ARPM(BADA4):
                 phase=phase,
                 v=cas,
                 mass=mass,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 hRWY=hRWY,
             )
         minSpeed = self.flightEnvelope.VMin(
@@ -3027,7 +3027,7 @@ class ARPM(BADA4):
         hRWY=0.0,
         speedSchedule_default=None,
         config=None,
-        DeltaTemp=0.0,
+        deltaTemp=0.0,
     ):
         """Computes the cruise speed schedule (CAS) for the given altitude
         based on various aircraft parameters.
@@ -3042,7 +3042,7 @@ class ARPM(BADA4):
             [Vcr1, Vcr2, Mcr].
         :param config: Optional, current aircraft aerodynamic
             configuration (TO/IC/CR/AP/LD).
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type theta: float
         :type delta: float
         :type mass: float
@@ -3050,7 +3050,7 @@ class ARPM(BADA4):
         :type hRWY: float, optional
         :type speedSchedule_default: list[float], optional
         :type config: str, optional
-        :type DeltaTemp: float, optional
+        :type deltaTemp: float, optional
         :returns: A tuple containing the cruise calibrated airspeed
             (CAS) in meters per second [m/s] and a status flag
             indicating whether the calculated CAS is constrained ('C'),
@@ -3117,7 +3117,7 @@ class ARPM(BADA4):
                 phase=phase,
                 v=cas,
                 mass=mass,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 hRWY=hRWY,
             )
 
@@ -3160,7 +3160,7 @@ class ARPM(BADA4):
         hRWY=0.0,
         speedSchedule_default=None,
         config=None,
-        DeltaTemp=0.0,
+        deltaTemp=0.0,
     ):
         """Computes the descent speed schedule (CAS) for the given altitude
         based on various aircraft parameters.
@@ -3175,7 +3175,7 @@ class ARPM(BADA4):
             [Vdes1, Vdes2, Mdes].
         :param config: Optional, current aircraft aerodynamic
             configuration (TO/IC/CR/AP/LD).
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type theta: float
         :type delta: float
         :type mass: float
@@ -3183,7 +3183,7 @@ class ARPM(BADA4):
         :type hRWY: float, optional
         :type speedSchedule_default: list[float], optional
         :type config: str, optional
-        :type DeltaTemp: float, optional
+        :type deltaTemp: float, optional
         :returns: A tuple containing the descent calibrated airspeed
             (CAS) in meters per second [m/s] and a status flag
             indicating whether the calculated CAS is constrained ('C'),
@@ -3207,7 +3207,7 @@ class ARPM(BADA4):
 
         [HLid, LG] = self.flightEnvelope.getAeroConfig(config="LD")
         VstallDES = self.flightEnvelope.VStall(
-            h=h_AGL, mass=mass, HLid=HLid, LG=LG, nz=1.0, DeltaTemp=DeltaTemp
+            h=h_AGL, mass=mass, HLid=HLid, LG=LG, nz=1.0, deltaTemp=deltaTemp
         )
         [Vdes1, Vdes2, Mdes] = self.flightEnvelope.getSpeedSchedule(
             phase=phase
@@ -3306,7 +3306,7 @@ class ARPM(BADA4):
                 phase=phase,
                 v=cas,
                 mass=mass,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 hRWY=hRWY,
             )
 
@@ -3415,20 +3415,20 @@ class Optimization(BADA4):
 
         return M / CF
 
-    def econMach(self, theta, delta, mass, DeltaTemp, cI, wS):
+    def econMach(self, theta, delta, mass, deltaTemp, cI, wS):
         """Computes the economic Mach number for a given flight condition and
         cost index.
 
         :param delta: Normalized pressure [-].
         :param theta: Normalized temperature [-].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :param cI: Cost index in kilograms per minute [kg min^-1].
         :param wS: Longitudinal wind speed in meters per second [m/s].
         :type delta: float
         :type theta: float
         :type mass: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :type cI: float
         :type wS: float
         :returns: Maximum Range Cruise (MRC) Mach number [-].
@@ -3474,7 +3474,7 @@ class Optimization(BADA4):
                 delta=delta,
                 theta=theta,
                 M=M,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
 
             # max Thrust limitation
@@ -3483,7 +3483,7 @@ class Optimization(BADA4):
 
             CT = self.CT(Thrust=Thrust, delta=delta)
             CF = self.CF(
-                CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp
+                CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp
             )
 
             # maximize the cost function
@@ -3505,7 +3505,7 @@ class Optimization(BADA4):
         #     Drag = self.D(M=M[0], delta=delta, CD=CD)
 
         #     CT = self.CT(Thrust=Drag, delta=delta)
-        #     CF = self.CF(CT=CT, delta=delta, theta=theta, M=M[0], DeltaTemp=DeltaTemp)
+        #     CF = self.CF(CT=CT, delta=delta, theta=theta, M=M[0], deltaTemp=deltaTemp)
 
         # maximize the cost function -> to minimize, change the sign to -1 what was originally a maximization
         #     cost = - (self.SR(M=M[0]+Mws, CF=ccI+CF))
@@ -3513,24 +3513,24 @@ class Optimization(BADA4):
 
         # bnds = Bounds([Mmin],[Mmax])
         # ThrustMax - Thrust >= 0
-        # cons = ({'type': 'ineq','fun': lambda M: self.Thrust(rating='MCRZ', delta=delta, theta=theta, M=M[0], DeltaTemp=DeltaTemp) - self.D(M=M[0], delta=delta, CD=self.CD(M=M[0], CL=self.CL(M=M[0], delta=delta, mass=mass), HLid=HLid, LG=LG))})
+        # cons = ({'type': 'ineq','fun': lambda M: self.Thrust(rating='MCRZ', delta=delta, theta=theta, M=M[0], deltaTemp=deltaTemp) - self.D(M=M[0], delta=delta, CD=self.CD(M=M[0], CL=self.CL(M=M[0], delta=delta, mass=mass), HLid=HLid, LG=LG))})
 
         # econ = minimize(f, np.array([Mmin]), method='SLSQP', bounds=bnds, constraints=cons)
         # return float(econ.x)
 
-    def MRC(self, theta, delta, mass, DeltaTemp, wS):
+    def MRC(self, theta, delta, mass, deltaTemp, wS):
         """Computes the Mach number representing Maximum Range Cruise (MRC)
         for the given flight conditions.
 
         :param theta: Normalized air temperature [-].
         :param delta: Normalized air pressure [-].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :param wS: Longitudinal wind speed in meters per second [m/s].
         :type theta: float
         :type delta: float
         :type mass: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :type wS: float
         :returns: Maximum Range Cruise (MRC) Mach number [-].
         :rtype: float
@@ -3547,7 +3547,7 @@ class Optimization(BADA4):
             theta=theta,
             delta=delta,
             mass=mass,
-            DeltaTemp=DeltaTemp,
+            deltaTemp=deltaTemp,
             wS=wS,
         )
 
@@ -3556,19 +3556,19 @@ class Optimization(BADA4):
 
         return mrcM
 
-    def LRC(self, theta, delta, mass, DeltaTemp, wS):
+    def LRC(self, theta, delta, mass, deltaTemp, wS):
         """Computes the Mach number representing Long Range Cruise (LRC) for
         the given flight conditions.
 
         :param theta: Normalized air temperature [-].
         :param delta: Normalized air pressure [-].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :param wS: Longitudinal wind speed in meters per second [m/s].
         :type theta: float
         :type delta: float
         :type mass: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :type wS: float
         :returns: Long Range Cruise (LRC) Mach number [-].
         :rtype: float The Long Range Cruise (LRC) is defined as the speed
@@ -3582,7 +3582,7 @@ class Optimization(BADA4):
         Mws = atm.tas2Mach(v=wS, theta=theta)
 
         MRC = self.MRC(
-            theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS
+            theta=theta, delta=delta, mass=mass, deltaTemp=deltaTemp, wS=wS
         )
 
         if isnan(MRC):
@@ -3597,7 +3597,7 @@ class Optimization(BADA4):
         Drag = self.D(M=MRC, delta=delta, CD=CD)
         CT = self.CT(Thrust=Drag, delta=delta)
         CF = self.CF(
-            CT=CT, delta=delta, theta=theta, M=MRC, DeltaTemp=DeltaTemp
+            CT=CT, delta=delta, theta=theta, M=MRC, deltaTemp=deltaTemp
         )
         SR_LRC = 0.99 * self.SR(M=MRC + Mws, CF=CF)
 
@@ -3624,7 +3624,7 @@ class Optimization(BADA4):
                 delta=delta,
                 theta=theta,
                 M=M,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
 
             # max Thrust limitation
@@ -3636,7 +3636,7 @@ class Optimization(BADA4):
 
             CT = self.CT(Thrust=Thrust, delta=delta)
             CF = self.CF(
-                CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp
+                CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp
             )
 
             # specific range for LRC (definition)
@@ -3655,14 +3655,14 @@ class Optimization(BADA4):
         #     Drag = self.D(M=M[0], delta=delta, CD=CD)
 
         #     CT = self.CT(Thrust=Drag, delta=delta)
-        #     CF = self.CF(CT=CT, delta=delta, theta=theta, M=M[0], DeltaTemp=DeltaTemp)
+        #     CF = self.CF(CT=CT, delta=delta, theta=theta, M=M[0], deltaTemp=deltaTemp)
         #     SR = self.SR(M=M[0]+Mws, CF=CF)
 
         #     return sqrt((SR - SR_LRC)**2)
 
         # bnds = Bounds([MRC],[Mmax])
         # ThrustMax - Thrust >= 0
-        # cons = ({'type': 'ineq','fun': lambda M: self.Thrust(rating='MCRZ', delta=delta, theta=theta, M=M[0], DeltaTemp=DeltaTemp) - self.D(M=M[0], delta=delta, CD=self.CD(M=M[0], CL=self.CL(M=M[0], delta=delta, mass=mass), HLid=HLid, LG=LG))})
+        # cons = ({'type': 'ineq','fun': lambda M: self.Thrust(rating='MCRZ', delta=delta, theta=theta, M=M[0], deltaTemp=deltaTemp) - self.D(M=M[0], delta=delta, CD=self.CD(M=M[0], CL=self.CL(M=M[0], delta=delta, mass=mass), HLid=HLid, LG=LG))})
 
         # lrc = minimize(f, np.array([0.1]), method='SLSQP', bounds=bnds, constraints=cons)
         # return float(lrc.x)
@@ -3670,19 +3670,19 @@ class Optimization(BADA4):
         # minimum = float(fmin(f, x0=np.array([MRC]), disp=False))
         # return minimum
 
-    def MEC(self, theta, delta, mass, DeltaTemp, wS):
+    def MEC(self, theta, delta, mass, deltaTemp, wS):
         """Computes the Mach number representing Maximum Endurance Cruise
         (MEC) for given flight conditions.
 
         :param delta: Normalized pressure [-].
         :param theta: Normalized temperature [-].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :param wS: Longitudinal wind speed in meters per second [m/s].
         :type delta: float
         :type theta: float
         :type mass: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :type wS: float
         :returns: Maximum Endurance Cruise (MEC) in Mach [-].
         :rtype: float The Maximum Endurance Cruise (MEC) Mach is the Mach
@@ -3723,7 +3723,7 @@ class Optimization(BADA4):
                 delta=delta,
                 theta=theta,
                 M=M,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
 
             # max Thrust limitation
@@ -3732,7 +3732,7 @@ class Optimization(BADA4):
 
             CT = self.CT(Thrust=Thrust, delta=delta)
             CF = self.CF(
-                CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp
+                CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp
             )
 
             # minimize the cost function
@@ -3752,26 +3752,26 @@ class Optimization(BADA4):
         #     Drag = self.D(M=M[0], delta=delta, CD=CD)
 
         #     CT = self.CT(Thrust=Drag, delta=delta)
-        #     CF = self.CF(CT=CT, delta=delta, theta=theta, M=M[0], DeltaTemp=DeltaTemp)
+        #     CF = self.CF(CT=CT, delta=delta, theta=theta, M=M[0], deltaTemp=deltaTemp)
         #     return CF
 
         # bnds = Bounds([Mmin],[Mmax + 1e-8])
         # ThrustMax - Thrust >= 0
-        # cons = ({'type': 'ineq','fun': lambda M: self.Thrust(rating='MCRZ', delta=delta, theta=theta, M=M[0], DeltaTemp=DeltaTemp) - self.D(M=M[0], delta=delta, CD=self.CD(M=M[0], CL=self.CL(M=M[0], delta=delta, mass=mass), HLid=HLid, LG=LG))})
+        # cons = ({'type': 'ineq','fun': lambda M: self.Thrust(rating='MCRZ', delta=delta, theta=theta, M=M[0], deltaTemp=deltaTemp) - self.D(M=M[0], delta=delta, CD=self.CD(M=M[0], CL=self.CL(M=M[0], delta=delta, mass=mass), HLid=HLid, LG=LG))})
 
         # mecM = minimize(f, np.array([Mmin]), method='SLSQP', bounds=bnds, constraints=cons)
         # return float(mecM.x)
 
-    def optAltitude(self, M, mass, DeltaTemp):
+    def optAltitude(self, M, mass, deltaTemp):
         """Computes the optimum altitude for a given flight condition and Mach
         number.
 
         :param M: Mach number [-].
         :param mass: Aircraft mass in kilograms [kg].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type M: float
         :type mass: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: Optimum altitude in feet [ft].
         :rtype: float The optimum altitude is the altitude where the aircraft
             achieves the maximum efficiency for a given Mach number and mass,
@@ -3786,7 +3786,7 @@ class Optimization(BADA4):
         LG = "LGUP"
 
         Hmax = self.flightEnvelope.maxAltitude(
-            HLid=HLid, LG=LG, M=M, DeltaTemp=DeltaTemp, mass=mass, nz=1.0
+            HLid=HLid, LG=LG, M=M, deltaTemp=deltaTemp, mass=mass, nz=1.0
         )
 
         epsilon = 100
@@ -3795,8 +3795,8 @@ class Optimization(BADA4):
         H_opt = []
         cost_opt = []
         for H in H_list:
-            theta = atm.theta(H, DeltaTemp=DeltaTemp)
-            delta = atm.delta(H, DeltaTemp=DeltaTemp)
+            theta = atm.theta(H, deltaTemp=deltaTemp)
+            delta = atm.delta(H, deltaTemp=deltaTemp)
 
             # min/max M speed limitation
             Mmin = self.flightEnvelope.minMbuffet(
@@ -3819,7 +3819,7 @@ class Optimization(BADA4):
                 delta=delta,
                 theta=theta,
                 M=M,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
 
             # max Thrust limitation
@@ -3828,10 +3828,10 @@ class Optimization(BADA4):
 
             CT = self.CT(Thrust=Thrust, delta=delta)
             CF = self.CF(
-                CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp
+                CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp
             )
             ff = self.ff(
-                CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp
+                CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp
             )
             a = atm.aSound(theta=theta)
 
@@ -3853,8 +3853,8 @@ class Optimization(BADA4):
         return utils.proper_round(optH, 10)
 
         # def f(H):
-        #     theta = atm.theta(h=H[0],DeltaTemp=DeltaTemp)
-        #     delta = atm.delta(h=H[0],DeltaTemp=DeltaTemp)
+        #     theta = atm.theta(h=H[0],deltaTemp=deltaTemp)
+        #     delta = atm.delta(h=H[0],deltaTemp=deltaTemp)
 
         # min/max M speed limitation
         #     Mmin = self.flightEnvelope.minMbuffet(theta=theta, delta=delta, mass=mass, HLid=HLid, LG=LG)
@@ -3867,14 +3867,14 @@ class Optimization(BADA4):
         #     CD = self.CD(M=M, CL=CL, HLid=HLid, LG=LG)
 
         #     Drag = self.D(M=M, delta=delta, CD=CD)
-        # ThrustMax = self.Thrust(rating='MCRZ', delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp)
+        # ThrustMax = self.Thrust(rating='MCRZ', delta=delta, theta=theta, M=M, deltaTemp=deltaTemp)
 
         # max Thrust limitation
         # if Thrust > ThrustMax:
         #     return float('Inf')
 
         #     CT = self.CT(Thrust=Drag, delta=delta)
-        #     ff = self.ff(CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp)
+        #     ff = self.ff(CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp)
         #     a = atm.aSound(theta=theta)
 
         # maximize the cost function
@@ -4135,15 +4135,15 @@ class PTD(BADA4):
         self.flightEnvelope = FlightEnvelope(AC)
         self.ARPM = ARPM(AC)
 
-    def create(self, DeltaTemp, saveToPath):
+    def create(self, deltaTemp, saveToPath):
         """Creates the BADA4 Performance Table Data (PTD) file, calculating
         climb, cruise, and descent profiles for different mass levels and
         altitudes, and saves the output to the specified path.
 
         :param saveToPath: Directory path where the PTD file should be stored.
-        :param DeltaTemp: Deviation from the ISA (International Standard Atmosphere) temperature in Kelvin [K].
+        :param deltaTemp: Deviation from the ISA (International Standard Atmosphere) temperature in Kelvin [K].
         :type saveToPath: str
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: None
         :rtype: None
 
@@ -4186,17 +4186,17 @@ class PTD(BADA4):
         for mass in massList:
             CLList.append(
                 self.PTD_climb(
-                    mass=mass, altitudeList=altitudeList, DeltaTemp=DeltaTemp
+                    mass=mass, altitudeList=altitudeList, deltaTemp=deltaTemp
                 )
             )
             CRList.append(
                 self.PTD_cruise(
-                    mass=mass, altitudeList=altitudeList, DeltaTemp=DeltaTemp
+                    mass=mass, altitudeList=altitudeList, deltaTemp=deltaTemp
                 )
             )
             DESList.append(
                 self.PTD_descent(
-                    mass=mass, altitudeList=altitudeList, DeltaTemp=DeltaTemp
+                    mass=mass, altitudeList=altitudeList, deltaTemp=deltaTemp
                 )
             )
 
@@ -4205,10 +4205,10 @@ class PTD(BADA4):
             CLList=CLList,
             CRList=CRList,
             DESList=DESList,
-            DeltaTemp=DeltaTemp,
+            deltaTemp=deltaTemp,
         )
 
-    def save2PTD(self, saveToPath, CLList, CRList, DESList, DeltaTemp):
+    def save2PTD(self, saveToPath, CLList, CRList, DESList, deltaTemp):
         """Saves climb, cruise, and descent performance data into a PTD
         (Performance Table Data) file.
 
@@ -4216,13 +4216,13 @@ class PTD(BADA4):
         :param CLList: List of climb performance data.
         :param CRList: List of cruise performance data.
         :param DESList: List of descent performance data.
-        :param DeltaTemp: Deviation from ISA (International Standard
+        :param deltaTemp: Deviation from ISA (International Standard
             Atmosphere) temperature in Kelvin [K].
         :type saveToPath: str
         :type CLList: list
         :type CRList: list
         :type DESList: list
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: None
         :rtype: None
         """
@@ -4241,12 +4241,12 @@ class PTD(BADA4):
         if not os.path.exists(newpath):
             os.makedirs(newpath)
 
-        if DeltaTemp == 0.0:
+        if deltaTemp == 0.0:
             ISA = ""
-        elif DeltaTemp > 0.0:
-            ISA = "+" + str(int(DeltaTemp))
-        elif DeltaTemp < 0.0:
-            ISA = str(int(DeltaTemp))
+        elif deltaTemp > 0.0:
+            ISA = "+" + str(int(deltaTemp))
+        elif deltaTemp < 0.0:
+            ISA = str(int(deltaTemp))
 
         filename = saveToPath + self.AC.acName + "_ISA" + ISA + ".PTD"
 
@@ -4576,16 +4576,16 @@ class PTD(BADA4):
                 )
             )
 
-    def PTD_climb(self, mass, altitudeList, DeltaTemp):
+    def PTD_climb(self, mass, altitudeList, deltaTemp):
         """Calculates the BADA4 PTD (Performance Table Data) for the CLIMB
         phase of flight.
 
         :param mass: Aircraft mass in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type mass: float
         :type altitudeList: list of int
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: List of PTD CLIMB data.
         :rtype: list
         """
@@ -4617,14 +4617,14 @@ class PTD(BADA4):
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             [cas, speedUpdated] = self.ARPM.climbSpeed(
                 h=H_m,
                 mass=mass,
                 theta=theta,
                 delta=delta,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 speedSchedule_default=[Vcl1, Vcl2, Mcl],
             )
             tas = atm.cas2Tas(cas=cas, delta=delta, sigma=sigma)
@@ -4641,7 +4641,7 @@ class PTD(BADA4):
                     delta=delta,
                     theta=theta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 * 60
             )
@@ -4650,14 +4650,14 @@ class PTD(BADA4):
                 delta=delta,
                 theta=theta,
                 M=M,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
             config = self.flightEnvelope.getConfig(
                 h=H_m,
                 phase=phase,
                 v=cas,
                 mass=mass,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
 
             # ensure the continuity of aerodyamic configuration during Climb phase of flight
@@ -4676,11 +4676,11 @@ class PTD(BADA4):
 
             if H_m < crossAlt:
                 ESF = self.esf(
-                    h=H_m, flightEvolution="constCAS", M=M, DeltaTemp=DeltaTemp
+                    h=H_m, flightEvolution="constCAS", M=M, deltaTemp=deltaTemp
                 )
             else:
                 ESF = self.esf(
-                    h=H_m, flightEvolution="constM", M=M, DeltaTemp=DeltaTemp
+                    h=H_m, flightEvolution="constM", M=M, deltaTemp=deltaTemp
                 )
 
             ROCD = (
@@ -4692,14 +4692,14 @@ class PTD(BADA4):
                         v=tas,
                         mass=mass,
                         ESF=ESF,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 )
                 * 60
             )
 
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
             dhdt = (conv.ft2m(ROCD / 60)) * temp_const
             gamma = conv.rad2deg(asin(dhdt / tas))
@@ -4744,16 +4744,16 @@ class PTD(BADA4):
 
         return CLList
 
-    def PTD_descent(self, mass, altitudeList, DeltaTemp):
+    def PTD_descent(self, mass, altitudeList, deltaTemp):
         """Calculates the BADA4 PTD (Performance Table Data) for the DESCENT
         phase of flight.
 
         :param mass: Aircraft mass in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type mass: float
         :type altitudeList: list of int
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: List of PTD DESCENT data.
         :rtype: list
         """
@@ -4787,14 +4787,14 @@ class PTD(BADA4):
         for h in reversed(altitudeList):
             H_m = conv.ft2m(h)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             [cas, speedUpdated] = self.ARPM.descentSpeed(
                 h=H_m,
                 mass=mass,
                 theta=theta,
                 delta=delta,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 speedSchedule_default=[Vdes1, Vdes2, Mdes],
             )
             tas = atm.cas2Tas(cas=cas, delta=delta, sigma=sigma)
@@ -4810,10 +4810,10 @@ class PTD(BADA4):
                 delta=delta,
                 theta=theta,
                 M=M,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
             config = self.flightEnvelope.getConfig(
-                h=H_m, phase="Descent", v=cas, mass=mass, DeltaTemp=DeltaTemp
+                h=H_m, phase="Descent", v=cas, mass=mass, deltaTemp=deltaTemp
             )
 
             # ensure the continuity of aerodyamic configuration during Descent phase of flight
@@ -4836,18 +4836,18 @@ class PTD(BADA4):
                     delta=delta,
                     theta=theta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 * 60
             )
 
             if H_m < crossAlt:
                 ESF = self.esf(
-                    h=H_m, flightEvolution="constCAS", M=M, DeltaTemp=DeltaTemp
+                    h=H_m, flightEvolution="constCAS", M=M, deltaTemp=deltaTemp
                 )
             else:
                 ESF = self.esf(
-                    h=H_m, flightEvolution="constM", M=M, DeltaTemp=DeltaTemp
+                    h=H_m, flightEvolution="constM", M=M, deltaTemp=deltaTemp
                 )
 
             ROCD = (
@@ -4859,13 +4859,13 @@ class PTD(BADA4):
                         v=tas,
                         mass=mass,
                         ESF=ESF,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 )
                 * 60
             )
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
             dhdt = (conv.ft2m(ROCD / 60)) * temp_const
             gamma = conv.rad2deg(asin(dhdt / tas))
@@ -4882,7 +4882,7 @@ class PTD(BADA4):
             if config == "AP" or config == "LD":
                 gamma = -3.0
                 temp_const = (theta * const.temp_0) / (
-                    theta * const.temp_0 - DeltaTemp
+                    theta * const.temp_0 - deltaTemp
                 )
 
                 ROCD_gamma = sin(conv.deg2rad(gamma)) * tas * (1 / temp_const)
@@ -4902,7 +4902,7 @@ class PTD(BADA4):
                         delta=delta,
                         theta=theta,
                         M=M,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                     * 60
                 )
@@ -4955,16 +4955,16 @@ class PTD(BADA4):
 
         return DESList
 
-    def PTD_cruise(self, mass, altitudeList, DeltaTemp):
+    def PTD_cruise(self, mass, altitudeList, deltaTemp):
         """Calculates the BADA4 PTD (Performance Table Data) for the CRUISE
         phase of flight.
 
         :param mass: Aircraft mass in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type mass: float
         :type altitudeList: list of int
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: List of PTD CRUISE data.
         :rtype: list
         """
@@ -4995,7 +4995,7 @@ class PTD(BADA4):
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             [cas, speedUpdated] = self.ARPM.cruiseSpeed(
                 h=H_m,
@@ -5024,12 +5024,12 @@ class PTD(BADA4):
                 delta=delta,
                 theta=theta,
                 M=M,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
             CT = self.CT(Thrust=Thrust, delta=delta)
             ff = (
                 self.ff(
-                    CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp
+                    CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp
                 )
                 * 60
             )
@@ -5099,14 +5099,14 @@ class PTF(BADA4):
         self.flightEnvelope = FlightEnvelope(AC)
         self.ARPM = ARPM(AC)
 
-    def create(self, DeltaTemp, saveToPath):
+    def create(self, deltaTemp, saveToPath):
         """Creates the BADA4 PTF and saves it to the specified directory.
 
         :param saveToPath: Path to the directory where the PTF should be
             stored.
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type saveToPath: str
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: None
         :rtype: None
         """
@@ -5135,13 +5135,13 @@ class PTF(BADA4):
             altitudeList.append(max_alt_ft)
 
         CRList = self.PTF_cruise(
-            massList=massList, altitudeList=altitudeList, DeltaTemp=DeltaTemp
+            massList=massList, altitudeList=altitudeList, deltaTemp=deltaTemp
         )
         CLList = self.PTF_climb(
-            massList=massList, altitudeList=altitudeList, DeltaTemp=DeltaTemp
+            massList=massList, altitudeList=altitudeList, deltaTemp=deltaTemp
         )
         DESList = self.PTF_descent(
-            massList=massList, altitudeList=altitudeList, DeltaTemp=DeltaTemp
+            massList=massList, altitudeList=altitudeList, deltaTemp=deltaTemp
         )
 
         self.save2PTF(
@@ -5151,7 +5151,7 @@ class PTF(BADA4):
             CRList=CRList,
             CLList=CLList,
             DESList=DESList,
-            DeltaTemp=DeltaTemp,
+            deltaTemp=deltaTemp,
         )
 
     def save2PTF(
@@ -5160,7 +5160,7 @@ class PTF(BADA4):
         CLList,
         CRList,
         DESList,
-        DeltaTemp,
+        deltaTemp,
         massList,
         altitudeList,
     ):
@@ -5171,14 +5171,14 @@ class PTF(BADA4):
         :param CLList: List of PTD data for CLIMB.
         :param CRList: List of PTD data for CRUISE.
         :param DESList: List of PTD data for DESCENT.
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :param massList: List of aircraft mass levels [kg].
         :param altitudeList: List of altitudes [ft].
         :type saveToPath: str
         :type CLList: list
         :type CRList: list
         :type DESList: list
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :type massList: list(float)
         :returns: None
         :rtype: None This function formats and writes the climb, cruise, and
@@ -5199,12 +5199,12 @@ class PTF(BADA4):
         if not os.path.exists(newpath):
             os.makedirs(newpath)
 
-        if DeltaTemp == 0.0:
+        if deltaTemp == 0.0:
             ISA = ""
-        elif DeltaTemp > 0.0:
-            ISA = "+" + str(int(DeltaTemp))
-        elif DeltaTemp < 0.0:
-            ISA = str(int(DeltaTemp))
+        elif deltaTemp > 0.0:
+            ISA = "+" + str(int(deltaTemp))
+        elif deltaTemp < 0.0:
+            ISA = str(int(deltaTemp))
 
         filename = saveToPath + self.AC.acName + "_ISA" + ISA + ".PTF"
 
@@ -5304,15 +5304,15 @@ class PTF(BADA4):
             "======================================================================================================\n"
         )
 
-    def PTF_cruise(self, massList, altitudeList, DeltaTemp):
+    def PTF_cruise(self, massList, altitudeList, deltaTemp):
         """Calculates the BADA4 PTF for the CRUISE phase of flight.
 
         :param massList: List of aircraft mass levels in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type massList: list
         :type altitudeList: list of int
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: List of PTF CRUISE data.
         :rtype: list
         """
@@ -5332,7 +5332,7 @@ class PTF(BADA4):
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             [cas, speedUpdated] = self.ARPM.cruiseSpeed(
                 h=H_m,
@@ -5340,7 +5340,7 @@ class PTF(BADA4):
                 theta=theta,
                 delta=delta,
                 speedSchedule_default=[Vcr1, Vcr2, Mcr],
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
             tas_nominal = atm.cas2Tas(cas=cas, delta=delta, sigma=sigma)
             FL = h / 100
@@ -5353,7 +5353,7 @@ class PTF(BADA4):
                     theta=theta,
                     delta=delta,
                     speedSchedule_default=[Vcr1, Vcr2, Mcr],
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 tas = atm.cas2Tas(cas=cas, delta=delta, sigma=sigma)
                 M = atm.tas2Mach(v=tas, theta=theta)
@@ -5370,7 +5370,7 @@ class PTF(BADA4):
                     delta=delta,
                     theta=theta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
 
                 CL = self.flightEnvelope.CL(
@@ -5394,7 +5394,7 @@ class PTF(BADA4):
                             delta=delta,
                             theta=theta,
                             M=M,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                         )
                         * 60
                     )
@@ -5424,15 +5424,15 @@ class PTF(BADA4):
 
         return CRList
 
-    def PTF_climb(self, massList, altitudeList, DeltaTemp):
+    def PTF_climb(self, massList, altitudeList, deltaTemp):
         """Calculates the BADA4 PTF for the CLIMB phase of flight.
 
         :param massList: List of aircraft mass levels in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type massList: list
         :type altitudeList: list of int
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: List of PTF CLIMB data.
         :rtype: list
         """
@@ -5459,14 +5459,14 @@ class PTF(BADA4):
         for h in altitudeList:
             H_m = conv.ft2m(h)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             [cas, speedUpdated] = self.ARPM.climbSpeed(
                 h=H_m,
                 mass=massNominal,
                 theta=theta,
                 delta=delta,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 speedSchedule_default=[Vcl1, Vcl2, Mcl],
             )
             tas_nominal = atm.cas2Tas(cas=cas, delta=delta, sigma=sigma)
@@ -5479,7 +5479,7 @@ class PTF(BADA4):
                     delta=delta,
                     theta=theta,
                     M=M_nominal,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 * 60
             )
@@ -5491,7 +5491,7 @@ class PTF(BADA4):
                     mass=mass,
                     theta=theta,
                     delta=delta,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     speedSchedule_default=[Vcl1, Vcl2, Mcl],
                 )
                 tas = atm.cas2Tas(cas=cas, delta=delta, sigma=sigma)
@@ -5502,14 +5502,14 @@ class PTF(BADA4):
                     delta=delta,
                     theta=theta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 config = self.flightEnvelope.getConfig(
                     h=H_m,
                     phase="Climb",
                     v=cas,
                     mass=mass,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
 
                 # ensure the continuity of aerodyamic configuration during CLimb phase of flight
@@ -5533,14 +5533,14 @@ class PTF(BADA4):
                         h=H_m,
                         flightEvolution="constCAS",
                         M=M,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     ESF = self.esf(
                         h=H_m,
                         flightEvolution="constM",
                         M=M,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
 
                 ROC_val = (
@@ -5552,7 +5552,7 @@ class PTF(BADA4):
                             v=tas,
                             mass=mass,
                             ESF=ESF,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                         )
                     )
                     * 60
@@ -5580,15 +5580,15 @@ class PTF(BADA4):
 
         return CLList
 
-    def PTF_descent(self, massList, altitudeList, DeltaTemp):
+    def PTF_descent(self, massList, altitudeList, deltaTemp):
         """Calculates the BADA4 PTF for the DESCENT phase of flight.
 
         :param massList: List of aircraft mass levels in kilograms [kg].
         :param altitudeList: List of aircraft altitudes in feet [ft].
-        :param DeltaTemp: Deviation from ISA temperature in Kelvin [K].
+        :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
         :type massList: list
         :type altitudeList: list of int
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :returns: List of PTF DESCENT data.
         :rtype: list
         """
@@ -5615,14 +5615,14 @@ class PTF(BADA4):
         for h in reversed(altitudeList):
             H_m = conv.ft2m(h)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             [cas, speedUpdated] = self.ARPM.descentSpeed(
                 h=H_m,
                 mass=massNominal,
                 theta=theta,
                 delta=delta,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 speedSchedule_default=[Vdes1, Vdes2, Mdes],
             )
             tas_nominal = atm.cas2Tas(cas=cas, delta=delta, sigma=sigma)
@@ -5635,7 +5635,7 @@ class PTF(BADA4):
                     delta=delta,
                     theta=theta,
                     M=M_nominal,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 * 60
             )
@@ -5648,7 +5648,7 @@ class PTF(BADA4):
                     mass=mass,
                     theta=theta,
                     delta=delta,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     speedSchedule_default=[Vdes1, Vdes2, Mdes],
                 )
                 tas = atm.cas2Tas(cas=cas, delta=delta, sigma=sigma)
@@ -5659,14 +5659,14 @@ class PTF(BADA4):
                     delta=delta,
                     theta=theta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 config = self.flightEnvelope.getConfig(
                     h=H_m,
                     phase="Descent",
                     v=cas,
                     mass=mass,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
 
                 # ensure the continuity of aerodyamic configuration during Descent phase of flight
@@ -5690,14 +5690,14 @@ class PTF(BADA4):
                         h=H_m,
                         flightEvolution="constCAS",
                         M=M,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     ESF = self.esf(
                         h=H_m,
                         flightEvolution="constM",
                         M=M,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
 
                 ROCD = (
@@ -5709,7 +5709,7 @@ class PTF(BADA4):
                             v=tas,
                             mass=mass,
                             ESF=ESF,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                         )
                     )
                     * 60
@@ -5719,7 +5719,7 @@ class PTF(BADA4):
                 if config == "AP" or config == "LD":
                     gamma = -3.0
                     temp_const = (theta * const.temp_0) / (
-                        theta * const.temp_0 - DeltaTemp
+                        theta * const.temp_0 - deltaTemp
                     )
                     ROCD_gamma = (
                         sin(conv.deg2rad(gamma)) * tas * (1 / temp_const)
@@ -5740,7 +5740,7 @@ class PTF(BADA4):
                             delta=delta,
                             theta=theta,
                             M=M,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                         )
                         * 60
                     )

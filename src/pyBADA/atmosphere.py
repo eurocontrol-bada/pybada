@@ -16,21 +16,21 @@ def _theta_core(arr_h, arr_dT):
     )
 
 
-def theta(h, DeltaTemp):
+def theta(h, deltaTemp):
     """
     Normalized temperature according to the ISA model, vectorized for
     xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
     :param h: Altitude in meters (m). Can be scalar, numpy array,
               pandas Series/DataFrame, or xarray.DataArray.
-    :param DeltaTemp: Deviation from ISA temperature in Kelvin (K). Same type as h.
+    :param deltaTemp: Deviation from ISA temperature in Kelvin (K). Same type as h.
     :type h: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :type DeltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :type deltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :returns: Normalized temperature [-].
     """
 
     arr_h = utils._extract(h)
-    arr_dT = utils._extract(DeltaTemp)
+    arr_dT = utils._extract(deltaTemp)
     arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
     core = _theta_core(arr_h_b, arr_dT_b)
@@ -62,21 +62,21 @@ def _delta_core(arr_h, arr_dT):
     return np.where(arr_h <= const.h_11, p, p * strato_factor)
 
 
-def delta(h, DeltaTemp):
+def delta(h, deltaTemp):
     """
     Normalized pressure according to the ISA model, vectorized for
     xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
     :param h: Altitude in meters (m). Can be scalar, numpy array,
               pandas Series/DataFrame, or xarray.DataArray.
-    :param DeltaTemp: Deviation from ISA temperature in Kelvin (K). Same type as h.
+    :param deltaTemp: Deviation from ISA temperature in Kelvin (K). Same type as h.
     :type h: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :type DeltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :type deltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :returns: Normalized pressure [-].
     """
 
     arr_h = utils._extract(h)
-    arr_dT = utils._extract(DeltaTemp)
+    arr_dT = utils._extract(deltaTemp)
     arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
     core = _delta_core(arr_h_b, arr_dT_b)
@@ -96,20 +96,20 @@ def _sigma_core(arr_theta, arr_delta):
     )
 
 
-def sigma(h=None, DeltaTemp=None, theta=None, delta=None):
+def sigma(h=None, deltaTemp=None, theta=None, delta=None):
     """Normalized density according to ISA, vectorized for
     xarray.DataArray, pandas Series/DataFrame, and numpy arrays/scalars.
 
     You can either provide:
-      - `h` (pressure altitude) and `DeltaTemp` (temperature deviation) to compute
+      - `h` (pressure altitude) and `deltaTemp` (temperature deviation) to compute
         normalized temperature and pressure internally;
       - Or precomputed `theta` (normalized temperature) and `delta`
         (normalized pressure) directly to avoid recomputation.
 
     :param h: pressure altitude AMSL [m], required if `theta` is None.
     :type h: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :param DeltaTemp: Temperature deviation from ISA at sea level [K], required if `theta` is None.
-    :type DeltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :param deltaTemp: Temperature deviation from ISA at sea level [K], required if `theta` is None.
+    :type deltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :param theta: Precomputed normalized temperature [-], optional.
     :type theta: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :param delta: Precomputed normalized pressure [-], optional.
@@ -125,9 +125,9 @@ def sigma(h=None, DeltaTemp=None, theta=None, delta=None):
 
         return utils._wrap(core, original=theta)
 
-    elif h is not None or DeltaTemp is not None:
+    elif h is not None or deltaTemp is not None:
         arr_h = utils._extract(h)
-        arr_dT = utils._extract(DeltaTemp)
+        arr_dT = utils._extract(deltaTemp)
         arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
         arr_t = _theta_core(arr_h_b, arr_dT_b)
         arr_d = _delta_core(arr_h_b, arr_dT_b)
@@ -137,7 +137,7 @@ def sigma(h=None, DeltaTemp=None, theta=None, delta=None):
 
     else:
         raise ValueError(
-            "Either provide both h & DeltaTemp, or theta & delta."
+            "Either provide both h & deltaTemp, or theta & delta."
         )
 
 
@@ -463,7 +463,7 @@ def crossOver(cas, Mach):
     return utils._vectorized_wrapper(_crossOver_core, cas_b, Mach_b)
 
 
-def atmosphereProperties(h, DeltaTemp):
+def atmosphereProperties(h, deltaTemp):
     """
     Calculates atmospheric properties: normalized temperature, pressure,
     and density ratios based on altitude and temperature deviation from ISA.
@@ -471,14 +471,14 @@ def atmosphereProperties(h, DeltaTemp):
 
     :param h: Altitude in meters (m). Can be scalar, numpy array,
               pandas Series/DataFrame, or xarray.DataArray.
-    :param DeltaTemp: Deviation from ISA temperature in Kelvin (K). Same type as h.
+    :param deltaTemp: Deviation from ISA temperature in Kelvin (K). Same type as h.
     :type h: float or array-like or xarray.DataArray or pandas Series/DataFrame
-    :type DeltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
+    :type deltaTemp: float or array-like or xarray.DataArray or pandas Series/DataFrame
     :returns: List of [theta_norm, delta_norm, sigma_norm], each matching the type of input.
     """
 
     arr_h = utils._extract(h)
-    arr_dT = utils._extract(DeltaTemp)
+    arr_dT = utils._extract(deltaTemp)
     arr_h_b, arr_dT_b = utils._broadcast(arr_h, arr_dT)
 
     arr_theta = _theta_core(arr_h_b, arr_dT_b)

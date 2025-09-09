@@ -44,7 +44,7 @@ Hp_VTOL = 5  # [ft] upper altitude for vertical take-off and landing
 m_init = AC.OEW + 0.7 * (AC.MTOW - AC.OEW)  # [kg] initial mass
 wS = 0  # [kt] wind speed
 bankAngle = 0  # [deg] bank angle
-DeltaTemp = 0  # [K] delta temperature from ISA
+deltaTemp = 0  # [K] delta temperature from ISA
 Hp_step = 500  # [ft] altitude step
 step_length = 10  # iteration step length for cruise
 RFL = 3000
@@ -53,8 +53,8 @@ maxRFL = 3000
 AVT = 0.3 * const.g  # [g] to [m/s^2]
 DVT = -0.3 * const.g  # [g] to [m/s^2]
 
-MEC = AC.OPT.getOPTParam("MEC", var_1=0, var_2=m_init, DeltaTemp=DeltaTemp)
-LRC = AC.OPT.getOPTParam("LRC", RFL, m_init, DeltaTemp)
+MEC = AC.OPT.getOPTParam("MEC", var_1=0, var_2=m_init, deltaTemp=deltaTemp)
+LRC = AC.OPT.getOPTParam("LRC", RFL, m_init, deltaTemp)
 
 flightTrajectory = TCL.constantSpeedROCD(
     AC=AC,
@@ -66,7 +66,7 @@ flightTrajectory = TCL.constantSpeedROCD(
     m_init=m_init,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Hp_step=Hp_step,
 )
 ft.append(AC, flightTrajectory)
@@ -87,7 +87,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 ft.append(AC, flightTrajectory)
 
@@ -104,7 +104,7 @@ flightTrajectory = TCL.constantSpeedROCD(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Hp_step=Hp_step,
 )
 ft.append(AC, flightTrajectory)
@@ -123,7 +123,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 ft.append(AC, flightTrajectory)
 
@@ -144,7 +144,7 @@ flightTrajectory = TCL.constantSpeedLevel(
     maxRFL=maxRFL,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     step_length=step_length,
 )
 ft.append(AC, flightTrajectory)
@@ -162,7 +162,7 @@ flightTrajectory = TCL.constantSpeedROCD(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Hp_step=Hp_step,
 )
 ft.append(AC, flightTrajectory)
@@ -182,7 +182,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 ft.append(AC, flightTrajectory)
 
@@ -199,7 +199,7 @@ flightTrajectory = TCL.constantSpeedROCD(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Hp_step=Hp_step,
 )
 ft.append(AC, flightTrajectory)
@@ -219,7 +219,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 ft.append(AC, flightTrajectory)
 
@@ -236,7 +236,7 @@ flightTrajectory = TCL.constantSpeedROCD(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Hp_step=Hp_step,
 )
 ft.append(AC, flightTrajectory)
@@ -256,7 +256,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 ft.append(AC, flightTrajectory)
 
@@ -273,7 +273,7 @@ flightTrajectory = TCL.constantSpeedROCD(
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Hp_step=Hp_step,
 )
 ft.append(AC, flightTrajectory)

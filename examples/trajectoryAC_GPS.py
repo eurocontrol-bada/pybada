@@ -47,7 +47,7 @@ ft = FT()
 speedType = "CAS"  # {M, CAS, TAS}
 wS = 0  # [kt] wind speed
 ba = 0  # [deg] bank angle
-DeltaTemp = 0  # [K] delta temperature from ISA
+deltaTemp = 0  # [K] delta temperature from ISA
 
 # Initial conditions
 m_init = AC.OEW + 0.7 * (AC.MTOW - AC.OEW)  # [kg] initial mass
@@ -58,14 +58,14 @@ Lon_init = 2.5995367285775965  # CDG RWY26R coordinates
 
 # take-off conditions
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(Hp_RWY), DeltaTemp=DeltaTemp
+    h=conv.ft2m(Hp_RWY), deltaTemp=deltaTemp
 )  # atmosphere properties at RWY altitude
 [cas_cl1, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(Hp_RWY),
     mass=m_init,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )  # [m/s] take-off CAS
 
 
@@ -95,7 +95,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_init,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=Lat_init,
     Lon=Lon_init,
     initialHeading={"magnetic": None, "true": 50, "constantHeading": False},
@@ -111,14 +111,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(2999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(2999), deltaTemp=deltaTemp
 )
 [cas_cl2, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(2999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 flightTrajectory = TCL.accDec(
@@ -132,7 +132,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -160,7 +160,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -181,14 +181,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(3999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(3999), deltaTemp=deltaTemp
 )
 [cas_cl3, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(3999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 flightTrajectory = TCL.accDec(
@@ -202,7 +202,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -230,7 +230,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -251,14 +251,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(4999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(4999), deltaTemp=deltaTemp
 )
 [cas_cl4, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(4999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 flightTrajectory = TCL.accDec(
@@ -272,7 +272,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -300,7 +300,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -321,14 +321,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(5999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(5999), deltaTemp=deltaTemp
 )
 [cas_cl5, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(5999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 flightTrajectory = TCL.accDec(
@@ -342,7 +342,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -370,7 +370,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -391,14 +391,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(9999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(9999), deltaTemp=deltaTemp
 )
 [cas_cl6, speedUpdated] = AC.ARPM.climbSpeed(
     h=conv.ft2m(9999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 flightTrajectory = TCL.accDec(
@@ -412,7 +412,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -440,7 +440,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -471,7 +471,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -503,7 +503,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -531,7 +531,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -563,7 +563,7 @@ if M_final < Mcr:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -592,7 +592,7 @@ flightTrajectory = TCL.constantSpeedLevel(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -624,7 +624,7 @@ ft.append(AC, flightTrajectory)
 # stepClimb=True,
 # wS=wS,
 # bankAngle=ba,
-# DeltaTemp=DeltaTemp,
+# deltaTemp=deltaTemp,
 # Lat=LAT_final,
 # Lon=LON_final,
 # initialHeading={"magnetic":None, "true":HDGTrue, "constantHeading":False},
@@ -649,7 +649,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -680,7 +680,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -708,7 +708,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -729,14 +729,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(9999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(9999), deltaTemp=deltaTemp
 )
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(9999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 flightTrajectory = TCL.accDec(
@@ -749,7 +749,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -777,7 +777,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -798,14 +798,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(5999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(5999), deltaTemp=deltaTemp
 )
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(5999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 flightTrajectory = TCL.accDec(
@@ -818,7 +818,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -846,7 +846,7 @@ flightTrajectory = TCL.constantSpeedRating(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -878,7 +878,7 @@ if AC.BADAFamily.BADA3:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -900,7 +900,7 @@ elif AC.BADAFamily.BADA4:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -923,14 +923,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(2999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(2999), deltaTemp=deltaTemp
 )
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(2999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 control = target(slopetarget=-3.0)
@@ -947,7 +947,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -979,7 +979,7 @@ if Hp > 2000:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -1001,14 +1001,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(1999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(1999), deltaTemp=deltaTemp
 )
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(1999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 control = target(slopetarget=-3.0)
@@ -1025,7 +1025,7 @@ flightTrajectory = TCL.accDec(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={
@@ -1057,7 +1057,7 @@ if Hp > 1500:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -1079,14 +1079,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(1499), DeltaTemp=DeltaTemp
+    h=conv.ft2m(1499), deltaTemp=deltaTemp
 )
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(1499),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 control = target(slopetarget=-3.0)
@@ -1104,7 +1104,7 @@ if AC.BADAFamily.BADA3:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -1127,7 +1127,7 @@ elif AC.BADAFamily.BADA4:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -1159,7 +1159,7 @@ if Hp > 1000:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -1180,14 +1180,14 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 
 # get BADA target speed from BADA ARPM procedure for the altitude bracket below
 [theta, delta, sigma] = atm.atmosphereProperties(
-    h=conv.ft2m(999), DeltaTemp=DeltaTemp
+    h=conv.ft2m(999), deltaTemp=deltaTemp
 )
 [cas, speedUpdated] = AC.ARPM.descentSpeed(
     h=conv.ft2m(999),
     mass=m_final,
     theta=theta,
     delta=delta,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
 )
 
 control = target(slopetarget=-3.0)
@@ -1205,7 +1205,7 @@ if AC.BADAFamily.BADA3:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -1228,7 +1228,7 @@ elif AC.BADAFamily.BADA4:
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
-        DeltaTemp=DeltaTemp,
+        deltaTemp=deltaTemp,
         Lat=LAT_final,
         Lon=LON_final,
         initialHeading={
@@ -1259,7 +1259,7 @@ flightTrajectory = TCL.constantSpeedSlope(
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
-    DeltaTemp=DeltaTemp,
+    deltaTemp=deltaTemp,
     Lat=LAT_final,
     Lon=LON_final,
     initialHeading={

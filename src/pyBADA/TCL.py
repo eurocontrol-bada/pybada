@@ -34,7 +34,7 @@ def constantSpeedLevel(
     v,
     Hp_init,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     maxRFL=float("Inf"),
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
@@ -61,7 +61,7 @@ def constantSpeedLevel(
     :param v: The target speed in [kt] for CAS/TAS or [-] for MACH.
     :param Hp_init: Initial pressure altitude at the start of the flight segment [ft].
     :param m_init: Initial mass of the aircraft [kg].
-    :param DeltaTemp: Deviation from the standard ISA temperature [K].
+    :param deltaTemp: Deviation from the standard ISA temperature [K].
     :param maxRFL: Maximum cruise altitude limit [ft]. Default is infinity.
     :param wS: Wind speed component along the longitudinal axis (positive for headwind, negative for tailwind) [kt]. Default is 0.0.
     :param turnMetrics: Dictionary containing turn parameters:
@@ -336,7 +336,7 @@ def constantSpeedLevel(
         # atmosphere properties
         H_m = conv.ft2m(Hp_i)  # altitude [m]
         [theta, delta, sigma] = atm.atmosphereProperties(
-            h=H_m, DeltaTemp=DeltaTemp
+            h=H_m, deltaTemp=deltaTemp
         )
         # aircraft speed
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
@@ -430,7 +430,7 @@ def constantSpeedLevel(
                         phase=flightPhase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -459,7 +459,7 @@ def constantSpeedLevel(
                 THR_i = Drag
                 CT = AC.CT(Thrust=THR_i, delta=delta)
                 FUEL_i = AC.ff(
-                    CT=CT, delta=delta, theta=theta, M=M_i, DeltaTemp=DeltaTemp
+                    CT=CT, delta=delta, theta=theta, M=M_i, deltaTemp=deltaTemp
                 )  # [kg/s]
 
             # BADA3
@@ -471,7 +471,7 @@ def constantSpeedLevel(
                         phase=flightPhase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -735,7 +735,7 @@ def constantSpeedLevel(
             nextHp = min(Hp_i + HpStep, maxRFL)
             H_m = conv.ft2m(nextHp)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
 
             # aircraft speed at upper cruise altitude
@@ -753,7 +753,7 @@ def constantSpeedLevel(
                         phase=flightPhase,
                         v=CAS_up,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -792,7 +792,7 @@ def constantSpeedLevel(
                         phase=flightPhase,
                         v=CAS_up,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -829,7 +829,7 @@ def constantSpeedLevel(
                     delta=delta,
                     theta=theta,
                     M=M_up,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # [kg/s]
 
             # Compare specific range at current and upper cruise altitudes
@@ -841,14 +841,14 @@ def constantSpeedLevel(
                         delta=delta,
                         theta=theta,
                         M=M_up,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # MCMB Thrust
                 elif AC.BADAFamily.BADA3:
                     THR_CL = AC.Thrust(
                         rating="MCMB",
                         v=TAS,
                         h=H_m,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                         config=config_i,
                     )  # MCMB Thrust
 
@@ -857,10 +857,10 @@ def constantSpeedLevel(
                     h=H_m,
                     flightEvolution=flightEvolution,
                     M=M_up,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 temp_const = (theta * const.temp_0) / (
-                    theta * const.temp_0 - DeltaTemp
+                    theta * const.temp_0 - deltaTemp
                 )  # T/T-dT
                 ROCD_up = (
                     conv.m2ft(
@@ -892,7 +892,7 @@ def constantSpeedLevel(
                             Hp_step=HpStep,
                             m_init=mass_i,
                             wS=wS,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                             Lat=LAT[-1],
                             Lon=LON[-1],
                             initialHeading={
@@ -913,7 +913,7 @@ def constantSpeedLevel(
                             Hp_step=HpStep,
                             m_init=mass_i,
                             wS=wS,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                             turnMetrics=turnMetrics,
                         )
 
@@ -982,7 +982,7 @@ def constantSpeedLevel(
                                     phase=flightPhase,
                                     v=CAS_up,
                                     mass=mass[-1],
-                                    DeltaTemp=DeltaTemp,
+                                    deltaTemp=deltaTemp,
                                 )
                             else:
                                 config_i = config_default
@@ -1025,7 +1025,7 @@ def constantSpeedLevel(
                                     phase=flightPhase,
                                     v=CAS_up,
                                     mass=mass[-1],
-                                    DeltaTemp=DeltaTemp,
+                                    deltaTemp=deltaTemp,
                                 )
                             else:
                                 config_i = config_default
@@ -1064,7 +1064,7 @@ def constantSpeedLevel(
                                 delta=delta,
                                 theta=theta,
                                 M=M_up,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )  # [kg/s]
 
                         Hp.append(Hp[-1])
@@ -1166,7 +1166,7 @@ def constantSpeedROCD(
     Hp_final,
     ROCDtarget,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
     Lat=None,
@@ -1194,7 +1194,7 @@ def constantSpeedROCD(
     :param Hp_final: Final pressure altitude at the end of the segment [ft].
     :param ROCDtarget: Target rate of climb/descent [ft/min].
     :param m_init: Initial aircraft mass at the start of the segment [kg].
-    :param DeltaTemp: Deviation from standard ISA temperature [K].
+    :param deltaTemp: Deviation from standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis [kt]. Positive values for headwind, negative for tailwind. Default is 0.0.
     :param turnMetrics: Dictionary defining turn parameters:
 
@@ -1467,10 +1467,10 @@ def constantSpeedROCD(
         # atmosphere properties
         H_m = conv.ft2m(Hp_i)  # altitude [m]
         [theta, delta, sigma] = atm.atmosphereProperties(
-            h=H_m, DeltaTemp=DeltaTemp
+            h=H_m, deltaTemp=deltaTemp
         )
         temp_const = (theta * const.temp_0) / (
-            theta * const.temp_0 - DeltaTemp
+            theta * const.temp_0 - deltaTemp
         )
 
         # aircraft speed
@@ -1486,7 +1486,7 @@ def constantSpeedROCD(
             ] = AC.ARPM.ARPMProcedure(
                 phase=phase,
                 h=H_m,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 mass=mass[-1],
                 rating="ARPM",
             )
@@ -1501,7 +1501,7 @@ def constantSpeedROCD(
         ESF_i = AC.esf(
             h=H_m,
             M=M_i,
-            DeltaTemp=DeltaTemp,
+            deltaTemp=deltaTemp,
             flightEvolution=("const" + speedType),
         )
 
@@ -1535,7 +1535,7 @@ def constantSpeedROCD(
                 # Compute power required for target ROCD
                 Preq_target_i = AC.Peng_target(
                     temp=theta * const.temp_0,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     ROCD=ROCDisu,
                     mass=mass_i,
                     Preq=Preq_i,
@@ -1551,7 +1551,7 @@ def constantSpeedROCD(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -1591,7 +1591,7 @@ def constantSpeedROCD(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -1637,7 +1637,7 @@ def constantSpeedROCD(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -1652,7 +1652,7 @@ def constantSpeedROCD(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -1682,7 +1682,7 @@ def constantSpeedROCD(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -1697,7 +1697,7 @@ def constantSpeedROCD(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -1723,28 +1723,28 @@ def constantSpeedROCD(
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Thrust
                 FUEL_min = AC.ff(
                     rating="LIDL",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Fuel Flow
                 THR_max = AC.Thrust(
                     rating="MCMB",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # MCMB Thrust
                 FUEL_max = AC.ff(
                     rating="MCMB",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # MCMB Fuel Flow
                 if THR_i < THR_min:
                     THR_i = THR_min
@@ -1779,7 +1779,7 @@ def constantSpeedROCD(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # [kg/s]
                     ROCD_i = ROCDtarget
 
@@ -1790,7 +1790,7 @@ def constantSpeedROCD(
                     v=TAS_i,
                     h=H_m,
                     config="CR",
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Thrust
                 FUEL_min = AC.ff(
                     flightPhase="Descent",
@@ -1804,7 +1804,7 @@ def constantSpeedROCD(
                     rating="MCMB",
                     v=TAS_i,
                     h=H_m,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     config="CR",
                 )  # MCMB Thrust
                 FUEL_max = AC.ff(
@@ -2206,7 +2206,7 @@ def constantSpeedROCD_time(
     Hp_init,
     ROCDtarget,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
     Lat=None,
@@ -2233,7 +2233,7 @@ def constantSpeedROCD_time(
     :param Hp_init: Initial pressure altitude [ft].
     :param ROCDtarget: Rate of climb or descent [ft/min].
     :param m_init: Initial aircraft mass at the start of the segment [kg].
-    :param DeltaTemp: Deviation from standard ISA temperature [K].
+    :param deltaTemp: Deviation from standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis [kt]. Default is 0.0.
     :param turnMetrics: Dictionary defining turn parameters:
 
@@ -2495,10 +2495,10 @@ def constantSpeedROCD_time(
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
 
             # aircraft speed
@@ -2514,7 +2514,7 @@ def constantSpeedROCD_time(
                 ] = AC.ARPM.ARPMProcedure(
                     phase=phase,
                     h=H_m,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     mass=mass[-1],
                     rating="ARPM",
                 )
@@ -2529,7 +2529,7 @@ def constantSpeedROCD_time(
             ESF_i = AC.esf(
                 h=H_m,
                 M=M_i,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 flightEvolution=("const" + speedType),
             )
 
@@ -2559,7 +2559,7 @@ def constantSpeedROCD_time(
                 # Compute power required for target ROCD
                 Preq_target_i = AC.Peng_target(
                     temp=theta * const.temp_0,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     ROCD=ROCDisu,
                     mass=mass_i,
                     Preq=Preq_i,
@@ -2575,7 +2575,7 @@ def constantSpeedROCD_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -2615,7 +2615,7 @@ def constantSpeedROCD_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -2661,7 +2661,7 @@ def constantSpeedROCD_time(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -2676,7 +2676,7 @@ def constantSpeedROCD_time(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -2706,7 +2706,7 @@ def constantSpeedROCD_time(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -2721,7 +2721,7 @@ def constantSpeedROCD_time(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -2747,28 +2747,28 @@ def constantSpeedROCD_time(
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Thrust
                 FUEL_min = AC.ff(
                     rating="LIDL",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Fuel Flow
                 THR_max = AC.Thrust(
                     rating="MCMB",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # MCMB Thrust
                 FUEL_max = AC.ff(
                     rating="MCMB",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # MCMB Fuel Flow
                 if THR_i < THR_min:
                     THR_i = THR_min
@@ -2803,7 +2803,7 @@ def constantSpeedROCD_time(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # [kg/s]
                     ROCD_i = ROCDtarget
 
@@ -2814,7 +2814,7 @@ def constantSpeedROCD_time(
                     v=TAS_i,
                     h=H_m,
                     config="CR",
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Thrust
                 FUEL_min = AC.ff(
                     flightPhase="Descent",
@@ -2828,7 +2828,7 @@ def constantSpeedROCD_time(
                     rating="MCMB",
                     v=TAS_i,
                     h=H_m,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     config="CR",
                 )  # MCMB Thrust
                 FUEL_max = AC.ff(
@@ -2979,10 +2979,10 @@ def constantSpeedROCD_time(
                 gamma_i = 90 * np.sign(ROCD_i)
             else:
                 [theta, delta, sigma] = atm.atmosphereProperties(
-                    h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
+                    h=conv.ft2m(Hp_i), deltaTemp=deltaTemp
                 )
                 temp_const = (theta * const.temp_0) / (
-                    theta * const.temp_0 - DeltaTemp
+                    theta * const.temp_0 - deltaTemp
                 )
                 if AC.BADAFamily.BADAE:
                     gamma_i = degrees(
@@ -3223,7 +3223,7 @@ def constantSpeedSlope(
     Hp_final,
     slopetarget,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
     Lat=None,
@@ -3250,7 +3250,7 @@ def constantSpeedSlope(
     :param Hp_final: Final pressure altitude [ft].
     :param slopetarget: Target slope (trajectory angle) to be maintained during climb/descent [deg].
     :param m_init: Initial mass of the aircraft at the start of the segment [kg].
-    :param DeltaTemp: Deviation from the standard ISA temperature [K].
+    :param deltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining the turn parameters:
 
@@ -3512,10 +3512,10 @@ def constantSpeedSlope(
         # atmosphere properties
         H_m = conv.ft2m(Hp_i)  # altitude [m]
         [theta, delta, sigma] = atm.atmosphereProperties(
-            h=H_m, DeltaTemp=DeltaTemp
+            h=H_m, deltaTemp=deltaTemp
         )
         temp_const = (theta * const.temp_0) / (
-            theta * const.temp_0 - DeltaTemp
+            theta * const.temp_0 - deltaTemp
         )
 
         # aircraft speed
@@ -3531,7 +3531,7 @@ def constantSpeedSlope(
             ] = AC.ARPM.ARPMProcedure(
                 phase=phase,
                 h=H_m,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 mass=mass[-1],
                 rating="ARPM",
             )
@@ -3561,7 +3561,7 @@ def constantSpeedSlope(
         ESF_i = AC.esf(
             h=H_m,
             M=M_i,
-            DeltaTemp=DeltaTemp,
+            deltaTemp=deltaTemp,
             flightEvolution=("const" + speedType),
         )
 
@@ -3586,7 +3586,7 @@ def constantSpeedSlope(
                 # Compute power required for target ROCD
                 Preq_target_i = AC.Peng_target(
                     temp=theta * const.temp_0,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     ROCD=ROCDisu,
                     mass=mass_i,
                     Preq=Preq_i,
@@ -3602,7 +3602,7 @@ def constantSpeedSlope(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -3642,7 +3642,7 @@ def constantSpeedSlope(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -3688,7 +3688,7 @@ def constantSpeedSlope(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -3703,7 +3703,7 @@ def constantSpeedSlope(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -3733,7 +3733,7 @@ def constantSpeedSlope(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -3748,7 +3748,7 @@ def constantSpeedSlope(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -3774,28 +3774,28 @@ def constantSpeedSlope(
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Thrust
                 FUEL_min = AC.ff(
                     rating="LIDL",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Fuel Flow
                 THR_max = AC.Thrust(
                     rating="MCMB",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # MCMB Thrust
                 FUEL_max = AC.ff(
                     rating="MCMB",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # MCMB Fuel Flow
 
                 if THR_i < THR_min:
@@ -3831,7 +3831,7 @@ def constantSpeedSlope(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # [kg/s]
                     ROCD_i = conv.m2ft(ROCDisu) * 60
 
@@ -3842,7 +3842,7 @@ def constantSpeedSlope(
                     v=TAS_i,
                     h=H_m,
                     config="CR",
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Thrust
                 FUEL_min = AC.ff(
                     flightPhase="Descent",
@@ -3856,7 +3856,7 @@ def constantSpeedSlope(
                     rating="MCMB",
                     v=TAS_i,
                     h=H_m,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     config="CR",
                 )  # MCMB Thrust
                 FUEL_max = AC.ff(
@@ -4255,7 +4255,7 @@ def constantSpeedSlope_time(
     Hp_init,
     slopetarget,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
     Lat=None,
@@ -4279,7 +4279,7 @@ def constantSpeedSlope_time(
     :param Hp_init: Initial pressure altitude [ft].
     :param slopetarget: Desired slope (trajectory angle) to follow [deg].
     :param m_init: Initial aircraft mass [kg].
-    :param DeltaTemp: Deviation from standard ISA temperature [K].
+    :param deltaTemp: Deviation from standard ISA temperature [K].
     :param wS: Longitudinal wind speed component (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining the turn parameters:
 
@@ -4538,10 +4538,10 @@ def constantSpeedSlope_time(
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
 
             # aircraft speed
@@ -4557,7 +4557,7 @@ def constantSpeedSlope_time(
                 ] = AC.ARPM.ARPMProcedure(
                     phase=phase,
                     h=H_m,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     mass=mass[-1],
                     rating="ARPM",
                 )
@@ -4587,7 +4587,7 @@ def constantSpeedSlope_time(
             ESF_i = AC.esf(
                 h=H_m,
                 M=M_i,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 flightEvolution=("const" + speedType),
             )
 
@@ -4613,7 +4613,7 @@ def constantSpeedSlope_time(
                 # Compute power required for target ROCD
                 Preq_target_i = AC.Peng_target(
                     temp=theta * const.temp_0,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     ROCD=ROCDisu,
                     mass=mass_i,
                     Preq=Preq_i,
@@ -4629,7 +4629,7 @@ def constantSpeedSlope_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -4669,7 +4669,7 @@ def constantSpeedSlope_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -4715,7 +4715,7 @@ def constantSpeedSlope_time(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -4730,7 +4730,7 @@ def constantSpeedSlope_time(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -4760,7 +4760,7 @@ def constantSpeedSlope_time(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -4775,7 +4775,7 @@ def constantSpeedSlope_time(
                                 mass=mass_i,
                                 ESF=ESF_i,
                                 theta=theta,
-                                DeltaTemp=DeltaTemp,
+                                deltaTemp=deltaTemp,
                             )
                         )
                         * 60
@@ -4801,28 +4801,28 @@ def constantSpeedSlope_time(
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Thrust
                 FUEL_min = AC.ff(
                     rating="LIDL",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Fuel Flow
                 THR_max = AC.Thrust(
                     rating="MCMB",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # MCMB Thrust
                 FUEL_max = AC.ff(
                     rating="MCMB",
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # MCMB Fuel Flow
 
                 if THR_i < THR_min:
@@ -4858,7 +4858,7 @@ def constantSpeedSlope_time(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # [kg/s]
                     ROCD_i = conv.m2ft(ROCDisu) * 60
 
@@ -4869,7 +4869,7 @@ def constantSpeedSlope_time(
                     v=TAS_i,
                     h=H_m,
                     config="CR",
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # IDLE Thrust
                 FUEL_min = AC.ff(
                     flightPhase="Descent",
@@ -4883,7 +4883,7 @@ def constantSpeedSlope_time(
                     rating="MCMB",
                     v=TAS_i,
                     h=H_m,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     config="CR",
                 )  # MCMB Thrust
                 FUEL_max = AC.ff(
@@ -5034,10 +5034,10 @@ def constantSpeedSlope_time(
                 gamma_i = 90 * np.sign(ROCD_i)
             else:
                 [theta, delta, sigma] = atm.atmosphereProperties(
-                    h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
+                    h=conv.ft2m(Hp_i), deltaTemp=deltaTemp
                 )
                 temp_const = (theta * const.temp_0) / (
-                    theta * const.temp_0 - DeltaTemp
+                    theta * const.temp_0 - deltaTemp
                 )
                 if AC.BADAFamily.BADAE:
                     gamma_i = degrees(
@@ -5277,7 +5277,7 @@ def constantSpeedRating(
     Hp_init,
     Hp_final,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
     Lat=None,
@@ -5305,7 +5305,7 @@ def constantSpeedRating(
     :param Hp_init: Initial pressure altitude [ft].
     :param Hp_final: Final pressure altitude [ft].
     :param m_init: Initial mass of the aircraft at the start of the segment [kg].
-    :param DeltaTemp: Deviation from the standard ISA temperature [K].
+    :param deltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining the turn parameters:
 
@@ -5595,10 +5595,10 @@ def constantSpeedRating(
         # atmosphere properties
         H_m = conv.ft2m(Hp_i)  # altitude [m]
         [theta, delta, sigma] = atm.atmosphereProperties(
-            h=H_m, DeltaTemp=DeltaTemp
+            h=H_m, deltaTemp=deltaTemp
         )
         temp_const = (theta * const.temp_0) / (
-            theta * const.temp_0 - DeltaTemp
+            theta * const.temp_0 - deltaTemp
         )
 
         # aircraft speed
@@ -5614,7 +5614,7 @@ def constantSpeedRating(
             ] = AC.ARPM.ARPMProcedure(
                 phase=phase,
                 h=H_m,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 mass=mass[-1],
                 rating=rating,
             )
@@ -5644,7 +5644,7 @@ def constantSpeedRating(
         ESF_i = AC.esf(
             h=H_m,
             M=M_i,
-            DeltaTemp=DeltaTemp,
+            deltaTemp=deltaTemp,
             flightEvolution=("const" + speedType),
         )
 
@@ -5695,14 +5695,14 @@ def constantSpeedRating(
                 delta=delta,
                 theta=theta,
                 M=M_i,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )  # [N]
             FUEL_i = AC.ff(
                 rating=rating,
                 delta=delta,
                 theta=theta,
                 M=M_i,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
 
         # BADA3
@@ -5714,7 +5714,7 @@ def constantSpeedRating(
                     phase=phase,
                     v=CAS_i,
                     mass=mass_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
             else:
                 config_i = config_default
@@ -5733,7 +5733,7 @@ def constantSpeedRating(
                 v=TAS_i,
                 h=H_m,
                 config=config_i,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
             )
             FUEL_i = AC.ff(
                 flightPhase=phase, v=TAS_i, h=H_m, T=THR_i, config=config_i
@@ -5768,7 +5768,7 @@ def constantSpeedRating(
                             mass=mass_i,
                             ESF=ESF_i,
                             theta=theta,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                         )
                     )
                     * 60
@@ -5783,7 +5783,7 @@ def constantSpeedRating(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -5834,7 +5834,7 @@ def constantSpeedRating(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -5868,7 +5868,7 @@ def constantSpeedRating(
                             mass=mass_i,
                             ESF=ESF_i,
                             h=H_m,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                             reducedPower=reducedPower,
                         )
                     )
@@ -6227,7 +6227,7 @@ def constantSpeedRating_time(
     Hp_init,
     phase,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
     Lat=None,
@@ -6255,7 +6255,7 @@ def constantSpeedRating_time(
     :param Hp_init: Initial pressure altitude [ft].
     :param phase: Phase of flight (Climb or Descent).
     :param m_init: Initial mass of the aircraft at the start of the segment [kg].
-    :param DeltaTemp: Deviation from the standard ISA temperature [K].
+    :param deltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining the turn parameters:
 
@@ -6549,10 +6549,10 @@ def constantSpeedRating_time(
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
 
             # aircraft speed
@@ -6568,7 +6568,7 @@ def constantSpeedRating_time(
                 ] = AC.ARPM.ARPMProcedure(
                     phase=phase,
                     h=H_m,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     mass=mass[-1],
                     rating=rating,
                 )
@@ -6598,7 +6598,7 @@ def constantSpeedRating_time(
             ESF_i = AC.esf(
                 h=H_m,
                 M=M_i,
-                DeltaTemp=DeltaTemp,
+                deltaTemp=deltaTemp,
                 flightEvolution=("const" + speedType),
             )
 
@@ -6651,14 +6651,14 @@ def constantSpeedRating_time(
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # [N]
                 FUEL_i = AC.ff(
                     rating=rating,
                     delta=delta,
                     theta=theta,
                     M=M_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
 
             # BADA3
@@ -6670,7 +6670,7 @@ def constantSpeedRating_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -6689,7 +6689,7 @@ def constantSpeedRating_time(
                     v=TAS_i,
                     h=H_m,
                     config=config_i,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )
                 FUEL_i = AC.ff(
                     flightPhase=phase, v=TAS_i, h=H_m, T=THR_i, config=config_i
@@ -6710,7 +6710,7 @@ def constantSpeedRating_time(
                             mass=mass_i,
                             ESF=ESF_i,
                             theta=theta,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                         )
                     )
                     * 60
@@ -6725,7 +6725,7 @@ def constantSpeedRating_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -6776,7 +6776,7 @@ def constantSpeedRating_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -6810,7 +6810,7 @@ def constantSpeedRating_time(
                             mass=mass_i,
                             ESF=ESF_i,
                             h=H_m,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                             reducedPower=reducedPower,
                         )
                     )
@@ -6924,10 +6924,10 @@ def constantSpeedRating_time(
                 gamma_i = 90 * np.sign(ROCD_i)
             else:
                 [theta, delta, sigma] = atm.atmosphereProperties(
-                    h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
+                    h=conv.ft2m(Hp_i), deltaTemp=deltaTemp
                 )
                 temp_const = (theta * const.temp_0) / (
-                    theta * const.temp_0 - DeltaTemp
+                    theta * const.temp_0 - deltaTemp
                 )
                 if AC.BADAFamily.BADAE:
                     gamma_i = degrees(
@@ -7168,7 +7168,7 @@ def accDec(
     phase,
     Hp_init,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
     control=None,
@@ -7210,7 +7210,7 @@ def accDec(
         - ESFtarget: Energy Share Factor to be followed [-].
     :param Hp_init: Initial pressure altitude [ft].
     :param m_init: Initial aircraft mass [kg].
-    :param DeltaTemp: Deviation from the standard ISA temperature [K].
+    :param deltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining turn parameters:
 
@@ -7609,10 +7609,10 @@ def accDec(
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
 
             # aircraft speed
@@ -7704,7 +7704,7 @@ def accDec(
                                         mass=mass_i,
                                         ESF=ESFc,
                                         theta=theta,
-                                        DeltaTemp=DeltaTemp,
+                                        deltaTemp=deltaTemp,
                                     )
                                 )
                                 * 60
@@ -7734,7 +7734,7 @@ def accDec(
                                         mass=mass_i,
                                         ESF=ESFc,
                                         theta=theta,
-                                        DeltaTemp=DeltaTemp,
+                                        deltaTemp=deltaTemp,
                                     )
                                 )
                                 * 60
@@ -7806,7 +7806,7 @@ def accDec(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -7855,28 +7855,28 @@ def accDec(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # IDLE Thrust
                     FUEL_min = AC.ff(
                         rating="LIDL",
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # IDLE Fuel Flow
                     THR_max = AC.Thrust(
                         rating="MCMB",
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # MCMB Thrust
                     FUEL_max = AC.ff(
                         rating="MCMB",
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # MCMB Fuel Flow
 
                     if THR_i < THR_min:
@@ -7892,7 +7892,7 @@ def accDec(
                             delta=delta,
                             theta=theta,
                             M=M_i,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                         )
                 else:
                     THR_i = AC.Thrust(
@@ -7900,7 +7900,7 @@ def accDec(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # [N]
                     CT = AC.CT(Thrust=THR_i, delta=delta)
                     FUEL_i = AC.ff(
@@ -7908,7 +7908,7 @@ def accDec(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
 
                 # compute excess power
@@ -7923,7 +7923,7 @@ def accDec(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -7967,7 +7967,7 @@ def accDec(
                         v=TAS_i,
                         h=H_m,
                         config="CR",
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # IDLE Thrust
                     FUEL_min = AC.ff(
                         flightPhase="Descent",
@@ -7982,7 +7982,7 @@ def accDec(
                         v=TAS_i,
                         h=H_m,
                         config="CR",
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # MCMB Thrust
                     FUEL_max = AC.ff(
                         flightPhase="Climb",
@@ -8013,7 +8013,7 @@ def accDec(
                         v=TAS_i,
                         h=H_m,
                         config=config_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                     if rating == "MCMB" or rating == "MTKF":
                         FUEL_i = AC.ff(
@@ -8195,10 +8195,10 @@ def accDec(
             gamma_i = 90 * np.sign(ROCD_i)
         else:
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
+                h=conv.ft2m(Hp_i), deltaTemp=deltaTemp
             )
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
             if AC.BADAFamily.BADAE:
                 gamma_i = degrees(
@@ -8450,7 +8450,7 @@ def accDec_time(
     phase,
     Hp_init,
     m_init,
-    DeltaTemp,
+    deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
     control=None,
@@ -8493,7 +8493,7 @@ def accDec_time(
         - ESFtarget: Energy Share Factor to be followed [-].
     :param Hp_init: Initial pressure altitude [ft].
     :param m_init: Initial aircraft mass [kg].
-    :param DeltaTemp: Deviation from the standard ISA temperature [K].
+    :param deltaTemp: Deviation from the standard ISA temperature [K].
     :param wS: Wind speed component along the longitudinal axis (affects ground speed) [kt]. Default is 0.0.
     :param turnMetrics: A dictionary defining turn parameters:
 
@@ -8805,7 +8805,7 @@ def accDec_time(
 
     # initialize output parameters
     [theta_init, delta_init, sigma_init] = atm.atmosphereProperties(
-        h=conv.ft2m(Hp_init), DeltaTemp=DeltaTemp
+        h=conv.ft2m(Hp_init), deltaTemp=deltaTemp
     )
     [M_init, CAS_init, TAS_init] = atm.convertSpeed(
         v=v_init,
@@ -8896,10 +8896,10 @@ def accDec_time(
             # atmosphere properties
             H_m = conv.ft2m(Hp_i)  # altitude [m]
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, DeltaTemp=DeltaTemp
+                h=H_m, deltaTemp=deltaTemp
             )
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
 
             step_time = length_loop - time[-1]
@@ -8987,7 +8987,7 @@ def accDec_time(
                                         mass=mass_i,
                                         ESF=ESFc,
                                         theta=theta,
-                                        DeltaTemp=DeltaTemp,
+                                        deltaTemp=deltaTemp,
                                     )
                                 )
                                 * 60
@@ -9016,7 +9016,7 @@ def accDec_time(
                                         mass=mass_i,
                                         ESF=ESFc,
                                         theta=theta,
-                                        DeltaTemp=DeltaTemp,
+                                        deltaTemp=deltaTemp,
                                     )
                                 )
                                 * 60
@@ -9088,7 +9088,7 @@ def accDec_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -9137,28 +9137,28 @@ def accDec_time(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # IDLE Thrust
                     FUEL_min = AC.ff(
                         rating="LIDL",
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # IDLE Fuel Flow
                     THR_max = AC.Thrust(
                         rating="MCMB",
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # MCMB Thrust
                     FUEL_max = AC.ff(
                         rating="MCMB",
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # MCMB Fuel Flow
 
                     if THR_i < THR_min:
@@ -9174,7 +9174,7 @@ def accDec_time(
                             delta=delta,
                             theta=theta,
                             M=M_i,
-                            DeltaTemp=DeltaTemp,
+                            deltaTemp=deltaTemp,
                         )
                 else:
                     THR_i = AC.Thrust(
@@ -9182,7 +9182,7 @@ def accDec_time(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # [N]
                     CT = AC.CT(Thrust=THR_i, delta=delta)
                     FUEL_i = AC.ff(
@@ -9190,10 +9190,10 @@ def accDec_time(
                         delta=delta,
                         theta=theta,
                         M=M_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                     # FUEL_i = AC.ff(
-                    # CT=CT, delta=delta, theta=theta, M=M_i, DeltaTemp=DeltaTemp
+                    # CT=CT, delta=delta, theta=theta, M=M_i, deltaTemp=deltaTemp
                     # )
 
                 # compute excess power
@@ -9208,7 +9208,7 @@ def accDec_time(
                         phase=phase,
                         v=CAS_i,
                         mass=mass_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                 else:
                     config_i = config_default
@@ -9252,7 +9252,7 @@ def accDec_time(
                         v=TAS_i,
                         h=H_m,
                         config="CR",
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # IDLE Thrust
                     FUEL_min = AC.ff(
                         flightPhase="Descent",
@@ -9267,7 +9267,7 @@ def accDec_time(
                         v=TAS_i,
                         h=H_m,
                         config="CR",
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )  # MCMB Thrust
                     FUEL_max = AC.ff(
                         flightPhase="Climb",
@@ -9298,7 +9298,7 @@ def accDec_time(
                         v=TAS_i,
                         h=H_m,
                         config=config_i,
-                        DeltaTemp=DeltaTemp,
+                        deltaTemp=deltaTemp,
                     )
                     if rating == "MCMB" or rating == "MTKF":
                         FUEL_i = AC.ff(
@@ -9476,10 +9476,10 @@ def accDec_time(
             gamma_i = 90 * np.sign(ROCD_i)
         else:
             [theta, delta, sigma] = atm.atmosphereProperties(
-                h=conv.ft2m(Hp_i), DeltaTemp=DeltaTemp
+                h=conv.ft2m(Hp_i), deltaTemp=deltaTemp
             )
             temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - DeltaTemp
+                theta * const.temp_0 - deltaTemp
             )
             if AC.BADAFamily.BADAE:
                 gamma_i = degrees(
