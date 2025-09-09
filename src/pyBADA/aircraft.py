@@ -211,13 +211,13 @@ class Airplane:
         """Computes the energy share factor based on flight conditions.
 
         :param h: Altitude in meters.
-        :param DeltaTemp: Temperature deviation with respect to ISA in Kelvin.
+        :param deltaTemp: Temperature deviation with respect to ISA in Kelvin.
         :param flightEvolution: Type of flight evolution
             [constM/constCAS/acc/dec].
         :param phase: Phase of flight [cl/des].
         :param v: Constant speed (Mach number).
         :type h: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :type flightEvolution: str
         :type phase: str
         :type v: float
@@ -251,9 +251,9 @@ class Airplane:
             # constant M below or at tropopause
             elif flightEvolution == "constM" and h <= const.h_11:
                 M = checkArgument("M", **kwargs)
-                DeltaTemp = checkArgument("DeltaTemp", **kwargs)
+                deltaTemp = checkArgument("deltaTemp", **kwargs)
 
-                temp = atm.theta(h, DeltaTemp) * const.temp_0
+                temp = atm.theta(h, deltaTemp) * const.temp_0
                 ESF = 1 / (
                     1
                     + (
@@ -264,15 +264,15 @@ class Airplane:
                         * M
                         / (2 * const.g)
                     )
-                    * ((temp - DeltaTemp) / temp)
+                    * ((temp - deltaTemp) / temp)
                 )
 
             # constant CAS below or at tropopause
             elif flightEvolution == "constCAS" and h <= const.h_11:
                 M = checkArgument("M", **kwargs)
-                DeltaTemp = checkArgument("DeltaTemp", **kwargs)
+                deltaTemp = checkArgument("deltaTemp", **kwargs)
 
-                temp = atm.theta(h, DeltaTemp) * const.temp_0
+                temp = atm.theta(h, deltaTemp) * const.temp_0
                 A = (
                     const.Agamma
                     * const.R
@@ -280,7 +280,7 @@ class Airplane:
                     * M
                     * M
                     / (2 * const.g)
-                ) * ((temp - DeltaTemp) / temp)
+                ) * ((temp - deltaTemp) / temp)
                 B = pow(
                     1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1)
                 )
@@ -331,13 +331,13 @@ class Helicopter:
         """Computes the energy share factor based on flight conditions.
 
         :param h: Altitude in meters.
-        :param DeltaTemp: Temperature deviation with respect to ISA in Kelvin.
+        :param deltaTemp: Temperature deviation with respect to ISA in Kelvin.
         :param flightEvolution: Type of flight evolution
             [constTAS/constCAS/acc/dec].
         :param phase: Phase of flight [Climb/Descent].
         :param v: Constant speed (Mach number).
         :type h: float
-        :type DeltaTemp: float
+        :type deltaTemp: float
         :type flightEvolution: str
         :type phase: str
         :type v: float
@@ -366,9 +366,9 @@ class Helicopter:
             if flightEvolution == "constCAS":
                 h = checkArgument("h", **kwargs)
                 M = checkArgument("M", **kwargs)
-                DeltaTemp = checkArgument("DeltaTemp", **kwargs)
+                deltaTemp = checkArgument("deltaTemp", **kwargs)
 
-                theta = atm.theta(h, DeltaTemp)
+                theta = atm.theta(h, deltaTemp)
                 temp = theta * const.temp_0
 
                 A = (
@@ -378,7 +378,7 @@ class Helicopter:
                     * M
                     * M
                     / (2 * const.g)
-                ) * ((temp - DeltaTemp) / temp)
+                ) * ((temp - deltaTemp) / temp)
                 B = pow(
                     1 + (const.Agamma - 1) * M * M / 2, -1 / (const.Agamma - 1)
                 )

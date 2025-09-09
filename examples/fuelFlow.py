@@ -24,7 +24,7 @@ ACList = [
 ]
 
 # deviation from ISA temperature
-DeltaTemp = 0
+deltaTemp = 0
 
 # definition of altitude range
 fl_array = np.arange(0, 401, 5)
@@ -61,12 +61,12 @@ for AC in ACList:
     for alt in altitude_array:
         # atmosphere properties
         theta, delta, sigma = atm.atmosphereProperties(
-            h=alt, DeltaTemp=DeltaTemp
+            h=alt, deltaTemp=deltaTemp
         )
 
         # determine the speed acording to BADA ARPM
         [cas, speedUpdated] = AC.ARPM.descentSpeed(
-            h=alt, mass=mass, theta=theta, delta=delta, DeltaTemp=DeltaTemp
+            h=alt, mass=mass, theta=theta, delta=delta, deltaTemp=deltaTemp
         )
         # general speed conversion
         [M, CAS, TAS] = atm.convertSpeed(
@@ -79,17 +79,17 @@ for AC in ACList:
 
         # determine the aerodynamic configuration if necesary
         config = AC.flightEnvelope.getConfig(
-            h=alt, phase="Descent", v=CAS, mass=mass, DeltaTemp=DeltaTemp
+            h=alt, phase="Descent", v=CAS, mass=mass, deltaTemp=deltaTemp
         )
 
         # calculate Energy Share Factor depending if aircraft is flying constant M or CAS (based on crossover altitude)
         if alt < crossAlt:
             ESF = AC.esf(
-                h=alt, flightEvolution="constCAS", M=M, DeltaTemp=DeltaTemp
+                h=alt, flightEvolution="constCAS", M=M, deltaTemp=deltaTemp
             )
         else:
             ESF = AC.esf(
-                h=alt, flightEvolution="constM", M=M, DeltaTemp=DeltaTemp
+                h=alt, flightEvolution="constM", M=M, deltaTemp=deltaTemp
             )
 
         # =====
@@ -102,7 +102,7 @@ for AC in ACList:
             if config == "AP" or config == "LD":
                 gamma = -3.0
                 temp_const = (theta * const.temp_0) / (
-                    theta * const.temp_0 - DeltaTemp
+                    theta * const.temp_0 - deltaTemp
                 )
                 ROCD_gamma = sin(conv.deg2rad(gamma)) * TAS * (1 / temp_const)
 
@@ -116,7 +116,7 @@ for AC in ACList:
                 ) + Drag
                 CT = AC.CT(Thrust=Thrust, delta=delta)
                 ff = AC.ff(
-                    CT=CT, delta=delta, theta=theta, M=M, DeltaTemp=DeltaTemp
+                    CT=CT, delta=delta, theta=theta, M=M, deltaTemp=deltaTemp
                 )
 
             # =============================================================
@@ -128,7 +128,7 @@ for AC in ACList:
                     delta=delta,
                     theta=theta,
                     M=M,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                 )  # [kg/s]
 
         # =====
@@ -147,7 +147,7 @@ for AC in ACList:
             if config in ("AP", "LD"):
                 gamma = -3.0
                 temp_const = (theta * const.temp_0) / (
-                    theta * const.temp_0 - DeltaTemp
+                    theta * const.temp_0 - deltaTemp
                 )
                 ROCD_gamma = sin(conv.deg2rad(gamma)) * TAS * (1 / temp_const)
 
@@ -163,7 +163,7 @@ for AC in ACList:
                     ROCD=ROCD_gamma,
                     mass=mass,
                     acc=0,
-                    DeltaTemp=DeltaTemp,
+                    deltaTemp=deltaTemp,
                     Drag=Drag,
                 )
                 ff = AC.ff(

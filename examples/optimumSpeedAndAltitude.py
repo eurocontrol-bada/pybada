@@ -20,17 +20,17 @@ print("BADA4 Optimum Speed and Altitude:")
 if AC.BADAFamily.BADA4:
     mass = AC.MTOW  # [kg] AC weight
     h = conv.ft2m(33000)  # [m] AC flight altitdue
-    DeltaTemp = 0  # [K] temperature deviation from ISA
+    deltaTemp = 0  # [K] temperature deviation from ISA
     cI = 50  # [kg min^-1] cost index
     wS = 0  # [m s^-1] longitudinal wind speed
 
     [theta, delta, sigma] = atm.atmosphereProperties(
-        h=h, DeltaTemp=DeltaTemp
+        h=h, deltaTemp=deltaTemp
     )  # atmosphere properties
 
     # Economic Mach Cruise Speed
     econMach = AC.OPT.econMach(
-        theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, cI=cI, wS=wS
+        theta=theta, delta=delta, mass=mass, deltaTemp=deltaTemp, cI=cI, wS=wS
     )
     print("EconMach = ", econMach)
 
@@ -41,7 +41,7 @@ if AC.BADAFamily.BADA4:
 
     # Maximum Range Cruise (MRC) Mach speed
     MRC = AC.OPT.MRC(
-        theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS
+        theta=theta, delta=delta, mass=mass, deltaTemp=deltaTemp, wS=wS
     )
     print("MRC = ", MRC)
 
@@ -50,7 +50,7 @@ if AC.BADAFamily.BADA4:
 
     # Long Range Cruise (LRC) Mach speed
     LRC = AC.OPT.LRC(
-        theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS
+        theta=theta, delta=delta, mass=mass, deltaTemp=deltaTemp, wS=wS
     )
     print("LRC = ", LRC)
 
@@ -59,7 +59,7 @@ if AC.BADAFamily.BADA4:
 
     # Maximum Endurance Cruise (MEC) Mach speed
     MEC = AC.OPT.MEC(
-        theta=theta, delta=delta, mass=mass, DeltaTemp=DeltaTemp, wS=wS
+        theta=theta, delta=delta, mass=mass, deltaTemp=deltaTemp, wS=wS
     )
     print("MEC = ", MEC)
 
@@ -68,7 +68,7 @@ if AC.BADAFamily.BADA4:
 
     # optimum flight altitude at given M speed
     M = MRC
-    optAlt = AC.OPT.optAltitude(M=M, mass=mass, DeltaTemp=DeltaTemp)
+    optAlt = AC.OPT.optAltitude(M=M, mass=mass, deltaTemp=deltaTemp)
     print("optAlt =", optAlt)
 
     optAlt_precomputed = AC.OPT.getOPTParam("OPTALT", M, mass)
@@ -83,31 +83,31 @@ if AC.BADAFamily.BADAH:
     mass = 1600  # [kg] AC weight
     Hp = 14000  # [ft] AC flight altitude
     h = conv.ft2m(Hp)  # [m] AC flight altitude
-    DeltaTemp = 20  # [K] temperature deviation from ISA
+    deltaTemp = 20  # [K] temperature deviation from ISA
     wS = 0  # [m s^-1] longitudinal wind speed
 
     [theta, delta, sigma] = atm.atmosphereProperties(
-        h=h, DeltaTemp=DeltaTemp
+        h=h, deltaTemp=deltaTemp
     )  # atmoshpere properties
 
     # Maximum Range Cruise (MRC) Mach speed
-    MRC = AC.OPT.MRC(h=h, mass=mass, DeltaTemp=DeltaTemp, wS=wS)
+    MRC = AC.OPT.MRC(h=h, mass=mass, deltaTemp=deltaTemp, wS=wS)
     # print("MRC = ", conv.ms2kt(MRC))
     print("MRC = ", (MRC))
 
-    MRC_precomputed = AC.OPT.getOPTParam("MRC", Hp, mass, DeltaTemp)
+    MRC_precomputed = AC.OPT.getOPTParam("MRC", Hp, mass, deltaTemp)
     print("MRC_precomputed = ", conv.kt2ms(MRC_precomputed))
 
     # Long Range Cruise (LRC) Mach speed
-    LRC = AC.OPT.LRC(h=h, mass=mass, DeltaTemp=DeltaTemp, wS=wS)
+    LRC = AC.OPT.LRC(h=h, mass=mass, deltaTemp=deltaTemp, wS=wS)
     print("LRC = ", (LRC))
 
-    LRC_precomputed = AC.OPT.getOPTParam("LRC", Hp, mass, DeltaTemp)
+    LRC_precomputed = AC.OPT.getOPTParam("LRC", Hp, mass, deltaTemp)
     print("LRC_precomputed = ", conv.kt2ms(LRC_precomputed))
 
     # Maximum Endurance Cruise (MEC) Mach speed
-    MEC = AC.OPT.MEC(h=h, mass=mass, DeltaTemp=DeltaTemp, wS=wS)
+    MEC = AC.OPT.MEC(h=h, mass=mass, deltaTemp=deltaTemp, wS=wS)
     print("MEC = ", (MEC))
 
-    MEC_precomputed = AC.OPT.getOPTParam("MEC", Hp, mass, DeltaTemp)
+    MEC_precomputed = AC.OPT.getOPTParam("MEC", Hp, mass, deltaTemp)
     print("MEC_precomputed = ", conv.kt2ms(MEC_precomputed))
