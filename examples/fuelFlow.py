@@ -19,8 +19,8 @@ from pyBADA.bada4 import Bada4Aircraft
 
 # create an aircraft
 ACList = [
-    Bada4Aircraft(badaVersion="4.3", acName="A320"),
-    Bada3Aircraft(badaVersion="3.16", acName="A320"),
+    Bada4Aircraft(badaVersion="DUMMY", acName="Dummy-TWIN"),
+    Bada3Aircraft(badaVersion="DUMMY", acName="J2M"),
 ]
 
 # deviation from ISA temperature
@@ -44,7 +44,7 @@ for AC in ACList:
     crossAlt = atm.crossOver(cas=Vdes2, Mach=Mdes)
 
     label = (
-        f"{AC.acName.strip('_')} (BADA {getattr(AC, 'BADAVersion')}) {mass} kg"
+        f"({AC.BADAFamilyName}) {AC.acName.strip('_')} (BADA {getattr(AC, 'BADAVersion')}) {mass} kg"
     )
 
     alt_ft_vals = []
