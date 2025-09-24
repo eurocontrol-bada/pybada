@@ -8649,7 +8649,7 @@ def accDec_time(
         if control.slopetarget is not None and control.slopetarget > 0:
             control.slopetarget = control.slopetarget * (-1)
             print("Slopetarget for Descent should be negative")
-        if control.ROCDtarget is not None and control.ROCDtarget < 0:
+        if control.ROCDtarget is not None and control.ROCDtarget > 0:
             control.ROCDtarget = control.ROCDtarget * (-1)
             print("ROCDtarget for Descent should be negative")
 
@@ -9186,15 +9186,12 @@ def accDec_time(
                     )  # [N]
                     CT = AC.CT(Thrust=THR_i, delta=delta)
                     FUEL_i = AC.ff(
-                        rating="LIDL",
+                        CT=CT,
                         delta=delta,
                         theta=theta,
                         M=M_i,
                         deltaTemp=deltaTemp,
                     )
-                    # FUEL_i = AC.ff(
-                    # CT=CT, delta=delta, theta=theta, M=M_i, deltaTemp=deltaTemp
-                    # )
 
                 # compute excess power
                 Pe_i = (THR_i - Drag) * TAS_i  # [kg*m^2/s^3]
