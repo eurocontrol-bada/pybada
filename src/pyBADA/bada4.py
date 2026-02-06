@@ -2489,7 +2489,7 @@ class FlightEnvelope(BADA4):
                     x1=np.array([0]),
                     x2=np.array([conv.ft2m(hMax)]),
                     disp=False,
-                )
+                ).item()
             )
 
         return hMax

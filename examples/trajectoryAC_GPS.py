@@ -9,9 +9,9 @@ from dataclasses import dataclass
 
 import matplotlib.pyplot as plt
 
-from pyBADA import trajectorySegments
 from pyBADA import atmosphere as atm
 from pyBADA import conversions as conv
+from pyBADA import trajectorySegments
 from pyBADA.bada4 import Bada4Aircraft
 from pyBADA.bada4 import Parser as Bada4Parser
 from pyBADA.flightTrajectory import FlightTrajectory as FT
@@ -584,7 +584,7 @@ Hp, m_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 
 flightTrajectory = trajectorySegments.constantSpeedLevel(
     AC=AC,
-    lengthType="distance",
+    lengthType="DISTANCE",
     length=200,
     speedType="M",
     v=Mcr,

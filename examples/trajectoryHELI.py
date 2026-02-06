@@ -10,8 +10,8 @@ from math import pi, tan
 
 import matplotlib.pyplot as plt
 
-from pyBADA import trajectorySegments
 from pyBADA import constants as const
+from pyBADA import trajectorySegments
 from pyBADA.badaH import BadaHAircraft
 from pyBADA.badaH import Parser as BadaHParser
 from pyBADA.flightTrajectory import FlightTrajectory as FT
@@ -135,7 +135,7 @@ length = 14.02  # 30 - 3.57 - DEdist
 # cruise const TAS
 flightTrajectory = trajectorySegments.constantSpeedLevel(
     AC=AC,
-    lengthType="distance",
+    lengthType="DISTANCE",
     length=length,
     speedType=speedType,
     v=v,
