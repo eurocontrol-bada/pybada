@@ -355,11 +355,11 @@ def constantSpeedLevel(
                     rateOfTurn=rateOfTurn, v=TAS_i
                 )  # [degrees]
 
-        if lengthType == "distance":
+        if lengthType == "DISTANCE":
             # step time is: distance differantial divided by ground speed
             step_distance = totalLength - dist_i  # [NM]
             step_time = 3600 * step_distance / GS_i  # [s]
-        elif lengthType == "time":
+        elif lengthType == "TIME":
             step_time = totalLength - time_i  # [s]
 
             if turnFlight:
@@ -917,9 +917,9 @@ def constantSpeedLevel(
                         )
 
                     # Avoid a step just before the Top of Descent, which can cause stability issues in the main cruise+descent loop
-                    if lengthType == "distance":
+                    if lengthType == "DISTANCE":
                         length_CL = flightTrajectory_CL["dist"].iloc[-1]
-                    elif lengthType == "time":
+                    elif lengthType == "TIME":
                         length_CL = flightTrajectory_CL["time"].iloc[-1]
 
                     if (totalLength + length_CL) < length - step_length:
@@ -1816,7 +1816,6 @@ def constantSpeedROCD(
                 )  # MCMB Fuel Flow
 
                 if THR_i < THR_min:
-                    print("below minimum")
                     THR_i = THR_min
                     FUEL_i = FUEL_min
                     ROCD_i = (
