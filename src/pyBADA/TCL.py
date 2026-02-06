@@ -1747,7 +1747,7 @@ def apcClimbCalculation(
     meteo: myTypes.Meteo | None = None,
     controlTarget: myTypes.ControlTarget | None = None,
     speedBrakes: myTypes.SpeedBrakes | None = None,
-    CASMACHProfileConfiguration: myTypes.ClimbCASMACHProfileConfiguration
+    climbCASMACHProfileConfiguration: myTypes.ClimbCASMACHProfileConfiguration
     | None = None,
 ) -> FT:
     """Dispatches and calculates the aircraft climb trajectory based on the specified climb type.
@@ -1766,7 +1766,7 @@ def apcClimbCalculation(
     :param meteo: Meteorological data (wind speed and temperature deviation).
     :param controlTarget: Target parameters governing the climb (e.g., target ROCD).
     :param speedBrakes: Configuration for speed brake state and deployment value.
-    :param CASMACHProfileConfiguration: Detailed settings for CAS/Mach climbs, including takeoff procedures.
+    :param climbCASMACHProfileConfiguration: Detailed settings for CAS/Mach climbs, including takeoff procedures.
 
     :type climbType: myTypes.ClimbType
     :type AC: Aircraft
@@ -1777,7 +1777,7 @@ def apcClimbCalculation(
     :type meteo: myTypes.Meteo | None
     :type controlTarget: myTypes.ControlTarget | None
     :type speedBrakes: myTypes.SpeedBrakes | None
-    :type CASMACHProfileConfiguration: myTypes.ClimbCASMACHProfileConfiguration | None
+    :type climbCASMACHProfileConfiguration: myTypes.ClimbCASMACHProfileConfiguration | None
 
     :returns: A Flight Trajectory object containing the results of the specific climb calculation.
     :rtype: FT
@@ -1819,10 +1819,10 @@ def apcClimbCalculation(
                 meteo=meteo,
                 controlTarget=controlTarget,
                 speedBrakes=speedBrakes,
-                casMachSpeedSchedule=CASMACHProfileConfiguration.casMachSpeedSchedule,
-                takeOffProcedure=CASMACHProfileConfiguration.takeOffProcedure,
-                departureProfile=CASMACHProfileConfiguration.departureProfile,
-                reducedPower=CASMACHProfileConfiguration.reducedPower,
+                casMachSpeedSchedule=climbCASMACHProfileConfiguration.casMachSpeedSchedule,
+                takeOffProcedure=climbCASMACHProfileConfiguration.takeOffProcedure,
+                departureProfile=climbCASMACHProfileConfiguration.departureProfile,
+                reducedPower=climbCASMACHProfileConfiguration.reducedPower,
             )
     return trajectory
 
