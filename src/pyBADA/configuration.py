@@ -157,6 +157,15 @@ def getAircraftList(badaFamily, badaVersion):
 def getAircraftListAndCategory(badaFamily, badaVersion):
     """Retrieve a list of available aircraft for a given BADA family and
     version with matching category from release file.
+    
+    :param badaFamily: The BADA family (e.g., BADA3, BADA4) for which
+        aircraft are being retrieved.
+    :param badaVersion: The specific version of the BADA family (e.g.,
+        3.10, 4.2).
+    :type badaFamily: str.
+    :type badaVersion: str.
+    :returns: List of available aircraft names and categories.
+    :rtype: pandas dataframe.
     """
 
     aircraft_names = getAircraftList(badaFamily, badaVersion)
