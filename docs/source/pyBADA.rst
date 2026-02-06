@@ -16,5 +16,7 @@ API reference
    API_reference/flightTrajectory
    API_reference/geodesic
    API_reference/magnetic
+   API_reference/myTypes
    API_reference/TCL
    API_reference/trajectoryPrediction
+   API_reference/trajectorySegments
