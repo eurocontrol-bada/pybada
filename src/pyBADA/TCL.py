@@ -2619,7 +2619,7 @@ def apcFlightEnvelope(
     mass: float,
     altitudeStep: float,
     meteo: myTypes.Meteo | None = None,
-):
+) -> dict[str, list]:
     """Generates the operational and certified flight envelopes for a fixed-wing aircraft.
 
     This function calculates the minimum and maximum speed limits across the
@@ -3003,7 +3003,7 @@ def hpcFlightEnvelope(
     mass: float,
     altitudeStep: float,
     meteo: myTypes.Meteo | None = None,
-):
+) -> dict[str, list]:
     """Generates the operational and certified flight envelopes for a helicopter.
 
     This function calculates the minimum and maximum speed boundaries for rotorcraft
@@ -3311,7 +3311,7 @@ def flightEnvelope(
     mass: float,
     altitudeStep: float,
     meteo: myTypes.Meteo | None = None,
-):
+) -> dict[str, list]:
     """Dispatches the flight envelope calculation to the appropriate aircraft or helicopter model.
 
     :param AC: Aircraft model instance containing the BADA family name and performance data.
@@ -3329,19 +3329,11 @@ def flightEnvelope(
     """
 
     match AC.BADAFamilyName:
-        case "BADA3":
+        case "BADA3" | "BADA4":
             flightEnvelopeData = apcFlightEnvelope(
                 AC=AC, mass=mass, meteo=meteo, altitudeStep=altitudeStep
             )
-        case "BADA4":
-            flightEnvelopeData = apcFlightEnvelope(
-                AC=AC, mass=mass, meteo=meteo, altitudeStep=altitudeStep
-            )
-        case "BADAH":
-            flightEnvelopeData = hpcFlightEnvelope(
-                AC=AC, mass=mass, meteo=meteo, altitudeStep=altitudeStep
-            )
-        case "BADAE":
+        case "BADAH" | "BADAE":
             flightEnvelopeData = hpcFlightEnvelope(
                 AC=AC, mass=mass, meteo=meteo, altitudeStep=altitudeStep
             )
