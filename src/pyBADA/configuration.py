@@ -154,6 +154,43 @@ def getAircraftList(badaFamily, badaVersion):
     return aircraftList
 
 
+def getAircraftListAndCategory(badaFamily, badaVersion):
+    """Retrieve a list of available aircraft for a given BADA family and
+    version with matching category from release file.
+    """
+
+    aircraft_names = getAircraftList(badaFamily, badaVersion)
+
+    if badaFamily == "BADA4":
+        path = getBadaVersionPath(badaFamily, badaVersion)
+        csv_path = os.path.join(path, "release.csv")
+
+        df_files = pd.DataFrame(aircraft_names, columns=['AIRCRAFT'])
+
+        if os.path.exists(csv_path):
+            df_csv = pd.read_csv(csv_path, sep=';')
+            df_csv = df_csv.rename(columns={'filename': 'AIRCRAFT', 'category': 'CATEGORY'})
+            df_result = pd.merge(df_files, df_csv[['AIRCRAFT', 'CATEGORY']], on='AIRCRAFT', how='left')
+
+            return df_result
+
+        else:
+            # Fallback: If CSV is missing, return list with None categories
+            df_files['CATEGORY'] = None
+            return df_files
+
+    elif badaFamily in ["BADA3", "BADAH", "BADAE"]:
+        data = []
+        for item in aircraft_names:
+            data.append({
+                "AIRCRAFT": item, 
+                "CATEGORY": None
+            })
+        return pd.DataFrame(data, columns=["AIRCRAFT", "CATEGORY"])
+
+    return pd.DataFrame(columns=["AIRCRAFT", "CATEGORY"])
+
+
 def getBadaFamilyPath(badaFamily):
     """Get the full path to the specified BADA family directory.
 
