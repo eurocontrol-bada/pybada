@@ -10,8 +10,8 @@ from math import pi, tan
 
 import matplotlib.pyplot as plt
 
-from pyBADA import TCL as TCL
 from pyBADA import constants as const
+from pyBADA import trajectorySegments
 from pyBADA.badaH import BadaHAircraft
 from pyBADA.badaH import Parser as BadaHParser
 from pyBADA.flightTrajectory import FlightTrajectory as FT
@@ -33,7 +33,7 @@ print(allData)
 
 AC = BadaHAircraft(badaVersion=badaVersion, acName="DUMH")
 
-# create a Flight Trajectory object to store the output from TCL segment calculations
+# create a Flight Trajectory object to store the output from trajectorySegments segment calculations
 ft = FT()
 
 # take-off with const ROCD
@@ -56,7 +56,7 @@ DVT = -0.3 * const.g  # [g] to [m/s^2]
 MEC = AC.OPT.getOPTParam("MEC", var_1=0, var_2=m_init, deltaTemp=deltaTemp)
 LRC = AC.OPT.getOPTParam("LRC", RFL, m_init, deltaTemp)
 
-flightTrajectory = TCL.constantSpeedROCD(
+flightTrajectory = trajectorySegments.constantSpeedROCD(
     AC=AC,
     speedType=speedType,
     v=v,
@@ -75,7 +75,7 @@ Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
 control = target(ROCDtarget=500, acctarget=AVT)
 
 # acc in climb
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType=speedType,
     v_init=v,
@@ -94,7 +94,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 
 # climb const ROCD
-flightTrajectory = TCL.constantSpeedROCD(
+flightTrajectory = trajectorySegments.constantSpeedROCD(
     AC=AC,
     speedType=speedType,
     v=v,
@@ -112,7 +112,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 
 # acc in cruise
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType=speedType,
     v_init=v,
@@ -133,9 +133,9 @@ DEdist = RFL / tan(3 * pi / 180) * 0.3048 / 1852  # [NM]
 length = 14.02  # 30 - 3.57 - DEdist
 
 # cruise const TAS
-flightTrajectory = TCL.constantSpeedLevel(
+flightTrajectory = trajectorySegments.constantSpeedLevel(
     AC=AC,
-    lengthType="distance",
+    lengthType="DISTANCE",
     length=length,
     speedType=speedType,
     v=v,
@@ -152,7 +152,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 
 # descent const ROCD
-flightTrajectory = TCL.constantSpeedROCD(
+flightTrajectory = trajectorySegments.constantSpeedROCD(
     AC=AC,
     speedType=speedType,
     v=v,
@@ -171,7 +171,7 @@ Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 control = target(ROCDtarget=-300, ESFtarget=0.3)
 
 # dec in descent const ROCD
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType=speedType,
     v_init=v,
@@ -189,7 +189,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 
 # descent const ROCD
-flightTrajectory = TCL.constantSpeedROCD(
+flightTrajectory = trajectorySegments.constantSpeedROCD(
     AC=AC,
     speedType=speedType,
     v=v,
@@ -208,7 +208,7 @@ Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 control = target(ROCDtarget=-200, ESFtarget=0.3)
 
 # dec in descent const ROCD
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType=speedType,
     v_init=v,
@@ -226,7 +226,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 
 # descent const ROCD
-flightTrajectory = TCL.constantSpeedROCD(
+flightTrajectory = trajectorySegments.constantSpeedROCD(
     AC=AC,
     speedType=speedType,
     v=v,
@@ -245,7 +245,7 @@ Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 control = target(acctarget=DVT)
 
 # dec in descent const ROCD
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType=speedType,
     v_init=v,
@@ -263,7 +263,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
 
 # descent const ROCD
-flightTrajectory = TCL.constantSpeedROCD(
+flightTrajectory = trajectorySegments.constantSpeedROCD(
     AC=AC,
     speedType=speedType,
     v=v,

@@ -4,25 +4,25 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pyBADA"
-version = "0.1.7"
+version = "0.1.8"
 authors = [
   { name="Henrich Glaser-Opitz", email="henrich.glaser-opitz@eurocontrol.int" },
   { name="Antonio Vivace", email="antonio.vivace@eurocontrol.int" }
 ]
 description = "Aircraft performance modelling, trajectory prediction and optimisation, and visualisation with EUROCONTROL's BADA."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12.3"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)"
 ]
 dependencies = [
-  "scipy>=1.16.1",
-  "numpy>=2.3.2",
-  "pandas>=2.3.2",
+  "scipy>=1.17.0",
+  "numpy>=2.4.2",
+  "pandas>=3.0.0",
   "simplekml>=1.3.6",
-  "XlsxWriter>=3.2.5",
-  "xarray >=2025.9.0"
+  "XlsxWriter>=3.2.9",
+  "xarray >=2026.1.0"
 ]
 license = { text = "EUPL-1.2" }
 
@@ -30,17 +30,17 @@ license = { text = "EUPL-1.2" }
 # linter, formatter, to build the docs, ..
 [project.optional-dependencies]
 dev = [
-  "sphinx-rtd-theme==3.0.2",
-  "Sphinx==8.2.3",
-  "pre-commit==4.2.0",
-  "sphinx-gallery==0.19.0",
-  "matplotlib==3.10.6",
+  "sphinx-rtd-theme==3.1.0",
+  "Sphinx==9.1.0",
+  "pre-commit==4.5.1",
+  "sphinx-gallery==0.20.0",
+  "matplotlib==3.10.8",
   "folium==0.20.0",
-  "pytest==8.4.2",
-  "build",
-  "twine",
+  "pytest==9.0.2",
+  "build==1.4.0",
+  "twine==6.2.0",
   "readthedocs-sphinx-search>=0.3.2",
-  "ruff==0.12.12",
+  "ruff==0.15.0",
   ]
 
 [project.urls]

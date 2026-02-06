@@ -9,9 +9,9 @@ from dataclasses import dataclass
 
 import matplotlib.pyplot as plt
 
-from pyBADA import TCL as TCL
 from pyBADA import atmosphere as atm
 from pyBADA import conversions as conv
+from pyBADA import trajectorySegments
 from pyBADA.bada3 import Bada3Aircraft
 from pyBADA.bada4 import Bada4Aircraft
 from pyBADA.bada4 import Parser as Bada4Parser
@@ -49,7 +49,7 @@ AC = Bada4Aircraft(
 #    filePath="/home/<USER>/ec/pybada-models/models/BADA4/4.3",
 # )
 
-# create a Flight Trajectory object to store the output from TCL segment calculations
+# create a Flight Trajectory object to store the output from trajectorySegments segment calculations
 ft = FT()
 
 # default parameters
@@ -93,7 +93,7 @@ Hp_CR = 33000  # [ft] CRUISing level
 
 # CLIMB to threshold altitude 1500ft at take-off speed
 # ------------------------------------------------
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=conv.ms2kt(cas_cl1),
@@ -122,7 +122,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
     deltaTemp=deltaTemp,
 )
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -142,7 +142,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=CAS_final,
@@ -172,7 +172,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
     deltaTemp=deltaTemp,
 )
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -192,7 +192,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=CAS_final,
@@ -222,7 +222,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
     deltaTemp=deltaTemp,
 )
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -242,7 +242,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=CAS_final,
@@ -272,7 +272,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
     deltaTemp=deltaTemp,
 )
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -292,7 +292,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=CAS_final,
@@ -322,7 +322,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
     deltaTemp=deltaTemp,
 )
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -342,7 +342,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=CAS_final,
@@ -361,7 +361,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -385,7 +385,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 # calculate the crosover altitude for climb phase
 crossoverAltitude = conv.m2ft(atm.crossOver(Vcl2, Mcl))
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=CAS_final,
@@ -403,7 +403,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="M",
     v=Mcl,
@@ -423,7 +423,7 @@ Hp, m_final, M_final = ft.getFinalValue(AC, ["Hp", "mass", "M"])
 
 if M_final < Mcr:
     control = target(acctarget=0.5)
-    flightTrajectory = TCL.accDec(
+    flightTrajectory = trajectorySegments.accDec(
         AC=AC,
         speedType="M",
         v_init=M_final,
@@ -443,9 +443,9 @@ if M_final < Mcr:
 # current values
 Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
 
-flightTrajectory = TCL.constantSpeedLevel(
+flightTrajectory = trajectorySegments.constantSpeedLevel(
     AC=AC,
-    lengthType="distance",
+    lengthType="DISTANCE",
     length=200,
     speedType="M",
     v=Mcr,
@@ -462,9 +462,9 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
 
-flightTrajectory = TCL.constantSpeedLevel(
+flightTrajectory = trajectorySegments.constantSpeedLevel(
     AC=AC,
-    lengthType="distance",
+    lengthType="DISTANCE",
     length=200,
     step_length=50,
     maxRFL=36000,
@@ -484,7 +484,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final, M_final = ft.getFinalValue(AC, ["Hp", "mass", "M"])
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="M",
     v_init=M_final,
@@ -506,7 +506,7 @@ Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
 # calculate the crosover altitude for descend phase
 crossoverAltitude = conv.m2ft(atm.crossOver(Vdes2, Mdes))
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="M",
     v=Mdes,
@@ -524,7 +524,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=conv.ms2kt(Vdes2),
@@ -554,7 +554,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
     deltaTemp=deltaTemp,
 )
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -573,7 +573,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=conv.ms2kt(cas),
@@ -603,7 +603,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
     deltaTemp=deltaTemp,
 )
 
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -622,7 +622,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
 
-flightTrajectory = TCL.constantSpeedRating(
+flightTrajectory = trajectorySegments.constantSpeedRating(
     AC=AC,
     speedType="CAS",
     v=conv.ms2kt(cas),
@@ -642,7 +642,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
 if AC.BADAFamily.BADA3:
-    flightTrajectory = TCL.constantSpeedSlope(
+    flightTrajectory = trajectorySegments.constantSpeedSlope(
         AC=AC,
         speedType="CAS",
         v=CAS_final,
@@ -656,7 +656,7 @@ if AC.BADAFamily.BADA3:
         deltaTemp=deltaTemp,
     )
 elif AC.BADAFamily.BADA4:
-    flightTrajectory = TCL.constantSpeedSlope(
+    flightTrajectory = trajectorySegments.constantSpeedSlope(
         AC=AC,
         speedType="CAS",
         v=CAS_final,
@@ -691,7 +691,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 )
 
 control = target(slopetarget=-3.0)
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -715,7 +715,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
 if Hp > 2000:
-    flightTrajectory = TCL.constantSpeedSlope(
+    flightTrajectory = trajectorySegments.constantSpeedSlope(
         AC=AC,
         speedType="CAS",
         v=CAS_final,
@@ -749,7 +749,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 )
 
 control = target(slopetarget=-3.0)
-flightTrajectory = TCL.accDec(
+flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
@@ -773,7 +773,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
 if Hp > 1500:
-    flightTrajectory = TCL.constantSpeedSlope(
+    flightTrajectory = trajectorySegments.constantSpeedSlope(
         AC=AC,
         speedType="CAS",
         v=CAS_final,
@@ -808,7 +808,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
 control = target(slopetarget=-3.0)
 if AC.BADAFamily.BADA3:
-    flightTrajectory = TCL.accDec(
+    flightTrajectory = trajectorySegments.accDec(
         AC=AC,
         speedType="CAS",
         v_init=CAS_final,
@@ -824,7 +824,7 @@ if AC.BADAFamily.BADA3:
         deltaTemp=deltaTemp,
     )
 elif AC.BADAFamily.BADA4:
-    flightTrajectory = TCL.accDec(
+    flightTrajectory = trajectorySegments.accDec(
         AC=AC,
         speedType="CAS",
         v_init=CAS_final,
@@ -847,7 +847,7 @@ ft.append(AC, flightTrajectory)
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
 if Hp > 1000:
-    flightTrajectory = TCL.constantSpeedSlope(
+    flightTrajectory = trajectorySegments.constantSpeedSlope(
         AC=AC,
         speedType="CAS",
         v=CAS_final,
@@ -881,7 +881,7 @@ Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
 control = target(slopetarget=-3.0)
 if AC.BADAFamily.BADA3:
-    flightTrajectory = TCL.accDec(
+    flightTrajectory = trajectorySegments.accDec(
         AC=AC,
         speedType="CAS",
         v_init=CAS_final,
@@ -897,7 +897,7 @@ if AC.BADAFamily.BADA3:
         deltaTemp=deltaTemp,
     )
 elif AC.BADAFamily.BADA4:
-    flightTrajectory = TCL.accDec(
+    flightTrajectory = trajectorySegments.accDec(
         AC=AC,
         speedType="CAS",
         v_init=CAS_final,
@@ -919,7 +919,7 @@ ft.append(AC, flightTrajectory)
 # current values
 Hp, m_final, CAS_final = ft.getFinalValue(AC, ["Hp", "mass", "CAS"])
 
-flightTrajectory = TCL.constantSpeedSlope(
+flightTrajectory = trajectorySegments.constantSpeedSlope(
     AC=AC,
     speedType="CAS",
     v=CAS_final,
