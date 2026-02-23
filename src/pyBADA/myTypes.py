@@ -196,9 +196,15 @@ class HClimbRatingConfiguration:
 
 @dataclass
 class ClimbCASMACHProfileConfiguration:
-    casMachSpeedSchedule: CASMACHSpeedSchedule | None = None
-    takeOffProcedure: TakeOffProcedure | None = None
-    departureProfile: DepartureProfile | None = None
+    casMachSpeedSchedule: CASMACHSpeedSchedule = field(
+        default_factory=CASMACHSpeedSchedule
+    )
+    takeOffProcedure: TakeOffProcedure = field(
+        default_factory=TakeOffProcedureBADA
+    )
+    departureProfile: DepartureProfile = field(
+        default_factory=DepartureProfile
+    )
     reducedPower: bool = False
 
 

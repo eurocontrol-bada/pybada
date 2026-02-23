@@ -2,8 +2,8 @@
 BADA ARPM Climb Calculation
 ===========================
 
-Example of BADA3 and BADA4 trajectory full climb
-taking into account the compelte BADA ARPM model
+Example of BADA4 trajectory full climb taking
+into account the compelte BADA ARPM model
 """
 
 import matplotlib.pyplot as plt
@@ -13,17 +13,7 @@ from pyBADA import myTypes
 from pyBADA.badaAircraft import BadaAircraft
 
 # load BADA specific model
-AC = BadaAircraft(badaFamily="BADA4", badaVersion="4.3", acName="A320")
-
-# takeOffProcedure = TakeOffProcedureNADP1(NADP1Threshold=3000)
-# takeOffProcedure = TakeOffProcedureNADP2(NADP2Threshold1=1000, NADP2Threshold2=6000)
-takeOffProcedure = myTypes.TakeOffProcedureBADA()
-
-climbCASMACHProfileConfiguration = myTypes.ClimbCASMACHProfileConfiguration(
-    casMachSpeedSchedule=myTypes.CASMACHSpeedSchedule(),
-    takeOffProcedure=takeOffProcedure,
-    departureProfile=myTypes.DepartureProfile(),
-)
+AC = BadaAircraft(badaFamily="BADA4", badaVersion="DUMMY", acName="Dummy-TWIN")
 
 trajectory = TCL.apcClimbCalculation(
     AC=AC,
@@ -34,11 +24,12 @@ trajectory = TCL.apcClimbCalculation(
         stepPressureAltitude=1000,
     ),
     speed=myTypes.Speed(
-        accelerationLevelKind=myTypes.AccelerationLevelKind.AT, stepSpeed=10
+        accelerationLevelKind=myTypes.AccelerationLevelKind.BEFORE,
+        stepSpeed=10,
     ),
     mass=0.7 * AC.MTOW,
     meteo=myTypes.Meteo(deltaTemp=0),
-    CASMACHProfileConfiguration=climbCASMACHProfileConfiguration,
+    CASMACHProfileConfiguration=myTypes.ClimbCASMACHProfileConfiguration(),
 )
 
 
@@ -65,7 +56,7 @@ fig1.suptitle("Altitude Profiles")
 ax1.plot(time, Hp, color="blue")
 ax1.set_title("Hp vs Time")
 ax1.set_xlabel("Time [s]")
-ax1.set_ylabel("Hp")
+ax1.set_ylabel("Hp [ft]")
 ax1.grid(True)
 
 # Hp = f(dist)
