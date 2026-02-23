@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Literal
 
@@ -69,7 +69,7 @@ class Meteo:
 class PressureAltitude:
     initPressureAltitude: float | None = None
     finalPressureAltitude: float | None = None
-    stepPressureAltitude: float | None = None
+    stepPressureAltitude: float | None = 1000.0
 
 
 @dataclass
@@ -116,7 +116,9 @@ class DepartureProfileType(StrEnum):
 
 @dataclass
 class DepartureProfile:
-    departureProfileType: DepartureProfileType | None = None
+    departureProfileType: DepartureProfileType | None = (
+        DepartureProfileType.calculatedCAS
+    )
 
 
 class ArrivalProfileType(StrEnum):
@@ -127,7 +129,9 @@ class ArrivalProfileType(StrEnum):
 
 @dataclass
 class ArrivalProfile:
-    arrivalProfileType: ArrivalProfileType | None = None
+    arrivalProfileType: ArrivalProfileType | None = (
+        ArrivalProfileType.calculatedCAS
+    )
 
 
 class ClimbType(StrEnum):
@@ -200,5 +204,7 @@ class ClimbCASMACHProfileConfiguration:
 
 @dataclass
 class DescentCASMACHProfileConfiguration:
-    casMachSpeedSchedule: CASMACHSpeedSchedule | None = None
-    arrivalProfile: ArrivalProfile | None = None
+    casMachSpeedSchedule: CASMACHSpeedSchedule = field(
+        default_factory=CASMACHSpeedSchedule
+    )
+    arrivalProfile: ArrivalProfile = field(default_factory=ArrivalProfile)

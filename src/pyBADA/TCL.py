@@ -13,6 +13,7 @@ from pyBADA.myTypes import (
     ArrivalProfileType,
     CalculationType,
     ClimbType,
+    ControlTarget,
     CruiseSpeedType,
     CruiseType,
     DepartureProfileType,
@@ -432,12 +433,12 @@ def apcClimbCasMach(
     speed: myTypes.Speed,
     mass: float,
     meteo: myTypes.Meteo,
-    controlTarget: myTypes.ControlTarget,
-    speedBrakes: myTypes.SpeedBrakes,
-    casMachSpeedSchedule: myTypes.CASMACHSpeedSchedule,
     takeOffProcedure: myTypes.TakeOffProcedure,
-    departureProfile: myTypes.DepartureProfile,
-    reducedPower: bool,
+    controlTarget: myTypes.ControlTarget = myTypes.ControlTarget(),
+    departureProfile: myTypes.DepartureProfile = myTypes.DepartureProfile(),
+    speedBrakes: myTypes.SpeedBrakes | None = None,
+    casMachSpeedSchedule: myTypes.CASMACHSpeedSchedule = myTypes.CASMACHSpeedSchedule(),
+    reducedPower: bool = False,
 ) -> FT:
     """Calculates a complete climb trajectory using a CAS/Mach speed schedule.
 
@@ -485,6 +486,15 @@ def apcClimbCasMach(
     config_current = None
 
     stepPressureAltitude = pressureAltitude.stepPressureAltitude
+    if speed.accelerationLevelKind == AccelerationLevelKind.AT:
+        controlTarget = ControlTarget(
+            ESFtarget=0.0,
+            ROCDtarget=None,
+            slopetarget=None,
+            acctarget=None,
+        )
+
+    # set ESFTarget for AcceleationKind.AT to 0.0
 
     # determine the BADA speed schedule [m/s and Mach]
     CASbelowFL100 = casMachSpeedSchedule.CASbelowFL100
@@ -1740,14 +1750,14 @@ def hpcDescentARPM(
 def apcClimbCalculation(
     climbType: myTypes.ClimbType,
     AC,
-    calculationType: myTypes.CalculationType,
     pressureAltitude: myTypes.PressureAltitude,
     speed: myTypes.Speed,
     mass: float,
+    calculationType: myTypes.CalculationType = myTypes.CalculationType.INTEGRATED,
     meteo: myTypes.Meteo | None = None,
     controlTarget: myTypes.ControlTarget | None = None,
     speedBrakes: myTypes.SpeedBrakes | None = None,
-    climbCASMACHProfileConfiguration: myTypes.ClimbCASMACHProfileConfiguration
+    CASMACHProfileConfiguration: myTypes.ClimbCASMACHProfileConfiguration
     | None = None,
 ) -> FT:
     """Dispatches and calculates the aircraft climb trajectory based on the specified climb type.
@@ -1766,7 +1776,7 @@ def apcClimbCalculation(
     :param meteo: Meteorological data (wind speed and temperature deviation).
     :param controlTarget: Target parameters governing the climb (e.g., target ROCD).
     :param speedBrakes: Configuration for speed brake state and deployment value.
-    :param climbCASMACHProfileConfiguration: Detailed settings for CAS/Mach climbs, including takeoff procedures.
+    :param CASMACHProfileConfiguration: Detailed settings for CAS/Mach climbs, including takeoff procedures.
 
     :type climbType: myTypes.ClimbType
     :type AC: Aircraft
@@ -1777,7 +1787,7 @@ def apcClimbCalculation(
     :type meteo: myTypes.Meteo | None
     :type controlTarget: myTypes.ControlTarget | None
     :type speedBrakes: myTypes.SpeedBrakes | None
-    :type climbCASMACHProfileConfiguration: myTypes.ClimbCASMACHProfileConfiguration | None
+    :type CASMACHProfileConfiguration: myTypes.ClimbCASMACHProfileConfiguration | None
 
     :returns: A Flight Trajectory object containing the results of the specific climb calculation.
     :rtype: FT
@@ -1819,10 +1829,10 @@ def apcClimbCalculation(
                 meteo=meteo,
                 controlTarget=controlTarget,
                 speedBrakes=speedBrakes,
-                casMachSpeedSchedule=climbCASMACHProfileConfiguration.casMachSpeedSchedule,
-                takeOffProcedure=climbCASMACHProfileConfiguration.takeOffProcedure,
-                departureProfile=climbCASMACHProfileConfiguration.departureProfile,
-                reducedPower=climbCASMACHProfileConfiguration.reducedPower,
+                casMachSpeedSchedule=CASMACHProfileConfiguration.casMachSpeedSchedule,
+                takeOffProcedure=CASMACHProfileConfiguration.takeOffProcedure,
+                departureProfile=CASMACHProfileConfiguration.departureProfile,
+                reducedPower=CASMACHProfileConfiguration.reducedPower,
             )
     return trajectory
 
@@ -2004,10 +2014,10 @@ def hpcDescentCalculation(
 def apcDescentCalculation(
     descentType: myTypes.DescentType,
     AC,
-    calculationType: myTypes.CalculationType,
     pressureAltitude: myTypes.PressureAltitude,
     speed: myTypes.Speed,
     mass: float,
+    calculationType: myTypes.CalculationType = myTypes.CalculationType.INTEGRATED,
     meteo: myTypes.Meteo | None = None,
     controlTarget: myTypes.ControlTarget | None = None,
     speedBrakes: myTypes.SpeedBrakes | None = None,
