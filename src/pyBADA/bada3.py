@@ -4760,6 +4760,7 @@ class Bada3Aircraft(BADA3):
             self.MTOW = configuration.safe_get(filtered_df, "MTOW", None)
             self.OEW = configuration.safe_get(filtered_df, "OEW", None)
             self.MPL = configuration.safe_get(filtered_df, "MPL", None)
+            self.MLW = configuration.safe_get(filtered_df, "MLW", None)
             self.MREF = configuration.safe_get(filtered_df, "MREF", None)
             self.VMO = configuration.safe_get(filtered_df, "VMO", None)
             self.MMO = configuration.safe_get(filtered_df, "MMO", None)
@@ -4919,6 +4920,7 @@ class Bada3Aircraft(BADA3):
                     )
                     self.OEW = configuration.safe_get(combined_df, "OEW", None)
                     self.MPL = configuration.safe_get(combined_df, "MPL", None)
+                    self.MLW = configuration.safe_get(combined_df, "MLW", None)
                     self.MREF = configuration.safe_get(
                         combined_df, "MREF", None
                     )
@@ -5051,6 +5053,7 @@ class Bada3Aircraft(BADA3):
                     )
                     self.OEW = configuration.safe_get(combined_df, "OEW", None)
                     self.MPL = configuration.safe_get(combined_df, "MPL", None)
+                    self.MLW = configuration.safe_get(combined_df, "MLW", None)
                     self.MREF = configuration.safe_get(
                         combined_df, "MREF", None
                     )
