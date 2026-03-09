@@ -3147,12 +3147,10 @@ def hpcFlightEnvelope(
     altitudeRange = np.append(altitudeRange, AC.hmo)
 
     if AC.BADAFamilyName == "BADAH":
-        maxAltitude = conv.m2ft(AC.flightEnvelope.maxAltitude())  # [ft]
-
         # Collect special altitudes that need to be included if they are less than AC.hmo.
         special_altitudes = [
             alt
-            for alt in [crossoverAltitude, tropopauseAltitude, maxAltitude]
+            for alt in [crossoverAltitude, tropopauseAltitude]
             if alt < AC.hmo
         ]
 
@@ -3212,7 +3210,7 @@ def hpcFlightEnvelope(
 
             if (
                 Vmax_powerLimited is None
-                or Hp > maxAltitude
+                or Hp > AC.hmo
                 or Vmin_operational is None
                 or (Vmin_operational > Vmax_powerLimited)
             ):
@@ -3282,12 +3280,10 @@ def hpcFlightEnvelope(
                 )
 
     elif AC.BADAFamilyName == "BADAE":
-        maxAltitude = conv.m2ft(AC.flightEnvelope.maxAltitude())  # [ft]
-
         # Collect special altitudes that need to be included if they are less than AC.hmo.
         special_altitudes = [
             alt
-            for alt in [crossoverAltitude, tropopauseAltitude, maxAltitude]
+            for alt in [crossoverAltitude, tropopauseAltitude]
             if alt < AC.hmo
         ]
 
@@ -3337,7 +3333,7 @@ def hpcFlightEnvelope(
                 )
             )
 
-            if Vmax_powerLimited is None or Hp > maxAltitude:
+            if Vmax_powerLimited is None or Hp > AC.hmo:
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = [None, None, None]
                 [Vmin_M, Vmin_CAS, Vmin_TAS] = [None, None, None]
 
