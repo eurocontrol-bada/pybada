@@ -2678,14 +2678,12 @@ def apcFlightEnvelope(
             AC.flightEnvelope.maxAltitude(mass=mass, deltaTemp=meteo.deltaTemp)
         )  # [ft]
 
-        # Collect special altitudes that need to be included if they are less than AC.hmo.
         special_altitudes = [
             alt
             for alt in [crossoverAltitude, tropopauseAltitude, maxAltitude]
             if alt < AC.hmo
         ]
 
-        # Merge the arrays, remove duplicates, and sort.
         altitudeRange = np.sort(
             np.unique(np.concatenate((altitudeRange, special_altitudes)))
         )
@@ -2846,14 +2844,12 @@ def apcFlightEnvelope(
                 )
 
     elif AC.BADAFamilyName == "BADA4":
-        # Collect special altitudes that need to be included if they are less than AC.hmo
         special_altitudes = [
             alt
             for alt in [crossoverAltitude, tropopauseAltitude]
             if alt < AC.hmo
         ]
 
-        # Merge the arrays, remove duplicates, and sort.
         altitudeRange = np.sort(
             np.unique(np.concatenate((altitudeRange, special_altitudes)))
         )
@@ -2869,15 +2865,19 @@ def apcFlightEnvelope(
                     config="CR", theta=theta, delta=delta, mass=mass
                 )
             )
-            Vmax = AC.flightEnvelope.VMax(
-                h=alt_m,
-                HLid=0,
-                LG="LGUP",
-                delta=delta,
-                theta=theta,
-                mass=mass,
-                nz=1.0,
+
+            Vmax = conv.ms2kt(
+                AC.flightEnvelope.VMax(
+                    h=alt_m,
+                    HLid=0,
+                    LG="LGUP",
+                    delta=delta,
+                    theta=theta,
+                    mass=mass,
+                    nz=1.0,
+                )
             )
+
             VminCertified = conv.ms2kt(
                 AC.flightEnvelope.VStall(
                     theta=theta,
@@ -2888,6 +2888,7 @@ def apcFlightEnvelope(
                     nz=1.0,
                 )
             )
+
             Vmax_thrustLimited = conv.ms2kt(
                 AC.flightEnvelope.Vmax_thrustLimited(
                     h=alt_m,
@@ -2932,10 +2933,16 @@ def apcFlightEnvelope(
             if VminCertified_CAS > VmaxCertified_CAS:
                 break
 
+
+            if Hp < crossoverAltitude:
+                VMAX = Vmax_thrustLimited
+            else:
+                VMAX = Vmax
+
             if (
-                Vmax_thrustLimited is None
+                VMAX is None
                 or Vmin_operational is None
-                or (Vmin_operational > Vmax_thrustLimited)
+                or (Vmin_operational > VMAX)
             ):
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = [None, None, None]
                 [Vmin_M, Vmin_CAS, Vmin_TAS] = [None, None, None]
@@ -2972,7 +2979,7 @@ def apcFlightEnvelope(
                     sigma=sigma,
                 )
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = atm.convertSpeed(
-                    v=Vmax_thrustLimited,
+                    v=VMAX,
                     speedType="CAS",
                     theta=theta,
                     delta=delta,

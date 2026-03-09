@@ -2107,8 +2107,6 @@ class FlightEnvelope(BADA4):
                     sigma=sigma,
                 )
 
-                # if M_buffet == float('-inf'):
-                # VMax = float('-inf')
             else:
                 VMax = self.maxCAS(HLid=HLid, LG=LG)
         else:
