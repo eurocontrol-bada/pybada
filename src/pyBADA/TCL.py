@@ -1511,8 +1511,6 @@ def hpcClimbARPM(
     TAS_current = conv.ms2kt(tas)
     ROCD_current = conv.m2ft(ROCD) * 60
 
-    Hp_speed = Hp_current  # Altitude to calculate the speed for the whole climb segment, which will not change at this point
-
     for Hp_next in altitudeClimbThresholdList:
         if Hp_next == 5:
             flightTrajectory = trajectorySegments.constantSpeedROCD(
@@ -1576,8 +1574,8 @@ def hpcClimbARPM(
                 )
                 trajectory.append(AC, flightTrajectory)
 
-        CAS_current, TAS_current, Hp_current, mass_current = (
-            trajectory.getFinalValue(AC, ["CAS", "TAS", "Hp", "mass"])
+        TAS_current, Hp_current, mass_current = (
+            trajectory.getFinalValue(AC, ["TAS", "Hp", "mass"])
         )
 
         if (
@@ -1585,6 +1583,50 @@ def hpcClimbARPM(
             and Hp_current != pressureAltitude.finalPressureAltitude
         ):
             trajectory.removeLines(AC, numberOfLines=1)
+
+        if Hp_current == 5:
+            Hp_speed = Hp_current + 0.1
+        else:
+            Hp_speed = Hp_current
+
+        # calculate the final TAS_current
+        [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = AC.ARPM.ARPMProcedure(
+            phase="Climb",
+            h=conv.ft2m(Hp_speed),
+            deltaTemp=meteo.deltaTemp,
+            mass=mass_current,
+            rating=rating,
+        )
+        TAS_final = conv.ms2kt(tas)
+
+        if (
+            abs(TAS_current - TAS_final) > 3
+        ):
+            flightTrajectory = trajectorySegments.accDec(
+                AC=AC,
+                speedType=SpeedType.TAS,
+                v_init=TAS_current,
+                v_final=TAS_final,
+                speed_step=abs(TAS_final-TAS_current),
+                Hp_init=Hp_current,
+                control=controlTarget,
+                phase="Cruise",
+                m_init=mass_current,
+                wS=meteo.wS,
+                deltaTemp=meteo.deltaTemp,
+                calculationType=calculationType,
+            )
+            trajectory.append(AC, flightTrajectory)
+            TAS_current, Hp_current, mass_current, config_current = (
+                trajectory.getFinalValue(
+                    AC, ["TAS", "Hp", "mass", "config"]
+                )
+            )
+            if (
+                calculationType == CalculationType.POINT
+                and Hp_current != pressureAltitude.finalPressureAltitude
+            ):
+                trajectory.removeLines(AC, numberOfLines=1)
 
     return trajectory
 
@@ -1743,6 +1785,50 @@ def hpcDescentARPM(
             and Hp_current != pressureAltitude.finalPressureAltitude
         ):
             trajectory.removeLines(AC, numberOfLines=1)
+
+        if Hp_current == 5:
+            Hp_speed = Hp_current + 0.1
+        else:
+            Hp_speed = Hp_current
+
+        # calculate the final TAS_current
+        [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = AC.ARPM.ARPMProcedure(
+            phase="Descent",
+            h=conv.ft2m(Hp_speed),
+            deltaTemp=meteo.deltaTemp,
+            mass=mass_current,
+            rating="ARPM",
+        )
+        TAS_final = conv.ms2kt(tas)
+
+        if (
+            abs(TAS_current - TAS_final) > 3
+        ):
+            flightTrajectory = trajectorySegments.accDec(
+                AC=AC,
+                speedType=SpeedType.TAS,
+                v_init=TAS_current,
+                v_final=TAS_final,
+                speed_step=abs(TAS_final-TAS_current),
+                Hp_init=Hp_current,
+                control=controlTarget,
+                phase="Cruise",
+                m_init=mass_current,
+                wS=meteo.wS,
+                deltaTemp=meteo.deltaTemp,
+                calculationType=calculationType,
+            )
+            trajectory.append(AC, flightTrajectory)
+            TAS_current, Hp_current, mass_current, config_current = (
+                trajectory.getFinalValue(
+                    AC, ["TAS", "Hp", "mass", "config"]
+                )
+            )
+            if (
+                calculationType == CalculationType.POINT
+                and Hp_current != pressureAltitude.finalPressureAltitude
+            ):
+                trajectory.removeLines(AC, numberOfLines=1)
 
     return trajectory
 
