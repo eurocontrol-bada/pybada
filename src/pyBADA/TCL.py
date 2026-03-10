@@ -841,6 +841,7 @@ def apcClimbCasMach(
                         wS=meteo.wS,
                         deltaTemp=meteo.deltaTemp,
                         calculationType=calculationType,
+                        suppressWarnings=True,
                     )
                     traj.append(AC, flightTrajectory)
                     CAS, Hp_end = traj.getFinalValue(AC, ["CAS", "Hp"])
