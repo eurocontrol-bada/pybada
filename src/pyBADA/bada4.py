@@ -793,6 +793,23 @@ class BADA4(Airplane, Bada):
 
         return CLpoly
 
+    def CLder(self, M):
+        """Computes the derivative of lift coefficient polynomial for the given Mach number (CLPoly),
+        used to compute the slope of the extrapolation.
+
+        :param M: Mach number [-].
+        :type M: float
+        :return: Lift coefficient derivative [-].
+        :rtype: float
+        """
+
+        return (
+            self.AC.bf[1]
+            + 2 * self.AC.bf[2] * M
+            + 3 * self.AC.bf[3] * pow(M, 2)
+            + 4 * self.AC.bf[4] * pow(M, 3)
+        )
+
     def CLmax(self, M, HLid, LG):
         """Computes the maximum lift coefficient (CLmax) for the given Mach
         number (M), high-lift device (HLid) position, and landing gear (LG)
@@ -826,19 +843,9 @@ class BADA4(Airplane, Bada):
                         self.AC.CLPoly(self.AC.Mmin) - self.AC.CL_Mach0
                     )
                 elif M > self.AC.Mmax:
-                    CLder = (
-                        self.AC.bf[1]
-                        + 2 * self.AC.bf[2] * self.AC.Mmax
-                        + 3 * self.AC.bf[3] * self.AC.Mmax * self.AC.Mmax
-                        + 4
-                        * self.AC.bf[4]
-                        * self.AC.Mmax
-                        * self.AC.Mmax
-                        * self.AC.Mmax
-                    )
                     CLmax = (
                         self.CLPoly(self.AC.Mmax)
-                        + self.CLPoly(M - self.AC.Mmax) * CLder
+                        + self.CLPoly(M - self.AC.Mmax) * self.CLder(self.AC.Mmax)
                     )
                 else:
                     CLmax = self.CLPoly(M)
