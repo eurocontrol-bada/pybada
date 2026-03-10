@@ -1171,6 +1171,7 @@ def apcDescentCasMach(
             theta=theta,
             delta=delta,
             deltaTemp=meteo.deltaTemp,
+            applyLimits=False,
             speedSchedule_default=speedSchedule,
         )[0]
     )
@@ -1195,6 +1196,7 @@ def apcDescentCasMach(
                 theta=theta,
                 delta=delta,
                 deltaTemp=meteo.deltaTemp,
+                applyLimits=False,
                 speedSchedule_default=speedSchedule,
             )[0]
         )
