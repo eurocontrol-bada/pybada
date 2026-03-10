@@ -1472,6 +1472,8 @@ def constantSpeedROCD(
             theta * const.temp_0 - deltaTemp
         )
 
+        mass_i = mass[-1]
+
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
             [
@@ -1486,7 +1488,7 @@ def constantSpeedROCD(
                 phase=phase,
                 h=H_m,
                 deltaTemp=deltaTemp,
-                mass=mass[-1],
+                mass=mass_i,
                 rating="ARPM",
             )
             v = conv.ms2kt(tas_POINT)
@@ -1495,6 +1497,36 @@ def constantSpeedROCD(
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
+
+        # check for speed flight envelope
+        if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+            if config_default is None:
+                config_i = AC.flightEnvelope.getConfig(
+                    h=H_m,
+                    phase=phase,
+                    v=CAS_i,
+                    mass=mass_i,
+                    deltaTemp=deltaTemp,
+                )
+            else:
+                config_i = config_default
+
+        if AC.BADAFamily.BADA4:
+            minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+            [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+
+        if AC.BADAFamily.BADA3:
+            minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        if CAS_i < minSpeed:
+            v = conv.ms2kt(minSpeed)
+        elif CAS_i > maxSpeed:
+            v = conv.ms2kt(maxSpeed)
+
+        [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=v, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+
 
         # compute Energy Share Factor (ESF)
         ESF_i = AC.esf(
@@ -1523,7 +1555,6 @@ def constantSpeedROCD(
         ##         (due to unknown mass at end of step):
         ##         weight, lift, drag , thrust, fuel flow
 
-        mass_i = mass[-1]
         for _ in itertools.repeat(None, m_iter):
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -2523,6 +2554,35 @@ def constantSpeedROCD_time(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
 
+            # check for speed flight envelope
+            if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+                if config_default is None:
+                    config_i = AC.flightEnvelope.getConfig(
+                        h=H_m,
+                        phase=phase,
+                        v=CAS_i,
+                        mass=mass_i,
+                        deltaTemp=deltaTemp,
+                    )
+                else:
+                    config_i = config_default
+
+            if AC.BADAFamily.BADA4:
+                minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+
+            if AC.BADAFamily.BADA3:
+                minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            if CAS_i < minSpeed:
+                v = conv.ms2kt(minSpeed)
+            elif CAS_i > maxSpeed:
+                v = conv.ms2kt(maxSpeed)
+
+            [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=v, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+
             # compute Energy Share Factor (ESF)
             ESF_i = AC.esf(
                 h=H_m,
@@ -3516,6 +3576,8 @@ def constantSpeedSlope(
             theta * const.temp_0 - deltaTemp
         )
 
+        mass_i = mass[-1]
+
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
             [
@@ -3530,7 +3592,7 @@ def constantSpeedSlope(
                 phase=phase,
                 h=H_m,
                 deltaTemp=deltaTemp,
-                mass=mass[-1],
+                mass=mass_i,
                 rating="ARPM",
             )
             v = conv.ms2kt(tas_POINT)
@@ -3539,6 +3601,35 @@ def constantSpeedSlope(
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
+
+        # check for speed flight envelope
+        if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+            if config_default is None:
+                config_i = AC.flightEnvelope.getConfig(
+                    h=H_m,
+                    phase=phase,
+                    v=CAS_i,
+                    mass=mass_i,
+                    deltaTemp=deltaTemp,
+                )
+            else:
+                config_i = config_default
+
+        if AC.BADAFamily.BADA4:
+            minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+            [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+
+        if AC.BADAFamily.BADA3:
+            minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        if CAS_i < minSpeed:
+            v = conv.ms2kt(minSpeed)
+        elif CAS_i > maxSpeed:
+            v = conv.ms2kt(maxSpeed)
+
+        [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=v, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -3573,7 +3664,6 @@ def constantSpeedSlope(
         ##           (due to unknown mass at end of step):
         ##         weight, lift, drag , thrust, fuel flow
 
-        mass_i = mass[-1]
         for _ in itertools.repeat(None, m_iter):
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -4565,6 +4655,35 @@ def constantSpeedSlope_time(
             [M_i, CAS_i, TAS_i] = atm.convertSpeed(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
+
+            # check for speed flight envelope
+            if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+                if config_default is None:
+                    config_i = AC.flightEnvelope.getConfig(
+                        h=H_m,
+                        phase=phase,
+                        v=CAS_i,
+                        mass=mass_i,
+                        deltaTemp=deltaTemp,
+                    )
+                else:
+                    config_i = config_default
+
+            if AC.BADAFamily.BADA4:
+                minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+
+            if AC.BADAFamily.BADA3:
+                minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            if CAS_i < minSpeed:
+                v = conv.ms2kt(minSpeed)
+            elif CAS_i > maxSpeed:
+                v = conv.ms2kt(maxSpeed)
+
+            [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=v, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
