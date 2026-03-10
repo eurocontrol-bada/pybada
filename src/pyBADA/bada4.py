@@ -845,7 +845,7 @@ class BADA4(Airplane, Bada):
                 elif M > self.AC.Mmax:
                     CLmax = (
                         self.CLPoly(self.AC.Mmax)
-                        + self.CLPoly(M - self.AC.Mmax) * self.CLder(self.AC.Mmax)
+                        + (M - self.AC.Mmax) * self.CLder(self.AC.Mmax)
                     )
                 else:
                     CLmax = self.CLPoly(M)
