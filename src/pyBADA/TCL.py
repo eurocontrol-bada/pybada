@@ -494,8 +494,6 @@ def apcClimbCasMach(
             acctarget=None,
         )
 
-    # set ESFTarget for AcceleationKind.AT to 0.0
-
     # determine the BADA speed schedule [m/s and Mach]
     CASbelowFL100 = casMachSpeedSchedule.CASbelowFL100
     CASaboveFL100 = casMachSpeedSchedule.CASaboveFL100
@@ -615,6 +613,7 @@ def apcClimbCasMach(
                             delta=delta,
                             deltaTemp=meteo.deltaTemp,
                             speedSchedule_default=speedSchedule,
+                            applyLimits=False,
                         )[0]
                     )
                 case TakeOffProcedureNADP1(NADP1Threshold=threshold):
@@ -627,6 +626,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=False,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -639,6 +639,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=False,
                                 procedure=takeOffProcedure.type,
                                 NADP1_ALT=threshold,
                             )[0]
@@ -655,6 +656,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=False,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -667,6 +669,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=False,
                                 procedure=takeOffProcedure.type,
                                 NADP2_ALT=[threshold1, threshold2],
                             )[0]
