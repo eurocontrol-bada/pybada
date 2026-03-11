@@ -761,7 +761,6 @@ def apcClimbCasMach(
                                 NADP2_ALT=[threshold1, threshold2],
                             )[0]
                         )
-        # print("CAS_final", Hp_next, CAS_final)
         if Hp_next < crossoverAltitude:
             Hp_final = Hp_next
 
@@ -771,7 +770,6 @@ def apcClimbCasMach(
 
             if speed.accelerationLevelKind == AccelerationLevelKind.AT:
                 # climb to set altitude and accelerate then to reach the next threshold
-                # print("climbed from ", Hp_current, "to", Hp_final, "CAS_current:", CAS_current, "CAS_final", CAS_final)
                 flightTrajectory = trajectorySegments.constantSpeedRating(
                     AC=AC,
                     speedType=SpeedType.CAS,
@@ -796,11 +794,9 @@ def apcClimbCasMach(
                     and Hp_current != pressureAltitude.finalPressureAltitude
                 ):
                     trajectory.removeLines(AC, numberOfLines=1)
-                # print("before acceleration:", CAS_current, CAS_final)
                 if (
                     abs(CAS_current - CAS_final) > 0.3
                 ):  # preventing speed jumps due to small accuracy issues
-                    # print("accelerated at", Hp_current)
                     flightTrajectory = trajectorySegments.accDec(
                         AC=AC,
                         speedType=SpeedType.CAS,

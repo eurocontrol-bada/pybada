@@ -7661,7 +7661,6 @@ def accDec(
 
         # check the consistency of acctarget and acc/dec
         if speedEvol == "acc":
-            print("accTarget:",controlTarget.acctarget)
             if controlTarget.acctarget is not None and controlTarget.acctarget < 0:
                 controlTarget.acctarget = abs(controlTarget.acctarget)
                 print("Acctarget in acceleration should be > 1")
