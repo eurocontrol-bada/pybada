@@ -843,10 +843,9 @@ class BADA4(Airplane, Bada):
                         self.AC.CLPoly(self.AC.Mmin) - self.AC.CL_Mach0
                     )
                 elif M > self.AC.Mmax:
-                    CLmax = (
-                        self.CLPoly(self.AC.Mmax)
-                        + (M - self.AC.Mmax) * self.CLder(self.AC.Mmax)
-                    )
+                    CLmax = self.CLPoly(self.AC.Mmax) + (
+                        M - self.AC.Mmax
+                    ) * self.CLder(self.AC.Mmax)
                 else:
                     CLmax = self.CLPoly(M)
             else:
@@ -3002,7 +3001,13 @@ class ARPM(BADA4):
             )
             [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
             maxSpeed = self.flightEnvelope.VMax(
-                h=h, HLid=HLid, LG=LG, theta=theta, delta=delta, mass=mass, nz=1.2
+                h=h,
+                HLid=HLid,
+                LG=LG,
+                theta=theta,
+                delta=delta,
+                mass=mass,
+                nz=1.2,
             )
 
             eps = 1e-6  # float calculation precision
@@ -3139,7 +3144,13 @@ class ARPM(BADA4):
             )
             [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
             maxSpeed = self.flightEnvelope.VMax(
-                h=h, HLid=HLid, LG=LG, theta=theta, delta=delta, mass=mass, nz=1.2
+                h=h,
+                HLid=HLid,
+                LG=LG,
+                theta=theta,
+                delta=delta,
+                mass=mass,
+                nz=1.2,
             )
 
             eps = 1e-6  # float calculation precision
@@ -3332,7 +3343,13 @@ class ARPM(BADA4):
             )
             [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
             maxSpeed = self.flightEnvelope.VMax(
-                h=h, HLid=HLid, LG=LG, theta=theta, delta=delta, mass=mass, nz=1.2
+                h=h,
+                HLid=HLid,
+                LG=LG,
+                theta=theta,
+                delta=delta,
+                mass=mass,
+                nz=1.2,
             )
 
             eps = 1e-6  # float calculation precision

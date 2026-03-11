@@ -991,7 +991,7 @@ def apcClimbCasMach(
             trajectory.append(AC, flightTrajectory)
             CAS_current, Hp_current, massCurrent, M_current, config_current = (
                 trajectory.getFinalValue(
-                    AC, ["CAS", "Hp", "mass","M", "config"]
+                    AC, ["CAS", "Hp", "mass", "M", "config"]
                 )
             )
             if (
@@ -1580,8 +1580,8 @@ def hpcClimbARPM(
                 )
                 trajectory.append(AC, flightTrajectory)
 
-        TAS_current, Hp_current, mass_current = (
-            trajectory.getFinalValue(AC, ["TAS", "Hp", "mass"])
+        TAS_current, Hp_current, mass_current = trajectory.getFinalValue(
+            AC, ["TAS", "Hp", "mass"]
         )
 
         if (
@@ -1605,15 +1605,13 @@ def hpcClimbARPM(
         )
         TAS_final = conv.ms2kt(tas)
 
-        if (
-            abs(TAS_current - TAS_final) > 3
-        ):
+        if abs(TAS_current - TAS_final) > 3:
             flightTrajectory = trajectorySegments.accDec(
                 AC=AC,
                 speedType=SpeedType.TAS,
                 v_init=TAS_current,
                 v_final=TAS_final,
-                speed_step=abs(TAS_final-TAS_current),
+                speed_step=abs(TAS_final - TAS_current),
                 Hp_init=Hp_current,
                 control=controlTarget,
                 phase="Cruise",
@@ -1624,9 +1622,7 @@ def hpcClimbARPM(
             )
             trajectory.append(AC, flightTrajectory)
             TAS_current, Hp_current, mass_current, config_current = (
-                trajectory.getFinalValue(
-                    AC, ["TAS", "Hp", "mass", "config"]
-                )
+                trajectory.getFinalValue(AC, ["TAS", "Hp", "mass", "config"])
             )
             if (
                 calculationType == CalculationType.POINT
@@ -1807,15 +1803,13 @@ def hpcDescentARPM(
         )
         TAS_final = conv.ms2kt(tas)
 
-        if (
-            abs(TAS_current - TAS_final) > 3
-        ):
+        if abs(TAS_current - TAS_final) > 3:
             flightTrajectory = trajectorySegments.accDec(
                 AC=AC,
                 speedType=SpeedType.TAS,
                 v_init=TAS_current,
                 v_final=TAS_final,
-                speed_step=abs(TAS_final-TAS_current),
+                speed_step=abs(TAS_final - TAS_current),
                 Hp_init=Hp_current,
                 control=controlTarget,
                 phase="Cruise",
@@ -1826,9 +1820,7 @@ def hpcDescentARPM(
             )
             trajectory.append(AC, flightTrajectory)
             TAS_current, Hp_current, mass_current, config_current = (
-                trajectory.getFinalValue(
-                    AC, ["TAS", "Hp", "mass", "config"]
-                )
+                trajectory.getFinalValue(AC, ["TAS", "Hp", "mass", "config"])
             )
             if (
                 calculationType == CalculationType.POINT
@@ -3024,7 +3016,6 @@ def apcFlightEnvelope(
             # limit the calcuation to where the max certified speed is lower than min certified speed
             if VminCertified_CAS > VmaxCertified_CAS:
                 break
-
 
             if Hp < crossoverAltitude:
                 VMAX = Vmax_thrustLimited

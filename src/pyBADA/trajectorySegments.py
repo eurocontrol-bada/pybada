@@ -357,21 +357,37 @@ def constantSpeedLevel(
                 config_i = config_default
 
         if AC.BADAFamily.BADA4:
-            minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+            minSpeed = AC.flightEnvelope.VMin(
+                config=config_i, mass=mass_i, theta=theta, delta=delta
+            )
             [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-            maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+            maxSpeed = AC.flightEnvelope.VMax(
+                h=H_m,
+                HLid=HLid_i,
+                LG=LG_i,
+                theta=theta,
+                delta=delta,
+                mass=mass_i,
+                nz=1.2,
+            )
 
         if AC.BADAFamily.BADA3:
-            minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+            minSpeed = AC.flightEnvelope.VMin(
+                h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+            )
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
         # stop when out of speed flight envelope
         if minSpeed is None or maxSpeed is None:
-            warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+            )
             break
 
         if CAS_i < minSpeed or CAS_i > maxSpeed:
-            warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft"
+            )
             break
 
         if turnFlight:
@@ -1543,22 +1559,40 @@ def constantSpeedROCD(
                 config_i = config_default
 
         if AC.BADAFamily.BADA4:
-            minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+            minSpeed = AC.flightEnvelope.VMin(
+                config=config_i, mass=mass_i, theta=theta, delta=delta
+            )
             [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-            maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+            maxSpeed = AC.flightEnvelope.VMax(
+                h=H_m,
+                HLid=HLid_i,
+                LG=LG_i,
+                theta=theta,
+                delta=delta,
+                mass=mass_i,
+                nz=1.2,
+            )
 
         if AC.BADAFamily.BADA3:
-            minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+            minSpeed = AC.flightEnvelope.VMin(
+                h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+            )
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
         # stop when out of speed flight envelope
         if minSpeed is None or maxSpeed is None:
-            warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+            )
             break
 
-        if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+        if (phase == "Climb" and Hp_i < Hp_final) or (
+            phase == "Descent" and Hp_i > Hp_final
+        ):
             if CAS_i < minSpeed or CAS_i > maxSpeed:
-                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                )
                 break
 
         # compute Energy Share Factor (ESF)
@@ -2601,22 +2635,42 @@ def constantSpeedROCD_time(
                     config_i = config_default
 
             if AC.BADAFamily.BADA4:
-                minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-                maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+                minSpeed = AC.flightEnvelope.VMin(
+                    config=config_i, mass=mass_i, theta=theta, delta=delta
+                )
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
+                maxSpeed = AC.flightEnvelope.VMax(
+                    h=H_m,
+                    HLid=HLid_i,
+                    LG=LG_i,
+                    theta=theta,
+                    delta=delta,
+                    mass=mass_i,
+                    nz=1.2,
+                )
 
             if AC.BADAFamily.BADA3:
-                minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+                minSpeed = AC.flightEnvelope.VMin(
+                    h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+                )
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
             # stop when out of speed flight envelope
             if minSpeed is None or maxSpeed is None:
-                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+                )
                 break
 
-            if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+            if (phase == "Climb" and Hp_i < Hp_final) or (
+                phase == "Descent" and Hp_i > Hp_final
+            ):
                 if CAS_i < minSpeed or CAS_i > maxSpeed:
-                    warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                    )
                     break
 
             # compute Energy Share Factor (ESF)
@@ -3652,24 +3706,41 @@ def constantSpeedSlope(
                 config_i = config_default
 
         if AC.BADAFamily.BADA4:
-            minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+            minSpeed = AC.flightEnvelope.VMin(
+                config=config_i, mass=mass_i, theta=theta, delta=delta
+            )
             [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-            maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+            maxSpeed = AC.flightEnvelope.VMax(
+                h=H_m,
+                HLid=HLid_i,
+                LG=LG_i,
+                theta=theta,
+                delta=delta,
+                mass=mass_i,
+                nz=1.2,
+            )
 
         if AC.BADAFamily.BADA3:
-            minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+            minSpeed = AC.flightEnvelope.VMin(
+                h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+            )
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
         # stop when out of speed flight envelope
         if minSpeed is None or maxSpeed is None:
-            warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+            )
             break
 
-        if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+        if (phase == "Climb" and Hp_i < Hp_final) or (
+            phase == "Descent" and Hp_i > Hp_final
+        ):
             if CAS_i < minSpeed or CAS_i > maxSpeed:
-                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                )
                 break
-
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -4710,22 +4781,42 @@ def constantSpeedSlope_time(
                     config_i = config_default
 
             if AC.BADAFamily.BADA4:
-                minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-                maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+                minSpeed = AC.flightEnvelope.VMin(
+                    config=config_i, mass=mass_i, theta=theta, delta=delta
+                )
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
+                maxSpeed = AC.flightEnvelope.VMax(
+                    h=H_m,
+                    HLid=HLid_i,
+                    LG=LG_i,
+                    theta=theta,
+                    delta=delta,
+                    mass=mass_i,
+                    nz=1.2,
+                )
 
             if AC.BADAFamily.BADA3:
-                minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+                minSpeed = AC.flightEnvelope.VMin(
+                    h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+                )
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
             # stop when out of speed flight envelope
             if minSpeed is None or maxSpeed is None:
-                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+                )
                 break
 
-            if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+            if (phase == "Climb" and Hp_i < Hp_final) or (
+                phase == "Descent" and Hp_i > Hp_final
+            ):
                 if CAS_i < minSpeed or CAS_i > maxSpeed:
-                    warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                    )
                     break
 
             if turnFlight:
@@ -5801,32 +5892,49 @@ def constantSpeedRating(
                 config_i = config_default
 
         if AC.BADAFamily.BADA4:
-            minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+            minSpeed = AC.flightEnvelope.VMin(
+                config=config_i, mass=mass_i, theta=theta, delta=delta
+            )
             [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-            maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+            maxSpeed = AC.flightEnvelope.VMax(
+                h=H_m,
+                HLid=HLid_i,
+                LG=LG_i,
+                theta=theta,
+                delta=delta,
+                mass=mass_i,
+                nz=1.2,
+            )
 
         if AC.BADAFamily.BADA3:
-            minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+            minSpeed = AC.flightEnvelope.VMin(
+                h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+            )
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
         # stop when out of speed flight envelope
         if minSpeed is None or maxSpeed is None:
-            warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+            )
             break
 
-        if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+        if (phase == "Climb" and Hp_i < Hp_final) or (
+            phase == "Descent" and Hp_i > Hp_final
+        ):
             if CAS_i < minSpeed or CAS_i > maxSpeed:
-                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                )
                 break
 
         # if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
-            # if CAS_i < minSpeed:
-                # correctedSpeed = conv.ms2kt(minSpeed)
-                # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
-            # elif CAS_i > maxSpeed:
-                # correctedSpeed = conv.ms2kt(maxSpeed)
-                # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
-
+        # if CAS_i < minSpeed:
+        # correctedSpeed = conv.ms2kt(minSpeed)
+        # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+        # elif CAS_i > maxSpeed:
+        # correctedSpeed = conv.ms2kt(maxSpeed)
+        # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -6794,31 +6902,51 @@ def constantSpeedRating_time(
                     config_i = config_default
 
             if AC.BADAFamily.BADA4:
-                minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-                maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+                minSpeed = AC.flightEnvelope.VMin(
+                    config=config_i, mass=mass_i, theta=theta, delta=delta
+                )
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
+                maxSpeed = AC.flightEnvelope.VMax(
+                    h=H_m,
+                    HLid=HLid_i,
+                    LG=LG_i,
+                    theta=theta,
+                    delta=delta,
+                    mass=mass_i,
+                    nz=1.2,
+                )
 
             if AC.BADAFamily.BADA3:
-                minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+                minSpeed = AC.flightEnvelope.VMin(
+                    h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+                )
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
             # stop when out of speed flight envelope
             if minSpeed is None or maxSpeed is None:
-                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+                )
                 break
 
-            if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+            if (phase == "Climb" and Hp_i < Hp_final) or (
+                phase == "Descent" and Hp_i > Hp_final
+            ):
                 if CAS_i < minSpeed or CAS_i > maxSpeed:
-                    warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                    )
                     break
 
             # if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
-                # if CAS_i < minSpeed:
-                    # correctedSpeed = conv.ms2kt(minSpeed)
-                    # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
-                # elif CAS_i > maxSpeed:
-                    # correctedSpeed = conv.ms2kt(maxSpeed)
-                    # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+            # if CAS_i < minSpeed:
+            # correctedSpeed = conv.ms2kt(minSpeed)
+            # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+            # elif CAS_i > maxSpeed:
+            # correctedSpeed = conv.ms2kt(maxSpeed)
+            # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
@@ -7529,13 +7657,18 @@ def accDec(
         directionOfTurn = turnMetrics["directionOfTurn"]
 
         turnFlight = True
-        if turnMetrics["rateOfTurn"] == 0.0 and turnMetrics["bankAngle"] == 0.0:
+        if (
+            turnMetrics["rateOfTurn"] == 0.0
+            and turnMetrics["bankAngle"] == 0.0
+        ):
             turnFlight = False
 
         # conversion of Magnetic Heading to True Heading
         if magneticDeclinationGrid is not None:
-            magneticDeclination = magneticDeclinationGrid.getMagneticDeclination(
-                LAT_target=Lat, LON_target=Lon
+            magneticDeclination = (
+                magneticDeclinationGrid.getMagneticDeclination(
+                    LAT_target=Lat, LON_target=Lon
+                )
             )
         else:
             magneticDeclination = 0
@@ -7585,7 +7718,9 @@ def accDec(
         if speedType == "M":
             speed_step = kwargs.get("speed_step", 0.01)  # [-] Mach increment
         elif speedType == "CAS" or speedType == "TAS":
-            speed_step = kwargs.get("speed_step", 5.0)  # [kt] CAS/TAS increment
+            speed_step = kwargs.get(
+                "speed_step", 5.0
+            )  # [kt] CAS/TAS increment
 
         # number of iteration of mass/altitude loop
         # BADAE
@@ -7614,23 +7749,38 @@ def accDec(
         # check the consistency of SLOPE/ROCD and climb/descent phase of flight
         # if incosistent, change the sign on slope/ROCD target value
         if phase == "Climb":
-            if controlTarget.slopetarget is not None and controlTarget.slopetarget < 0:
+            if (
+                controlTarget.slopetarget is not None
+                and controlTarget.slopetarget < 0
+            ):
                 controlTarget.slopetarget = abs(controlTarget.slopetarget)
                 print("Slopetarget for Climb should be positive")
-            if controlTarget.ROCDtarget is not None and controlTarget.ROCDtarget < 0:
+            if (
+                controlTarget.ROCDtarget is not None
+                and controlTarget.ROCDtarget < 0
+            ):
                 controlTarget.ROCDtarget = abs(controlTarget.ROCDtarget)
                 print("ROCDtarget for Climb should be positive")
         elif phase == "Descent":
-            if controlTarget.slopetarget is not None and controlTarget.slopetarget > 0:
+            if (
+                controlTarget.slopetarget is not None
+                and controlTarget.slopetarget > 0
+            ):
                 controlTarget.slopetarget = controlTarget.slopetarget * (-1)
                 print("Slopetarget for Descent should be negative")
-            if controlTarget.ROCDtarget is not None and controlTarget.ROCDtarget > 0:
+            if (
+                controlTarget.ROCDtarget is not None
+                and controlTarget.ROCDtarget > 0
+            ):
                 controlTarget.ROCDtarget = controlTarget.ROCDtarget * (-1)
                 print("ROCDtarget for Descent should be negative")
 
         # check the consistency of acc/dec and ESF
         if phase == "Cruise":
-            if controlTarget.ESFtarget is not None and controlTarget.ESFtarget != 0:
+            if (
+                controlTarget.ESFtarget is not None
+                and controlTarget.ESFtarget != 0
+            ):
                 controlTarget.ESFtarget = 0
         elif phase == "Climb":
             if (
@@ -7638,39 +7788,58 @@ def accDec(
                 and speedEvol == "acc"
                 and controlTarget.ESFtarget > 1
             ):
-                warnings.warn("ESFtarget for acceleration in Climb should be < 1")
+                warnings.warn(
+                    "ESFtarget for acceleration in Climb should be < 1"
+                )
             if (
                 controlTarget.ESFtarget is not None
                 and speedEvol == "dec"
                 and controlTarget.ESFtarget < 1
             ):
-                warnings.warn("ESFtarget for deceleration in Climb should be > 1")
+                warnings.warn(
+                    "ESFtarget for deceleration in Climb should be > 1"
+                )
         elif phase == "Descent":
             if (
                 controlTarget.ESFtarget is not None
                 and speedEvol == "acc"
                 and controlTarget.ESFtarget < 1
             ):
-                warnings.warn("ESFtarget for acceleration in Descent should be > 1")
+                warnings.warn(
+                    "ESFtarget for acceleration in Descent should be > 1"
+                )
             if (
                 controlTarget.ESFtarget is not None
                 and speedEvol == "dec"
                 and controlTarget.ESFtarget > 1
             ):
-                warnings.warn("ESFtarget for deceleration in Descent should be < 1")
+                warnings.warn(
+                    "ESFtarget for deceleration in Descent should be < 1"
+                )
 
         # check the consistency of acctarget and acc/dec
         if speedEvol == "acc":
-            if controlTarget.acctarget is not None and controlTarget.acctarget < 0:
+            if (
+                controlTarget.acctarget is not None
+                and controlTarget.acctarget < 0
+            ):
                 controlTarget.acctarget = abs(controlTarget.acctarget)
                 print("Acctarget in acceleration should be > 1")
         elif speedEvol == "dec":
-            if controlTarget.acctarget is not None and controlTarget.acctarget > 0:
+            if (
+                controlTarget.acctarget is not None
+                and controlTarget.acctarget > 0
+            ):
                 controlTarget.acctarget = controlTarget.acctarget * (-1)
                 print("Acctarget in deceleration should be < 1")
 
-        if controlTarget.ROCDtarget is not None and controlTarget.slopetarget is not None:
-            print("Both ROCD and SLOPE target provided, priority given to SLOPE")
+        if (
+            controlTarget.ROCDtarget is not None
+            and controlTarget.slopetarget is not None
+        ):
+            print(
+                "Both ROCD and SLOPE target provided, priority given to SLOPE"
+            )
 
         # comment line describing type of trajectory calculation
         controlTargetComment = ""
@@ -7712,7 +7881,10 @@ def accDec(
         # compute Energy Share Factor
         if controlTarget.ESFtarget is not None:
             ESFc = controlTarget.ESFtarget
-        elif controlTarget.ROCDtarget is not None or controlTarget.slopetarget is not None:
+        elif (
+            controlTarget.ROCDtarget is not None
+            or controlTarget.slopetarget is not None
+        ):
             ESFc = None
         elif controlTarget.acctarget is not None:
             ESFc = None
@@ -7750,13 +7922,19 @@ def accDec(
 
         # Determine engine rating
         if (
-            controlTarget.ROCDtarget is not None or controlTarget.slopetarget is not None
-        ) and (controlTarget.ESFtarget is not None or controlTarget.acctarget is not None):
+            controlTarget.ROCDtarget is not None
+            or controlTarget.slopetarget is not None
+        ) and (
+            controlTarget.ESFtarget is not None
+            or controlTarget.acctarget is not None
+        ):
             rating = None
         else:
             if phase == "Climb" or (phase == "Cruise" and speedEvol == "acc"):
                 rating = maxRating
-            elif phase == "Descent" or (phase == "Cruise" and speedEvol == "dec"):
+            elif phase == "Descent" or (
+                phase == "Cruise" and speedEvol == "dec"
+            ):
                 if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
                     rating = "UNKNOWN"  # TBD: No minimum power model
                 else:
@@ -7853,9 +8031,7 @@ def accDec(
             mass_i = mass[-1]
             Hp_i = Hp[-1]
 
-            
             for _ in itertools.repeat(None, m_iter):
-                
                 H_m = conv.ft2m(Hp_i)  # altitude [m]
 
                 # atmosphere properties
@@ -7877,35 +8053,35 @@ def accDec(
 
                 # check for speed flight envelope
                 # if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
-                    # if config_default is None:
-                        # config_i = AC.flightEnvelope.getConfig(
-                            # h=H_m,
-                            # phase="Cruise",
-                            # v=CAS_i,
-                            # mass=mass_i,
-                            # deltaTemp=deltaTemp,
-                        # )
-                    # else:
-                        # config_i = config_default
+                # if config_default is None:
+                # config_i = AC.flightEnvelope.getConfig(
+                # h=H_m,
+                # phase="Cruise",
+                # v=CAS_i,
+                # mass=mass_i,
+                # deltaTemp=deltaTemp,
+                # )
+                # else:
+                # config_i = config_default
 
                 # if AC.BADAFamily.BADA4:
-                    # minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
-                    # [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-                    # maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+                # minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+                # [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                # maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
 
                 # if AC.BADAFamily.BADA3:
-                    # minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
-                    # maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+                # minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+                # maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
                 # stop when out of speed flight envelope
                 # if minSpeed is None or maxSpeed is None:
-                    # warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
-                    # break
+                # warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+                # break
 
                 # if CAS_i < minSpeed or CAS_i > maxSpeed:
-                    # warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
-                    # break
-                
+                # warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                # break
+
                 if turnFlight:
                     if turnMetrics["bankAngle"] != 0.0:
                         # bankAngle is defined
@@ -7947,7 +8123,9 @@ def accDec(
                     if rating is None:
                         # compute power required for the manoeuver
                         if ESFc is not None:
-                            P_i = dh_dt_i * mass_i * const.g / ESFc + Preq_i  # [W]
+                            P_i = (
+                                dh_dt_i * mass_i * const.g / ESFc + Preq_i
+                            )  # [W]
                         elif controlTarget.acctarget is not None:
                             P_i = (
                                 dh_dt_i * mass_i * const.g
@@ -7996,7 +8174,9 @@ def accDec(
                                     conv.m2ft(
                                         (
                                             P_i
-                                            - mass_i * TAS_i * controlTarget.acctarget
+                                            - mass_i
+                                            * TAS_i
+                                            * controlTarget.acctarget
                                             - Preq_i
                                         )
                                         / (mass_i * const.g * temp_const)
@@ -8026,7 +8206,9 @@ def accDec(
                                     conv.m2ft(
                                         (
                                             P_i
-                                            - mass_i * TAS_i * controlTarget.acctarget
+                                            - mass_i
+                                            * TAS_i
+                                            * controlTarget.acctarget
                                             - Preq_i
                                         )
                                         / (mass_i * const.g * temp_const)
@@ -8076,7 +8258,8 @@ def accDec(
                         Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
                         Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
                         Vgbat_i = (
-                            AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                            AC.Vocbat(SOC=SOC[-1])
+                            - AC.R0bat(SOC=SOC[-1]) * Ibat_i
                         )
 
                 # BADA4
@@ -8095,10 +8278,12 @@ def accDec(
 
                     # ensure continuity of configuration change within the segment
                     if config:
-                        config_i = AC.flightEnvelope.checkConfigurationContinuity(
-                            phase=phase,
-                            previousConfig=config[-1],
-                            currentConfig=config_i,
+                        config_i = (
+                            AC.flightEnvelope.checkConfigurationContinuity(
+                                phase=phase,
+                                previousConfig=config[-1],
+                                currentConfig=config_i,
+                            )
                         )
 
                     [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
@@ -8109,7 +8294,11 @@ def accDec(
                     CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
                     # compute drag coefficient
                     CD = AC.CD(
-                        M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
+                        M=M_i,
+                        CL=CL,
+                        HLid=HLid_i,
+                        LG=LG_i,
+                        speedBrakes=speedBrakes,
                     )
                     # compute drag force
                     Drag = AC.D(M=M_i, delta=delta, CD=CD)
@@ -8119,7 +8308,8 @@ def accDec(
                         # compute thrust force required for the manoeuver
                         if ESFc is not None:
                             THR_i = (
-                                dh_dt_i * mass_i * const.g / (TAS_i * ESFc) + Drag
+                                dh_dt_i * mass_i * const.g / (TAS_i * ESFc)
+                                + Drag
                             )  # [N]
                         elif controlTarget.acctarget is not None:
                             THR_i = (
@@ -8212,10 +8402,12 @@ def accDec(
 
                     # ensure continuity of configuration change within the segment
                     if config:
-                        config_i = AC.flightEnvelope.checkConfigurationContinuity(
-                            phase=phase,
-                            previousConfig=config[-1],
-                            currentConfig=config_i,
+                        config_i = (
+                            AC.flightEnvelope.checkConfigurationContinuity(
+                                phase=phase,
+                                previousConfig=config[-1],
+                                currentConfig=config_i,
+                            )
                         )
 
                     # compute lift coefficient
@@ -8230,7 +8422,8 @@ def accDec(
                         # compute thrust force required for the manoeuver
                         if ESFc is not None:
                             THR_i = (
-                                dh_dt_i * mass_i * const.g / (TAS_i * ESFc) + Drag
+                                dh_dt_i * mass_i * const.g / (TAS_i * ESFc)
+                                + Drag
                             )  # [N]
                         elif controlTarget.acctarget is not None:
                             THR_i = (
@@ -8370,7 +8563,9 @@ def accDec(
 
                 # compute acceleration
                 if TAS_i == 0:
-                    dVdtisu_i = (Pe_i - PC_i) / (mass_i * (TAS_i + 0.5))  # [m/s^2]
+                    dVdtisu_i = (Pe_i - PC_i) / (
+                        mass_i * (TAS_i + 0.5)
+                    )  # [m/s^2]
                 else:
                     dVdtisu_i = (Pe_i - PC_i) / (mass_i * TAS_i)  # [m/s^2]
 
@@ -8410,7 +8605,9 @@ def accDec(
                         if not mass_const:
                             mass_i = mass[-1] - step_mass  # [kg]
                             fuelConsumed_i = step_FUEL * step_time
-                        fuelConsumed_i = FUELCONSUMED[-1] + step_FUEL * step_time
+                        fuelConsumed_i = (
+                            FUELCONSUMED[-1] + step_FUEL * step_time
+                        )
 
             ## PART 3: store information about end of step point
 
@@ -8501,7 +8698,9 @@ def accDec(
             ROT.append(rateOfTurn)
 
             # integrated data
-            if v_i != v_init:  # exclude first point: initial t/d/m already known
+            if (
+                v_i != v_init
+            ):  # exclude first point: initial t/d/m already known
                 if AC.BADAFamily.BADAE:
                     SOC.append(SOC_i)
 
@@ -8528,7 +8727,9 @@ def accDec(
                 if turnFlight:
                     step_distance = conv.m2nm(
                         turn.distance(
-                            rateOfTurn=rateOfTurn, TAS=TAS_i, timeOfTurn=step_time
+                            rateOfTurn=rateOfTurn,
+                            TAS=TAS_i,
+                            timeOfTurn=step_time,
                         )
                     )  # arcLength during the turn [NM]
                 else:
@@ -8921,23 +9122,38 @@ def accDec_time(
     # check the consistency of SLOPE/ROCD and climb/descent phase of flight
     # if incosistent, change the sign on slope/ROCD target value
     if phase == "Climb":
-        if controlTarget.slopetarget is not None and controlTarget.slopetarget < 0:
+        if (
+            controlTarget.slopetarget is not None
+            and controlTarget.slopetarget < 0
+        ):
             controlTarget.slopetarget = abs(controlTarget.slopetarget)
             print("Slopetarget for Climb should be positive")
-        if controlTarget.ROCDtarget is not None and controlTarget.ROCDtarget < 0:
+        if (
+            controlTarget.ROCDtarget is not None
+            and controlTarget.ROCDtarget < 0
+        ):
             controlTarget.ROCDtarget = abs(controlTarget.ROCDtarget)
             print("ROCDtarget for Climb should be positive")
     elif phase == "Descent":
-        if controlTarget.slopetarget is not None and controlTarget.slopetarget > 0:
+        if (
+            controlTarget.slopetarget is not None
+            and controlTarget.slopetarget > 0
+        ):
             controlTarget.slopetarget = controlTarget.slopetarget * (-1)
             print("Slopetarget for Descent should be negative")
-        if controlTarget.ROCDtarget is not None and controlTarget.ROCDtarget > 0:
+        if (
+            controlTarget.ROCDtarget is not None
+            and controlTarget.ROCDtarget > 0
+        ):
             controlTarget.ROCDtarget = controlTarget.ROCDtarget * (-1)
             print("ROCDtarget for Descent should be negative")
 
     # check the consistency of acc/dec and ESF
     if phase == "Cruise":
-        if controlTarget.ESFtarget is not None and controlTarget.ESFtarget != 0:
+        if (
+            controlTarget.ESFtarget is not None
+            and controlTarget.ESFtarget != 0
+        ):
             controlTarget.ESFtarget = 0
     elif phase == "Climb":
         if (
@@ -8976,7 +9192,10 @@ def accDec_time(
             controlTarget.acctarget = controlTarget.acctarget * (-1)
             print("Acctarget in deceleration should be < 1")
 
-    if controlTarget.ROCDtarget is not None and controlTarget.slopetarget is not None:
+    if (
+        controlTarget.ROCDtarget is not None
+        and controlTarget.slopetarget is not None
+    ):
         print("Both ROCD and SLOPE target provided, priority given to SLOPE")
 
     # comment line describing type of trajectory calculation
@@ -9020,7 +9239,10 @@ def accDec_time(
     # compute Energy Share Factor
     if controlTarget.ESFtarget is not None:
         ESFc = controlTarget.ESFtarget
-    elif controlTarget.ROCDtarget is not None or controlTarget.slopetarget is not None:
+    elif (
+        controlTarget.ROCDtarget is not None
+        or controlTarget.slopetarget is not None
+    ):
         ESFc = None
     elif controlTarget.acctarget is not None:
         ESFc = None
@@ -9058,8 +9280,12 @@ def accDec_time(
 
     # Determine engine rating
     if (
-        controlTarget.ROCDtarget is not None or controlTarget.slopetarget is not None
-    ) and (controlTarget.ESFtarget is not None or controlTarget.acctarget is not None):
+        controlTarget.ROCDtarget is not None
+        or controlTarget.slopetarget is not None
+    ) and (
+        controlTarget.ESFtarget is not None
+        or controlTarget.acctarget is not None
+    ):
         rating = None
     else:
         if phase == "Climb" or (phase == "Cruise" and speedEvol == "acc"):
@@ -9279,7 +9505,9 @@ def accDec_time(
                                 conv.m2ft(
                                     (
                                         P_i
-                                        - mass_i * TAS_i * controlTarget.acctarget
+                                        - mass_i
+                                        * TAS_i
+                                        * controlTarget.acctarget
                                         - Preq_i
                                     )
                                     / (mass_i * const.g * temp_const)
@@ -9308,7 +9536,9 @@ def accDec_time(
                                 conv.m2ft(
                                     (
                                         P_i
-                                        - mass_i * TAS_i * controlTarget.acctarget
+                                        - mass_i
+                                        * TAS_i
+                                        * controlTarget.acctarget
                                         - Preq_i
                                     )
                                     / (mass_i * const.g * temp_const)
