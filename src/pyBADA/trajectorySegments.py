@@ -343,6 +343,58 @@ def constantSpeedLevel(
         )
         GS_i = conv.ms2kt(TAS_i) - wS  # ground speed [kt]
 
+        # check for speed flight envelope
+        if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+            if config_default is None:
+                config_i = AC.flightEnvelope.getConfig(
+                    h=H_m,
+                    phase="Cruise",
+                    v=CAS_i,
+                    mass=mass_i,
+                    deltaTemp=deltaTemp,
+                )
+            else:
+                config_i = config_default
+
+        if AC.BADAFamily.BADA4:
+            minSpeed = AC.flightEnvelope.VMin(
+                config=config_i, mass=mass_i, theta=theta, delta=delta
+            )
+            [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+            maxSpeed = AC.flightEnvelope.VMax(
+                h=H_m,
+                HLid=HLid_i,
+                LG=LG_i,
+                theta=theta,
+                delta=delta,
+                mass=mass_i,
+                nz=1.2,
+            )
+
+        elif AC.BADAFamily.BADA3:
+            minSpeed = AC.flightEnvelope.VMin(
+                h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+            )
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        elif AC.BADAFamily.BADAH:
+            minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
+                h=H_m, mass=mass_i, deltaTemp=deltaTemp
+            )
+
+        # stop when out of speed flight envelope
+        if minSpeed is None or maxSpeed is None:
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+            )
+            break
+
+        if CAS_i < minSpeed or CAS_i > maxSpeed:
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft"
+            )
+            break
+
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
                 # bankAngle is defined
@@ -1472,6 +1524,8 @@ def constantSpeedROCD(
             theta * const.temp_0 - deltaTemp
         )
 
+        mass_i = mass[-1]
+
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
             [
@@ -1486,7 +1540,7 @@ def constantSpeedROCD(
                 phase=phase,
                 h=H_m,
                 deltaTemp=deltaTemp,
-                mass=mass[-1],
+                mass=mass_i,
                 rating="ARPM",
             )
             v = conv.ms2kt(tas_POINT)
@@ -1495,6 +1549,61 @@ def constantSpeedROCD(
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
+
+        # check for speed flight envelope
+        if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+            if config_default is None:
+                config_i = AC.flightEnvelope.getConfig(
+                    h=H_m,
+                    phase=phase,
+                    v=CAS_i,
+                    mass=mass_i,
+                    deltaTemp=deltaTemp,
+                )
+            else:
+                config_i = config_default
+
+        if AC.BADAFamily.BADA4:
+            minSpeed = AC.flightEnvelope.VMin(
+                config=config_i, mass=mass_i, theta=theta, delta=delta
+            )
+            [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+            maxSpeed = AC.flightEnvelope.VMax(
+                h=H_m,
+                HLid=HLid_i,
+                LG=LG_i,
+                theta=theta,
+                delta=delta,
+                mass=mass_i,
+                nz=1.2,
+            )
+
+        elif AC.BADAFamily.BADA3:
+            minSpeed = AC.flightEnvelope.VMin(
+                h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+            )
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        elif AC.BADAFamily.BADAH:
+            minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
+                h=H_m, mass=mass_i, deltaTemp=deltaTemp
+            )
+
+        # stop when out of speed flight envelope
+        if minSpeed is None or maxSpeed is None:
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+            )
+            break
+
+        if (phase == "Climb" and Hp_i < Hp_final) or (
+            phase == "Descent" and Hp_i > Hp_final
+        ):
+            if CAS_i < minSpeed or CAS_i > maxSpeed:
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                )
+                break
 
         # compute Energy Share Factor (ESF)
         ESF_i = AC.esf(
@@ -1523,7 +1632,6 @@ def constantSpeedROCD(
         ##         (due to unknown mass at end of step):
         ##         weight, lift, drag , thrust, fuel flow
 
-        mass_i = mass[-1]
         for _ in itertools.repeat(None, m_iter):
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -2523,6 +2631,65 @@ def constantSpeedROCD_time(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
 
+            # check for speed flight envelope
+            if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+                if config_default is None:
+                    config_i = AC.flightEnvelope.getConfig(
+                        h=H_m,
+                        phase=phase,
+                        v=CAS_i,
+                        mass=mass_i,
+                        deltaTemp=deltaTemp,
+                    )
+                else:
+                    config_i = config_default
+
+            if AC.BADAFamily.BADA4:
+                minSpeed = AC.flightEnvelope.VMin(
+                    config=config_i, mass=mass_i, theta=theta, delta=delta
+                )
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
+                maxSpeed = AC.flightEnvelope.VMax(
+                    h=H_m,
+                    HLid=HLid_i,
+                    LG=LG_i,
+                    theta=theta,
+                    delta=delta,
+                    mass=mass_i,
+                    nz=1.2,
+                )
+
+            elif AC.BADAFamily.BADA3:
+                minSpeed = AC.flightEnvelope.VMin(
+                    h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+                )
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            elif AC.BADAFamily.BADAH:
+                minSpeed, maxSpeed = (
+                    AC.flightEnvelope.speedEnvelope_powerLimited(
+                        h=H_m, mass=mass_i, deltaTemp=deltaTemp
+                    )
+                )
+
+            # stop when out of speed flight envelope
+            if minSpeed is None or maxSpeed is None:
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+                )
+                break
+
+            if (phase == "Climb" and Hp_i < Hp_final) or (
+                phase == "Descent" and Hp_i > Hp_final
+            ):
+                if CAS_i < minSpeed or CAS_i > maxSpeed:
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                    )
+                    break
+
             # compute Energy Share Factor (ESF)
             ESF_i = AC.esf(
                 h=H_m,
@@ -3516,6 +3683,8 @@ def constantSpeedSlope(
             theta * const.temp_0 - deltaTemp
         )
 
+        mass_i = mass[-1]
+
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
             [
@@ -3530,7 +3699,7 @@ def constantSpeedSlope(
                 phase=phase,
                 h=H_m,
                 deltaTemp=deltaTemp,
-                mass=mass[-1],
+                mass=mass_i,
                 rating="ARPM",
             )
             v = conv.ms2kt(tas_POINT)
@@ -3539,6 +3708,61 @@ def constantSpeedSlope(
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
+
+        # check for speed flight envelope
+        if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+            if config_default is None:
+                config_i = AC.flightEnvelope.getConfig(
+                    h=H_m,
+                    phase=phase,
+                    v=CAS_i,
+                    mass=mass_i,
+                    deltaTemp=deltaTemp,
+                )
+            else:
+                config_i = config_default
+
+        if AC.BADAFamily.BADA4:
+            minSpeed = AC.flightEnvelope.VMin(
+                config=config_i, mass=mass_i, theta=theta, delta=delta
+            )
+            [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+            maxSpeed = AC.flightEnvelope.VMax(
+                h=H_m,
+                HLid=HLid_i,
+                LG=LG_i,
+                theta=theta,
+                delta=delta,
+                mass=mass_i,
+                nz=1.2,
+            )
+
+        elif AC.BADAFamily.BADA3:
+            minSpeed = AC.flightEnvelope.VMin(
+                h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+            )
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        elif AC.BADAFamily.BADAH:
+            minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
+                h=H_m, mass=mass_i, deltaTemp=deltaTemp
+            )
+
+        # stop when out of speed flight envelope
+        if minSpeed is None or maxSpeed is None:
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+            )
+            break
+
+        if (phase == "Climb" and Hp_i < Hp_final) or (
+            phase == "Descent" and Hp_i > Hp_final
+        ):
+            if CAS_i < minSpeed or CAS_i > maxSpeed:
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                )
+                break
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -3573,7 +3797,6 @@ def constantSpeedSlope(
         ##           (due to unknown mass at end of step):
         ##         weight, lift, drag , thrust, fuel flow
 
-        mass_i = mass[-1]
         for _ in itertools.repeat(None, m_iter):
             # BADAH or BADAE
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -4565,6 +4788,65 @@ def constantSpeedSlope_time(
             [M_i, CAS_i, TAS_i] = atm.convertSpeed(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
+
+            # check for speed flight envelope
+            if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+                if config_default is None:
+                    config_i = AC.flightEnvelope.getConfig(
+                        h=H_m,
+                        phase=phase,
+                        v=CAS_i,
+                        mass=mass_i,
+                        deltaTemp=deltaTemp,
+                    )
+                else:
+                    config_i = config_default
+
+            if AC.BADAFamily.BADA4:
+                minSpeed = AC.flightEnvelope.VMin(
+                    config=config_i, mass=mass_i, theta=theta, delta=delta
+                )
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
+                maxSpeed = AC.flightEnvelope.VMax(
+                    h=H_m,
+                    HLid=HLid_i,
+                    LG=LG_i,
+                    theta=theta,
+                    delta=delta,
+                    mass=mass_i,
+                    nz=1.2,
+                )
+
+            elif AC.BADAFamily.BADA3:
+                minSpeed = AC.flightEnvelope.VMin(
+                    h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+                )
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            elif AC.BADAFamily.BADAH:
+                minSpeed, maxSpeed = (
+                    AC.flightEnvelope.speedEnvelope_powerLimited(
+                        h=H_m, mass=mass_i, deltaTemp=deltaTemp
+                    )
+                )
+
+            # stop when out of speed flight envelope
+            if minSpeed is None or maxSpeed is None:
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+                )
+                break
+
+            if (phase == "Climb" and Hp_i < Hp_final) or (
+                phase == "Descent" and Hp_i > Hp_final
+            ):
+                if CAS_i < minSpeed or CAS_i > maxSpeed:
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                    )
+                    break
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
@@ -5599,6 +5881,8 @@ def constantSpeedRating(
             theta * const.temp_0 - deltaTemp
         )
 
+        mass_i = mass[-1]
+
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
             [
@@ -5613,7 +5897,7 @@ def constantSpeedRating(
                 phase=phase,
                 h=H_m,
                 deltaTemp=deltaTemp,
-                mass=mass[-1],
+                mass=mass_i,
                 rating=rating,
             )
             v = conv.ms2kt(tas_POINT)
@@ -5622,6 +5906,69 @@ def constantSpeedRating(
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
+
+        # check for speed flight envelope
+        if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+            if config_default is None:
+                config_i = AC.flightEnvelope.getConfig(
+                    h=H_m,
+                    phase=phase,
+                    v=CAS_i,
+                    mass=mass_i,
+                    deltaTemp=deltaTemp,
+                )
+            else:
+                config_i = config_default
+
+        if AC.BADAFamily.BADA4:
+            minSpeed = AC.flightEnvelope.VMin(
+                config=config_i, mass=mass_i, theta=theta, delta=delta
+            )
+            [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+            maxSpeed = AC.flightEnvelope.VMax(
+                h=H_m,
+                HLid=HLid_i,
+                LG=LG_i,
+                theta=theta,
+                delta=delta,
+                mass=mass_i,
+                nz=1.2,
+            )
+
+        elif AC.BADAFamily.BADA3:
+            minSpeed = AC.flightEnvelope.VMin(
+                h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+            )
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        elif AC.BADAFamily.BADAH:
+            minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
+                h=H_m, mass=mass_i, deltaTemp=deltaTemp
+            )
+
+        # stop when out of speed flight envelope
+        if minSpeed is None or maxSpeed is None:
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+            )
+            break
+
+        if (phase == "Climb" and Hp_i < Hp_final) or (
+            phase == "Descent" and Hp_i > Hp_final
+        ):
+            if CAS_i < minSpeed or CAS_i > maxSpeed:
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                )
+                break
+
+        # if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+        # if CAS_i < minSpeed:
+        # correctedSpeed = conv.ms2kt(minSpeed)
+        # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+        # elif CAS_i > maxSpeed:
+        # correctedSpeed = conv.ms2kt(maxSpeed)
+        # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -5645,8 +5992,6 @@ def constantSpeedRating(
             deltaTemp=deltaTemp,
             flightEvolution=("const" + speedType),
         )
-
-        mass_i = mass[-1]
 
         # BADAH
         if AC.BADAFamily.BADAH:
@@ -6577,6 +6922,73 @@ def constantSpeedRating_time(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
 
+            # check for speed flight envelope
+            if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+                if config_default is None:
+                    config_i = AC.flightEnvelope.getConfig(
+                        h=H_m,
+                        phase=phase,
+                        v=CAS_i,
+                        mass=mass_i,
+                        deltaTemp=deltaTemp,
+                    )
+                else:
+                    config_i = config_default
+
+            if AC.BADAFamily.BADA4:
+                minSpeed = AC.flightEnvelope.VMin(
+                    config=config_i, mass=mass_i, theta=theta, delta=delta
+                )
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
+                maxSpeed = AC.flightEnvelope.VMax(
+                    h=H_m,
+                    HLid=HLid_i,
+                    LG=LG_i,
+                    theta=theta,
+                    delta=delta,
+                    mass=mass_i,
+                    nz=1.2,
+                )
+
+            elif AC.BADAFamily.BADA3:
+                minSpeed = AC.flightEnvelope.VMin(
+                    h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
+                )
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            elif AC.BADAFamily.BADAH:
+                minSpeed, maxSpeed = (
+                    AC.flightEnvelope.speedEnvelope_powerLimited(
+                        h=H_m, mass=mass_i, deltaTemp=deltaTemp
+                    )
+                )
+
+            # stop when out of speed flight envelope
+            if minSpeed is None or maxSpeed is None:
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed"
+                )
+                break
+
+            if (phase == "Climb" and Hp_i < Hp_final) or (
+                phase == "Descent" and Hp_i > Hp_final
+            ):
+                if CAS_i < minSpeed or CAS_i > maxSpeed:
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
+                    )
+                    break
+
+            # if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+            # if CAS_i < minSpeed:
+            # correctedSpeed = conv.ms2kt(minSpeed)
+            # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+            # elif CAS_i > maxSpeed:
+            # correctedSpeed = conv.ms2kt(maxSpeed)
+            # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
                     # bankAngle is defined
@@ -7169,12 +7581,13 @@ def accDec(
     deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
-    control=None,
+    controlTarget=None,
     Lat=None,
     Lon=None,
     initialHeading={"magnetic": None, "true": None, "constantHeading": None},
     reducedPower=None,
     magneticDeclinationGrid=None,
+    suppressWarnings=False,
     **kwargs,
 ):
     """Calculates the time, fuel consumption, and other key flight parameters
@@ -7183,10 +7596,10 @@ def accDec(
     cruise, or descent phases of flight.
 
     The flight parameters are calculated using different models for the BADA (Base of Aircraft Data) families (BADA3, BADA4, BADAH, BADAE).
-    The function can also accommodate different control laws, vertical evolution phases, wind conditions, and complex flight dynamics like turns.
+    The function can also accommodate different controlTarget laws, vertical evolution phases, wind conditions, and complex flight dynamics like turns.
 
     .. note::
-        The control law used during the segment depends on the targets provided in the input parameter 'control':
+        The controlTarget law used during the segment depends on the targets provided in the input parameter 'controlTarget':
 
         - ROCD/slope+ESF:  Law based on ROCD/slope + ESF
         - ROCD/slope+acc:  Law based on ROCD/slope + acceleration
@@ -7200,7 +7613,7 @@ def accDec(
     :param v_init: Initial speed [kt] (CAS/TAS) or [-] MACH.
     :param v_final: Final speed [kt] (CAS/TAS) or [-] MACH.
     :param phase: Vertical evolution phase {Climb, Descent, Cruise}.
-    :param control: A dictionary containing the following targets:
+    :param controlTarget: A dictionary containing the following targets:
 
         - ROCDtarget: Rate of climb/descent to be followed [ft/min].
         - slopetarget: Slope (flight path angle) to be followed [deg].
@@ -7224,6 +7637,7 @@ def accDec(
         - constantHeading: Whether to maintain a constant heading. Default is None.
     :param reducedPower: Boolean specifying if reduced power is applied during the climb. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
+    :param suppressWarnings: Boolean to enable suppressing the warning messages
     :param kwargs: Additional optional parameters:
 
         - speed_step: Speed step size for the iterative calculation [-] for M, [kt] for TAS/CAS. Default is 0.01 Mach, 5 kt for TAS/CAS.
@@ -7275,615 +7689,732 @@ def accDec(
     :rtype: pandas.DataFrame
     """
 
-    rateOfTurn = turnMetrics["rateOfTurn"]
-    bankAngle = turnMetrics["bankAngle"]
-    directionOfTurn = turnMetrics["directionOfTurn"]
+    with warnings.catch_warnings():
+        if suppressWarnings:
+            warnings.simplefilter("ignore")
 
-    turnFlight = True
-    if turnMetrics["rateOfTurn"] == 0.0 and turnMetrics["bankAngle"] == 0.0:
-        turnFlight = False
+        rateOfTurn = turnMetrics["rateOfTurn"]
+        bankAngle = turnMetrics["bankAngle"]
+        directionOfTurn = turnMetrics["directionOfTurn"]
 
-    # conversion of Magnetic Heading to True Heading
-    if magneticDeclinationGrid is not None:
-        magneticDeclination = magneticDeclinationGrid.getMagneticDeclination(
-            LAT_target=Lat, LON_target=Lon
-        )
-    else:
-        magneticDeclination = 0
+        turnFlight = True
+        if (
+            turnMetrics["rateOfTurn"] == 0.0
+            and turnMetrics["bankAngle"] == 0.0
+        ):
+            turnFlight = False
 
-    # retrieve magnetic and true heading inputs
-    magneticHeading = initialHeading["magnetic"]
-    trueHeading = initialHeading["true"]
-    constantHeading = initialHeading["constantHeading"]
-
-    if Lat and Lon and (magneticHeading or trueHeading):
-        if trueHeading is not None and magneticHeading is None:
-            # fly TRUE Heading
-            headingToFly = "TRUE"
-            magneticHeading = trueHeading - magneticDeclination
-        elif magneticHeading is not None and trueHeading is None:
-            # fly MAGNETIC Heading
-            if constantHeading is True:
-                headingToFly = "MAGNETIC"
-                trueHeading = magneticHeading + magneticDeclination
-            else:
-                raise Exception("Cannot fly non-constant magnetic heading")
-
+        # conversion of Magnetic Heading to True Heading
+        if magneticDeclinationGrid is not None:
+            magneticDeclination = (
+                magneticDeclinationGrid.getMagneticDeclination(
+                    LAT_target=Lat, LON_target=Lon
+                )
+            )
         else:
-            raise Exception("Undefined Heading value combination")
+            magneticDeclination = 0
 
-    # calculation with constant mass (True) or integrated (False)
-    calculationType = kwargs.get("calculationType", "INTEGRATED")
+        # retrieve magnetic and true heading inputs
+        magneticHeading = initialHeading["magnetic"]
+        trueHeading = initialHeading["true"]
+        constantHeading = initialHeading["constantHeading"]
 
-    if calculationType == "INTEGRATED":
-        mass_const = False
-    if calculationType == "POINT":
-        mass_const = True
+        if Lat and Lon and (magneticHeading or trueHeading):
+            if trueHeading is not None and magneticHeading is None:
+                # fly TRUE Heading
+                headingToFly = "TRUE"
+                magneticHeading = trueHeading - magneticDeclination
+            elif magneticHeading is not None and trueHeading is None:
+                # fly MAGNETIC Heading
+                if constantHeading is True:
+                    headingToFly = "MAGNETIC"
+                    trueHeading = magneticHeading + magneticDeclination
+                else:
+                    raise Exception("Cannot fly non-constant magnetic heading")
 
-    # optional parameter to define initial Baterry State of Charge (SOC)
-    if AC.BADAFamily.BADAE:
-        SOC_init = kwargs.get("SOC_init", 100)
-    else:
-        SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
-
-    # iteratin step of speed loop
-    if speedType == "M":
-        speed_step = kwargs.get("speed_step", 0.01)  # [-] Mach increment
-    elif speedType == "CAS" or speedType == "TAS":
-        speed_step = kwargs.get("speed_step", 5.0)  # [kt] CAS/TAS increment
-
-    # number of iteration of mass/altitude loop
-    # BADAE
-    if AC.BADAFamily.BADAE:
-        m_iter = kwargs.get(
-            "m_iter", 5
-        )  # number of iterations for integration loop[-]
-    # BADA3 or BADA4 or BADAH
-    else:
-        m_iter = kwargs.get(
-            "m_iter", 10
-        )  # number of iterations for integration loop[-]
-
-    # Determine if speed evolution over the segment is acceleration or deceleration
-    # and associated speed iteration direction
-    if v_init < v_final:
-        speedEvol = "acc"
-    else:
-        speedEvol = "dec"
-        speed_step = -speed_step
-
-    if control is None:
-        # create empty control target
-        control = target()
-
-    # check the consistency of SLOPE/ROCD and climb/descent phase of flight
-    # if incosistent, change the sign on slope/ROCD target value
-    if phase == "Climb":
-        if control.slopetarget is not None and control.slopetarget < 0:
-            control.slopetarget = abs(control.slopetarget)
-            print("Slopetarget for Climb should be positive")
-        if control.ROCDtarget is not None and control.ROCDtarget < 0:
-            control.ROCDtarget = abs(control.ROCDtarget)
-            print("ROCDtarget for Climb should be positive")
-    elif phase == "Descent":
-        if control.slopetarget is not None and control.slopetarget > 0:
-            control.slopetarget = control.slopetarget * (-1)
-            print("Slopetarget for Descent should be negative")
-        if control.ROCDtarget is not None and control.ROCDtarget > 0:
-            control.ROCDtarget = control.ROCDtarget * (-1)
-            print("ROCDtarget for Descent should be negative")
-
-    # check the consistency of acc/dec and ESF
-    if phase == "Cruise":
-        if control.ESFtarget is not None and control.ESFtarget != 0:
-            control.ESFtarget = 0
-    elif phase == "Climb":
-        if (
-            control.ESFtarget is not None
-            and speedEvol == "acc"
-            and control.ESFtarget > 1
-        ):
-            print("ESFtarget for acceleration in Climb should be < 1")
-        if (
-            control.ESFtarget is not None
-            and speedEvol == "dec"
-            and control.ESFtarget < 1
-        ):
-            print("ESFtarget for deceleration in Climb should be > 1")
-    elif phase == "Descent":
-        if (
-            control.ESFtarget is not None
-            and speedEvol == "acc"
-            and control.ESFtarget < 1
-        ):
-            print("ESFtarget for acceleration in Descent should be > 1")
-        if (
-            control.ESFtarget is not None
-            and speedEvol == "dec"
-            and control.ESFtarget > 1
-        ):
-            print("ESFtarget for deceleration in Descent should be < 1")
-
-    # check the consistency of acctarget and acc/dec
-    if speedEvol == "acc":
-        if control.acctarget is not None and control.acctarget < 0:
-            control.acctarget = abs(control.acctarget)
-            print("Acctarget in acceleration should be > 1")
-    elif speedEvol == "dec":
-        if control.acctarget is not None and control.acctarget > 0:
-            control.acctarget = control.acctarget * (-1)
-            print("Acctarget in deceleration should be < 1")
-
-    if control.ROCDtarget is not None and control.slopetarget is not None:
-        print("Both ROCD and SLOPE target provided, priority given to SLOPE")
-
-    # comment line describing type of trajectory calculation
-    controlComment = ""
-    if control is not None:
-        if control.ROCDtarget is not None:
-            controlComment += "_" + "ROCDtarget"
-        if control.slopetarget is not None:
-            controlComment += "_" + "slopetarget"
-        if control.acctarget is not None:
-            controlComment += "_" + "acctarget"
-        if control.ESFtarget is not None:
-            controlComment += "_" + "ESFtarget"
-
-    if turnFlight:
-        turnComment = "_turn"
-    else:
-        turnComment = ""
-
-    if constantHeading:
-        constHeadingStr = "_const_Heading"
-    elif constantHeading is False or constantHeading is None:
-        constHeadingStr = ""
-
-    # comment line describing type of trajectory calculation
-    comment = (
-        phase
-        + turnComment
-        + "_"
-        + speedEvol
-        + "_"
-        + speedType
-        + controlComment
-        + constHeadingStr
-    )
-
-    if Lat and Lon and (magneticHeading or trueHeading):
-        comment = comment + "_" + headingToFly + "_Heading"
-
-    # compute Energy Share Factor
-    if control.ESFtarget is not None:
-        ESFc = control.ESFtarget
-    elif control.ROCDtarget is not None or control.slopetarget is not None:
-        ESFc = None
-    elif control.acctarget is not None:
-        ESFc = None
-
-        # update ROCD target if phase is set to "Cruise"
-        if phase == "Cruise":
-            control.ROCDtarget = 0
-    else:
-        # Neither ROCD/slope nor ESF/acc provided means control is rating+default ESF
-        if (phase == "Climb" and speedEvol == "acc") or (
-            phase == "Descent" and speedEvol == "dec"
-        ):
-            ESFc = 0.3
-        elif (phase == "Climb" and speedEvol == "dec") or (
-            phase == "Descent" and speedEvol == "acc"
-        ):
-            ESFc = 1.7
-        elif phase == "Cruise":
-            ESFc = 0
-
-    # convert target values to ISU units
-    if control.ROCDtarget is not None:
-        ROCDtargetisu = conv.ft2m(control.ROCDtarget) / 60  # [m/s]
-    if control.slopetarget is not None:
-        slopetargetisu = conv.deg2rad(control.slopetarget)
-
-    # Determine max engine rating if not provided
-    if "maxRating" not in kwargs:
-        if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
-            maxRating = "MTKF"
-        else:
-            maxRating = "MCMB"
-    else:
-        maxRating = utils.checkArgument("maxRating", **kwargs)
-
-    # Determine engine rating
-    if (
-        control.ROCDtarget is not None or control.slopetarget is not None
-    ) and (control.ESFtarget is not None or control.acctarget is not None):
-        rating = None
-    else:
-        if phase == "Climb" or (phase == "Cruise" and speedEvol == "acc"):
-            rating = maxRating
-        elif phase == "Descent" or (phase == "Cruise" and speedEvol == "dec"):
-            if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
-                rating = "UNKNOWN"  # TBD: No minimum power model
             else:
-                rating = "LIDL"
+                raise Exception("Undefined Heading value combination")
 
-    # get the default aerodynamic configuration if provided to be used for the whole segment
-    config_default = kwargs.get("config", None)
-    if config_default is not None:
+        # calculation with constant mass (True) or integrated (False)
+        calculationType = kwargs.get("calculationType", "INTEGRATED")
+
+        if calculationType == "INTEGRATED":
+            mass_const = False
+        if calculationType == "POINT":
+            mass_const = True
+
+        # optional parameter to define initial Baterry State of Charge (SOC)
+        if AC.BADAFamily.BADAE:
+            SOC_init = kwargs.get("SOC_init", 100)
+        else:
+            SOC_init = None
+
+        # speed brakes application
         if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-            if not (
-                config_default == "TO"
-                or config_default == "IC"
-                or config_default == "CR"
-                or config_default == "AP"
-                or config_default == "LD"
+            speedBrakes = kwargs.get(
+                "speedBrakes", {"deployed": False, "value": 0.03}
+            )
+
+        # iteratin step of speed loop
+        if speedType == "M":
+            speed_step = kwargs.get("speed_step", 0.01)  # [-] Mach increment
+        elif speedType == "CAS" or speedType == "TAS":
+            speed_step = kwargs.get(
+                "speed_step", 5.0
+            )  # [kt] CAS/TAS increment
+
+        # number of iteration of mass/altitude loop
+        # BADAE
+        if AC.BADAFamily.BADAE:
+            m_iter = kwargs.get(
+                "m_iter", 5
+            )  # number of iterations for integration loop[-]
+        # BADA3 or BADA4 or BADAH
+        else:
+            m_iter = kwargs.get(
+                "m_iter", 10
+            )  # number of iterations for integration loop[-]
+
+        # Determine if speed evolution over the segment is acceleration or deceleration
+        # and associated speed iteration direction
+        if v_init < v_final:
+            speedEvol = "acc"
+        else:
+            speedEvol = "dec"
+            speed_step = -speed_step
+
+        if controlTarget is None:
+            # create empty controlTarget target
+            controlTarget = target()
+
+        # check the consistency of SLOPE/ROCD and climb/descent phase of flight
+        # if incosistent, change the sign on slope/ROCD target value
+        if phase == "Climb":
+            if (
+                controlTarget.slopetarget is not None
+                and controlTarget.slopetarget < 0
             ):
-                print(
-                    "WRONG default configuration set. Available values are: TO/IC/CR/AP/LD. Configuration will be calculated automatically"
+                controlTarget.slopetarget = abs(controlTarget.slopetarget)
+                print("Slopetarget for Climb should be positive")
+            if (
+                controlTarget.ROCDtarget is not None
+                and controlTarget.ROCDtarget < 0
+            ):
+                controlTarget.ROCDtarget = abs(controlTarget.ROCDtarget)
+                print("ROCDtarget for Climb should be positive")
+        elif phase == "Descent":
+            if (
+                controlTarget.slopetarget is not None
+                and controlTarget.slopetarget > 0
+            ):
+                controlTarget.slopetarget = controlTarget.slopetarget * (-1)
+                print("Slopetarget for Descent should be negative")
+            if (
+                controlTarget.ROCDtarget is not None
+                and controlTarget.ROCDtarget > 0
+            ):
+                controlTarget.ROCDtarget = controlTarget.ROCDtarget * (-1)
+                print("ROCDtarget for Descent should be negative")
+
+        # check the consistency of acc/dec and ESF
+        if phase == "Cruise":
+            if (
+                controlTarget.ESFtarget is not None
+                and controlTarget.ESFtarget != 0
+            ):
+                controlTarget.ESFtarget = 0
+        elif phase == "Climb":
+            if (
+                controlTarget.ESFtarget is not None
+                and speedEvol == "acc"
+                and controlTarget.ESFtarget > 1
+            ):
+                warnings.warn(
+                    "ESFtarget for acceleration in Climb should be < 1"
+                )
+            if (
+                controlTarget.ESFtarget is not None
+                and speedEvol == "dec"
+                and controlTarget.ESFtarget < 1
+            ):
+                warnings.warn(
+                    "ESFtarget for deceleration in Climb should be > 1"
+                )
+        elif phase == "Descent":
+            if (
+                controlTarget.ESFtarget is not None
+                and speedEvol == "acc"
+                and controlTarget.ESFtarget < 1
+            ):
+                warnings.warn(
+                    "ESFtarget for acceleration in Descent should be > 1"
+                )
+            if (
+                controlTarget.ESFtarget is not None
+                and speedEvol == "dec"
+                and controlTarget.ESFtarget > 1
+            ):
+                warnings.warn(
+                    "ESFtarget for deceleration in Descent should be < 1"
                 )
 
-    # initialize output parameters
-    Hp = [Hp_init]
-    TAS = []
-    CAS = []
-    GS = []
-    M = []
-    ROCD = []
-    esf = []
-    FUEL = []
-    FUELCONSUMED = []
-    time = [0]
-    dist = [0]
-    mass = [m_init]
-    ESF = []
-    Comment = []
-    check = []  # TEM consistency check result
-    Slope = []
-    acc = []
-    THR = []
-    DRAG = []
-    config = []
-    HLid = []
-    LG = []
-    BankAngle = []
-    ROT = []
+        # check the consistency of acctarget and acc/dec
+        if speedEvol == "acc":
+            if (
+                controlTarget.acctarget is not None
+                and controlTarget.acctarget < 0
+            ):
+                controlTarget.acctarget = abs(controlTarget.acctarget)
+                print("Acctarget in acceleration should be > 1")
+        elif speedEvol == "dec":
+            if (
+                controlTarget.acctarget is not None
+                and controlTarget.acctarget > 0
+            ):
+                controlTarget.acctarget = controlTarget.acctarget * (-1)
+                print("Acctarget in deceleration should be < 1")
 
-    if not AC.BADAFamily.BADAE:
-        FUELCONSUMED = [0]
-
-    # BADAH specific
-    Peng = []
-    Preq = []
-    Pav = []
-
-    # optional GPS coordiantes and HDG definition
-    if Lat and Lon and (magneticHeading or trueHeading):
-        LAT = [Lat]
-        LON = [Lon]
-        HDGMagnetic = [magneticHeading]
-        HDGTrue = [trueHeading]
-    else:
-        LAT = []
-        LON = []
-        HDGMagnetic = []
-        HDGTrue = []
-
-    # BADAE specific
-    Pmec = []
-    Pbat = []
-    SOCr = []
-    SOC = [SOC_init]
-    Pelc = []
-    Ibat = []
-    Vbat = []
-    Vgbat = []
-
-    # init loop parameters
-    dVdtisu = []
-
-    # initialize loop parameters: speed at end of step and loop termination
-    v_i = v_init
-    go_on = True
-
-    while go_on:
-        ## PART 1: compute parameters at end of step that are known without uncertainties:
-        ##         *none*
-
-        ## PART 2: compute parameters at end of step that are known only with uncertainties
-        ##           (due to unknown mass and altitude at end of step):
-
-        # Initialize loop parameters: aircraft mass (resp. altitude) at end of step is
-        # first estimated as equal to aircraft mass (resp. altitude) at start of step
-
-        mass_i = mass[-1]
-        Hp_i = Hp[-1]
-        for _ in itertools.repeat(None, m_iter):
-            # atmosphere properties
-            H_m = conv.ft2m(Hp_i)  # altitude [m]
-            [theta, delta, sigma] = atm.atmosphereProperties(
-                h=H_m, deltaTemp=deltaTemp
-            )
-            temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - deltaTemp
+        if (
+            controlTarget.ROCDtarget is not None
+            and controlTarget.slopetarget is not None
+        ):
+            print(
+                "Both ROCD and SLOPE target provided, priority given to SLOPE"
             )
 
-            # aircraft speed
-            [M_i, CAS_i, TAS_i] = atm.convertSpeed(
-                v=v_i,
-                speedType=speedType,
-                theta=theta,
-                delta=delta,
-                sigma=sigma,
-            )
+        # comment line describing type of trajectory calculation
+        controlTargetComment = ""
+        if controlTarget is not None:
+            if controlTarget.ROCDtarget is not None:
+                controlTargetComment += "_" + "ROCDtarget"
+            if controlTarget.slopetarget is not None:
+                controlTargetComment += "_" + "slopetarget"
+            if controlTarget.acctarget is not None:
+                controlTargetComment += "_" + "acctarget"
+            if controlTarget.ESFtarget is not None:
+                controlTargetComment += "_" + "ESFtarget"
 
-            if turnFlight:
-                if turnMetrics["bankAngle"] != 0.0:
-                    # bankAngle is defined
-                    rateOfTurn = AC.rateOfTurn_bankAngle(
-                        TAS=TAS_i, bankAngle=bankAngle
-                    )
-                else:
-                    # rateOfTurn is defined
-                    bankAngle = AC.bankAngle(
-                        rateOfTurn=rateOfTurn, v=TAS_i
-                    )  # [degrees]
+        if turnFlight:
+            turnComment = "_turn"
+        else:
+            turnComment = ""
 
-            # Load factor
-            nz = 1 / cos(radians(bankAngle))
+        if constantHeading:
+            constHeadingStr = "_const_Heading"
+        elif constantHeading is False or constantHeading is None:
+            constHeadingStr = ""
 
-            # compute ROCD target (if any) on this step
-            if control.slopetarget is not None:
-                # compute target ROCD corresponding to target slope
+        # comment line describing type of trajectory calculation
+        comment = (
+            phase
+            + turnComment
+            + "_"
+            + speedEvol
+            + "_"
+            + speedType
+            + controlTargetComment
+            + constHeadingStr
+        )
 
-                if AC.BADAFamily.BADAE:
-                    # special case for BADAE, in future it may apply also for BADAH
-                    dh_dt_i = TAS_i * tan(slopetargetisu)
-                else:
-                    dh_dt_i = TAS_i * sin(slopetargetisu)
+        if Lat and Lon and (magneticHeading or trueHeading):
+            comment = comment + "_" + headingToFly + "_Heading"
 
-                ROCDtargetisu_i = dh_dt_i * (1 / temp_const)
-            elif control.ROCDtarget is not None:
-                ROCDtargetisu_i = ROCDtargetisu
-                dh_dt_i = ROCDtargetisu_i * temp_const
+        # compute Energy Share Factor
+        if controlTarget.ESFtarget is not None:
+            ESFc = controlTarget.ESFtarget
+        elif (
+            controlTarget.ROCDtarget is not None
+            or controlTarget.slopetarget is not None
+        ):
+            ESFc = None
+        elif controlTarget.acctarget is not None:
+            ESFc = None
 
-            # BADAH or BADAE
+            # update ROCD target if phase is set to "Cruise"
+            if phase == "Cruise":
+                controlTarget.ROCDtarget = 0
+        else:
+            # Neither ROCD/slope nor ESF/acc provided means controlTarget is rating+default ESF
+            if (phase == "Climb" and speedEvol == "acc") or (
+                phase == "Descent" and speedEvol == "dec"
+            ):
+                ESFc = 0.3
+            elif (phase == "Climb" and speedEvol == "dec") or (
+                phase == "Descent" and speedEvol == "acc"
+            ):
+                ESFc = 1.7
+            elif phase == "Cruise":
+                ESFc = 0
+
+        # convert target values to ISU units
+        if controlTarget.ROCDtarget is not None:
+            ROCDtargetisu = conv.ft2m(controlTarget.ROCDtarget) / 60  # [m/s]
+        if controlTarget.slopetarget is not None:
+            slopetargetisu = conv.deg2rad(controlTarget.slopetarget)
+
+        # Determine max engine rating if not provided
+        if "maxRating" not in kwargs:
             if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
-                # compute Power required
-                Preq_i = AC.Preq(
-                    sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                maxRating = "MTKF"
+            else:
+                maxRating = "MCMB"
+        else:
+            maxRating = utils.checkArgument("maxRating", **kwargs)
+
+        # Determine engine rating
+        if (
+            controlTarget.ROCDtarget is not None
+            or controlTarget.slopetarget is not None
+        ) and (
+            controlTarget.ESFtarget is not None
+            or controlTarget.acctarget is not None
+        ):
+            rating = None
+        else:
+            if phase == "Climb" or (phase == "Cruise" and speedEvol == "acc"):
+                rating = maxRating
+            elif phase == "Descent" or (
+                phase == "Cruise" and speedEvol == "dec"
+            ):
+                if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
+                    rating = "UNKNOWN"  # TBD: No minimum power model
+                else:
+                    rating = "LIDL"
+
+        # get the default aerodynamic configuration if provided to be used for the whole segment
+        config_default = kwargs.get("config", None)
+        if config_default is not None:
+            if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
+                if not (
+                    config_default == "TO"
+                    or config_default == "IC"
+                    or config_default == "CR"
+                    or config_default == "AP"
+                    or config_default == "LD"
+                ):
+                    print(
+                        "WRONG default configuration set. Available values are: TO/IC/CR/AP/LD. Configuration will be calculated automatically"
+                    )
+
+        # initialize output parameters
+        Hp = [Hp_init]
+        TAS = []
+        CAS = []
+        GS = []
+        M = []
+        ROCD = []
+        esf = []
+        FUEL = []
+        FUELCONSUMED = []
+        time = [0]
+        dist = [0]
+        mass = [m_init]
+        ESF = []
+        Comment = []
+        check = []  # TEM consistency check result
+        Slope = []
+        acc = []
+        THR = []
+        DRAG = []
+        config = []
+        HLid = []
+        LG = []
+        BankAngle = []
+        ROT = []
+
+        if not AC.BADAFamily.BADAE:
+            FUELCONSUMED = [0]
+
+        # BADAH specific
+        Peng = []
+        Preq = []
+        Pav = []
+
+        # optional GPS coordiantes and HDG definition
+        if Lat and Lon and (magneticHeading or trueHeading):
+            LAT = [Lat]
+            LON = [Lon]
+            HDGMagnetic = [magneticHeading]
+            HDGTrue = [trueHeading]
+        else:
+            LAT = []
+            LON = []
+            HDGMagnetic = []
+            HDGTrue = []
+
+        # BADAE specific
+        Pmec = []
+        Pbat = []
+        SOCr = []
+        SOC = [SOC_init]
+        Pelc = []
+        Ibat = []
+        Vbat = []
+        Vgbat = []
+
+        # init loop parameters
+        dVdtisu = []
+
+        # initialize loop parameters: speed at end of step and loop termination
+        v_i = v_init
+        go_on = True
+
+        while go_on:
+            ## PART 1: compute parameters at end of step that are known without uncertainties:
+            ##         *none*
+
+            ## PART 2: compute parameters at end of step that are known only with uncertainties
+            ##           (due to unknown mass and altitude at end of step):
+
+            # Initialize loop parameters: aircraft mass (resp. altitude) at end of step is
+            # first estimated as equal to aircraft mass (resp. altitude) at start of step
+
+            mass_i = mass[-1]
+            Hp_i = Hp[-1]
+
+            for _ in itertools.repeat(None, m_iter):
+                H_m = conv.ft2m(Hp_i)  # altitude [m]
+
+                # atmosphere properties
+                [theta, delta, sigma] = atm.atmosphereProperties(
+                    h=H_m, deltaTemp=deltaTemp
+                )
+                temp_const = (theta * const.temp_0) / (
+                    theta * const.temp_0 - deltaTemp
                 )
 
-                # compute engine power
-                if rating is None:
-                    # compute power required for the manoeuver
-                    if ESFc is not None:
-                        P_i = dh_dt_i * mass_i * const.g / ESFc + Preq_i  # [W]
-                    elif control.acctarget is not None:
-                        P_i = (
-                            dh_dt_i * mass_i * const.g
-                            + mass_i * TAS_i * control.acctarget
-                            + Preq_i
-                        )  # [W]
-                    else:
-                        print("Error: neither ESF nor acc target provided")
+                # aircraft speed
+                [M_i, CAS_i, TAS_i] = atm.convertSpeed(
+                    v=v_i,
+                    speedType=speedType,
+                    theta=theta,
+                    delta=delta,
+                    sigma=sigma,
+                )
 
-                    # Check that required thrust/power fits in the available thrust/power envelope,
-                    # recompute ROCD if necessary and compute fuel coefficient accordingly
-                    Pmin = (
-                        0.1 * AC.P0
-                    )  # No minimum power model: assume 10% torque
+                # check for speed flight envelope
+                # if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+                # if config_default is None:
+                # config_i = AC.flightEnvelope.getConfig(
+                # h=H_m,
+                # phase="Cruise",
+                # v=CAS_i,
+                # mass=mass_i,
+                # deltaTemp=deltaTemp,
+                # )
+                # else:
+                # config_i = config_default
 
-                    if AC.BADAFamily.BADAH:
-                        Pmax = AC.Pav(
-                            rating=maxRating, theta=theta, delta=delta
+                # if AC.BADAFamily.BADA4:
+                # minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+                # [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                # maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+
+                # if AC.BADAFamily.BADA3:
+                # minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+                # maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+                # stop when out of speed flight envelope
+                # if minSpeed is None or maxSpeed is None:
+                # warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+                # break
+
+                # if CAS_i < minSpeed or CAS_i > maxSpeed:
+                # warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                # break
+
+                if turnFlight:
+                    if turnMetrics["bankAngle"] != 0.0:
+                        # bankAngle is defined
+                        rateOfTurn = AC.rateOfTurn_bankAngle(
+                            TAS=TAS_i, bankAngle=bankAngle
                         )
-                        Pav_i = AC.Pav(
-                            rating=maxRating, theta=theta, delta=delta
-                        )
-                    elif AC.BADAFamily.BADAE:
-                        Pmax = AC.Pav(rating=maxRating, SOC=SOC[-1])
-                        Pav_i = AC.Pav(rating=maxRating, SOC=SOC[-1])
-
-                    if P_i < Pmin:
-                        P_i = Pmin
-
-                        if ESFc is not None:
-                            ROCD_i = (
-                                conv.m2ft(
-                                    AC.ROCD(
-                                        Peng=P_i,
-                                        Preq=Preq_i,
-                                        mass=mass_i,
-                                        ESF=ESFc,
-                                        theta=theta,
-                                        deltaTemp=deltaTemp,
-                                    )
-                                )
-                                * 60
-                            )
-                        elif control.acctarget is not None:
-                            ROCD_i = (
-                                conv.m2ft(
-                                    (
-                                        P_i
-                                        - mass_i * TAS_i * control.acctarget
-                                        - Preq_i
-                                    )
-                                    / (mass_i * const.g * temp_const)
-                                )
-                                * 60
-                            )
-
-                    elif P_i > Pmax:
-                        P_i = Pmax
-
-                        if ESFc is not None:
-                            ROCD_i = (
-                                conv.m2ft(
-                                    AC.ROCD(
-                                        Peng=P_i,
-                                        Preq=Preq_i,
-                                        mass=mass_i,
-                                        ESF=ESFc,
-                                        theta=theta,
-                                        deltaTemp=deltaTemp,
-                                    )
-                                )
-                                * 60
-                            )
-                        elif control.acctarget is not None:
-                            ROCD_i = (
-                                conv.m2ft(
-                                    (
-                                        P_i
-                                        - mass_i * TAS_i * control.acctarget
-                                        - Preq_i
-                                    )
-                                    / (mass_i * const.g * temp_const)
-                                )
-                                * 60
-                            )
                     else:
-                        ROCD_i = control.ROCDtarget
+                        # rateOfTurn is defined
+                        bankAngle = AC.bankAngle(
+                            rateOfTurn=rateOfTurn, v=TAS_i
+                        )  # [degrees]
 
-                else:
-                    # Compute available power
-                    if rating == "UNKNOWN":
-                        P_i = (
+                # Load factor
+                nz = 1 / cos(radians(bankAngle))
+
+                # compute ROCD target (if any) on this step
+                if controlTarget.slopetarget is not None:
+                    # compute target ROCD corresponding to target slope
+
+                    if AC.BADAFamily.BADAE:
+                        # special case for BADAE, in future it may apply also for BADAH
+                        dh_dt_i = TAS_i * tan(slopetargetisu)
+                    else:
+                        dh_dt_i = TAS_i * sin(slopetargetisu)
+
+                    ROCDtargetisu_i = dh_dt_i * (1 / temp_const)
+                elif controlTarget.ROCDtarget is not None:
+                    ROCDtargetisu_i = ROCDtargetisu
+                    dh_dt_i = ROCDtargetisu_i * temp_const
+
+                # BADAH or BADAE
+                if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
+                    # compute Power required
+                    Preq_i = AC.Preq(
+                        sigma=sigma, tas=TAS_i, mass=mass_i, phi=bankAngle
+                    )
+
+                    # compute engine power
+                    if rating is None:
+                        # compute power required for the manoeuver
+                        if ESFc is not None:
+                            P_i = (
+                                dh_dt_i * mass_i * const.g / ESFc + Preq_i
+                            )  # [W]
+                        elif controlTarget.acctarget is not None:
+                            P_i = (
+                                dh_dt_i * mass_i * const.g
+                                + mass_i * TAS_i * controlTarget.acctarget
+                                + Preq_i
+                            )  # [W]
+                        else:
+                            print("Error: neither ESF nor acc target provided")
+
+                        # Check that required thrust/power fits in the available thrust/power envelope,
+                        # recompute ROCD if necessary and compute fuel coefficient accordingly
+                        Pmin = (
                             0.1 * AC.P0
                         )  # No minimum power model: assume 10% torque
-                        Pav_i = AC.Pav(
-                            rating=maxRating, theta=theta, delta=delta
-                        )
-                    else:
+
                         if AC.BADAFamily.BADAH:
-                            P_i = AC.Pav(
-                                rating=rating, theta=theta, delta=delta
+                            Pmax = AC.Pav(
+                                rating=maxRating, theta=theta, delta=delta
                             )
                             Pav_i = AC.Pav(
-                                rating=rating, theta=theta, delta=delta
+                                rating=maxRating, theta=theta, delta=delta
                             )
                         elif AC.BADAFamily.BADAE:
-                            P_i = AC.Pav(rating=rating, SOC=SOC[-1])
-                            Pav_i = AC.Pav(rating=rating, SOC=SOC[-1])
+                            Pmax = AC.Pav(rating=maxRating, SOC=SOC[-1])
+                            Pav_i = AC.Pav(rating=maxRating, SOC=SOC[-1])
 
-                # Compute excess power
-                Pe_i = P_i - Preq_i  # [W]
+                        if P_i < Pmin:
+                            P_i = Pmin
 
-                # BADAH
-                if AC.BADAFamily.BADAH:
-                    # compute fuel flow for level flight
-                    CP = AC.CP(Peng=P_i)
-                    FUEL_i = AC.ff(delta=delta, CP=CP)  # [kg/s]
+                            if ESFc is not None:
+                                ROCD_i = (
+                                    conv.m2ft(
+                                        AC.ROCD(
+                                            Peng=P_i,
+                                            Preq=Preq_i,
+                                            mass=mass_i,
+                                            ESF=ESFc,
+                                            theta=theta,
+                                            deltaTemp=deltaTemp,
+                                        )
+                                    )
+                                    * 60
+                                )
+                            elif controlTarget.acctarget is not None:
+                                ROCD_i = (
+                                    conv.m2ft(
+                                        (
+                                            P_i
+                                            - mass_i
+                                            * TAS_i
+                                            * controlTarget.acctarget
+                                            - Preq_i
+                                        )
+                                        / (mass_i * const.g * temp_const)
+                                    )
+                                    * 60
+                                )
 
-                # BADAE
-                elif AC.BADAFamily.BADAE:
-                    Pbat_i = AC.Pbat(Preq=P_i, SOC=SOC[-1])
-                    SOCr_i = AC.SOCrate(Preq=P_i, SOC=SOC[-1])
+                        elif P_i > Pmax:
+                            P_i = Pmax
 
-                    # debug data
-                    Pelc_i = P_i / AC.eta
-                    Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
-                    Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
-                    Vgbat_i = (
-                        AC.Vocbat(SOC=SOC[-1]) - AC.R0bat(SOC=SOC[-1]) * Ibat_i
-                    )
+                            if ESFc is not None:
+                                ROCD_i = (
+                                    conv.m2ft(
+                                        AC.ROCD(
+                                            Peng=P_i,
+                                            Preq=Preq_i,
+                                            mass=mass_i,
+                                            ESF=ESFc,
+                                            theta=theta,
+                                            deltaTemp=deltaTemp,
+                                        )
+                                    )
+                                    * 60
+                                )
+                            elif controlTarget.acctarget is not None:
+                                ROCD_i = (
+                                    conv.m2ft(
+                                        (
+                                            P_i
+                                            - mass_i
+                                            * TAS_i
+                                            * controlTarget.acctarget
+                                            - Preq_i
+                                        )
+                                        / (mass_i * const.g * temp_const)
+                                    )
+                                    * 60
+                                )
+                        else:
+                            ROCD_i = controlTarget.ROCDtarget
 
-            # BADA4
-            elif AC.BADAFamily.BADA4:
-                # aircraft aerodynamic configuration
-                if config_default is None:
-                    config_i = AC.flightEnvelope.getConfig(
-                        h=H_m,
-                        phase=phase,
-                        v=CAS_i,
-                        mass=mass_i,
-                        deltaTemp=deltaTemp,
-                    )
-                else:
-                    config_i = config_default
-
-                # ensure continuity of configuration change within the segment
-                if config:
-                    config_i = AC.flightEnvelope.checkConfigurationContinuity(
-                        phase=phase,
-                        previousConfig=config[-1],
-                        currentConfig=config_i,
-                    )
-
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
-                    config=config_i
-                )
-
-                # compute lift coefficient
-                CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
-                # compute drag coefficient
-                CD = AC.CD(
-                    M=M_i, CL=CL, HLid=HLid_i, LG=LG_i, speedBrakes=speedBrakes
-                )
-                # compute drag force
-                Drag = AC.D(M=M_i, delta=delta, CD=CD)
-
-                # compute thrust and fuel flow
-                if rating is None:
-                    # compute thrust force required for the manoeuver
-                    if ESFc is not None:
-                        THR_i = (
-                            dh_dt_i * mass_i * const.g / (TAS_i * ESFc) + Drag
-                        )  # [N]
-                    elif control.acctarget is not None:
-                        THR_i = (
-                            dh_dt_i * mass_i * const.g / TAS_i
-                            + mass_i * control.acctarget
-                            + Drag
-                        )  # [N]
                     else:
-                        print("Error: neither ESF nor acc target provided")
+                        # Compute available power
+                        if rating == "UNKNOWN":
+                            P_i = (
+                                0.1 * AC.P0
+                            )  # No minimum power model: assume 10% torque
+                            Pav_i = AC.Pav(
+                                rating=maxRating, theta=theta, delta=delta
+                            )
+                        else:
+                            if AC.BADAFamily.BADAH:
+                                P_i = AC.Pav(
+                                    rating=rating, theta=theta, delta=delta
+                                )
+                                Pav_i = AC.Pav(
+                                    rating=rating, theta=theta, delta=delta
+                                )
+                            elif AC.BADAFamily.BADAE:
+                                P_i = AC.Pav(rating=rating, SOC=SOC[-1])
+                                Pav_i = AC.Pav(rating=rating, SOC=SOC[-1])
 
-                    # Check that required thrust fits in the available thrust envelope,
-                    # recompute ROCD if necessary and compute fuel flow accordingly
-                    THR_min = AC.Thrust(
-                        rating="LIDL",
-                        delta=delta,
-                        theta=theta,
-                        M=M_i,
-                        deltaTemp=deltaTemp,
-                    )  # IDLE Thrust
-                    FUEL_min = AC.ff(
-                        rating="LIDL",
-                        delta=delta,
-                        theta=theta,
-                        M=M_i,
-                        deltaTemp=deltaTemp,
-                    )  # IDLE Fuel Flow
-                    THR_max = AC.Thrust(
-                        rating="MCMB",
-                        delta=delta,
-                        theta=theta,
-                        M=M_i,
-                        deltaTemp=deltaTemp,
-                    )  # MCMB Thrust
-                    FUEL_max = AC.ff(
-                        rating="MCMB",
-                        delta=delta,
-                        theta=theta,
-                        M=M_i,
-                        deltaTemp=deltaTemp,
-                    )  # MCMB Fuel Flow
+                    # Compute excess power
+                    Pe_i = P_i - Preq_i  # [W]
 
-                    if THR_i < THR_min:
-                        THR_i = THR_min
-                        FUEL_i = FUEL_min
-                    elif THR_i > THR_max:
-                        THR_i = THR_max
-                        FUEL_i = FUEL_max
+                    # BADAH
+                    if AC.BADAFamily.BADAH:
+                        # compute fuel flow for level flight
+                        CP = AC.CP(Peng=P_i)
+                        FUEL_i = AC.ff(delta=delta, CP=CP)  # [kg/s]
+
+                    # BADAE
+                    elif AC.BADAFamily.BADAE:
+                        Pbat_i = AC.Pbat(Preq=P_i, SOC=SOC[-1])
+                        SOCr_i = AC.SOCrate(Preq=P_i, SOC=SOC[-1])
+
+                        # debug data
+                        Pelc_i = P_i / AC.eta
+                        Ibat_i = AC.Ibat(P=Pelc_i, SOC=SOC[-1])
+                        Vbat_i = AC.Vbat(I=Ibat_i, SOC=SOC[-1])
+                        Vgbat_i = (
+                            AC.Vocbat(SOC=SOC[-1])
+                            - AC.R0bat(SOC=SOC[-1]) * Ibat_i
+                        )
+
+                # BADA4
+                elif AC.BADAFamily.BADA4:
+                    # aircraft aerodynamic configuration
+                    if config_default is None:
+                        config_i = AC.flightEnvelope.getConfig(
+                            h=H_m,
+                            phase=phase,
+                            v=CAS_i,
+                            mass=mass_i,
+                            deltaTemp=deltaTemp,
+                        )
                     else:
+                        config_i = config_default
+
+                    # ensure continuity of configuration change within the segment
+                    if config:
+                        config_i = (
+                            AC.flightEnvelope.checkConfigurationContinuity(
+                                phase=phase,
+                                previousConfig=config[-1],
+                                currentConfig=config_i,
+                            )
+                        )
+
+                    [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                        config=config_i
+                    )
+
+                    # compute lift coefficient
+                    CL = AC.CL(M=M_i, delta=delta, mass=mass_i, nz=nz)
+                    # compute drag coefficient
+                    CD = AC.CD(
+                        M=M_i,
+                        CL=CL,
+                        HLid=HLid_i,
+                        LG=LG_i,
+                        speedBrakes=speedBrakes,
+                    )
+                    # compute drag force
+                    Drag = AC.D(M=M_i, delta=delta, CD=CD)
+
+                    # compute thrust and fuel flow
+                    if rating is None:
+                        # compute thrust force required for the manoeuver
+                        if ESFc is not None:
+                            THR_i = (
+                                dh_dt_i * mass_i * const.g / (TAS_i * ESFc)
+                                + Drag
+                            )  # [N]
+                        elif controlTarget.acctarget is not None:
+                            THR_i = (
+                                dh_dt_i * mass_i * const.g / TAS_i
+                                + mass_i * controlTarget.acctarget
+                                + Drag
+                            )  # [N]
+                        else:
+                            print("Error: neither ESF nor acc target provided")
+
+                        # Check that required thrust fits in the available thrust envelope,
+                        # recompute ROCD if necessary and compute fuel flow accordingly
+                        THR_min = AC.Thrust(
+                            rating="LIDL",
+                            delta=delta,
+                            theta=theta,
+                            M=M_i,
+                            deltaTemp=deltaTemp,
+                        )  # IDLE Thrust
+                        FUEL_min = AC.ff(
+                            rating="LIDL",
+                            delta=delta,
+                            theta=theta,
+                            M=M_i,
+                            deltaTemp=deltaTemp,
+                        )  # IDLE Fuel Flow
+                        THR_max = AC.Thrust(
+                            rating="MCMB",
+                            delta=delta,
+                            theta=theta,
+                            M=M_i,
+                            deltaTemp=deltaTemp,
+                        )  # MCMB Thrust
+                        FUEL_max = AC.ff(
+                            rating="MCMB",
+                            delta=delta,
+                            theta=theta,
+                            M=M_i,
+                            deltaTemp=deltaTemp,
+                        )  # MCMB Fuel Flow
+
+                        if THR_i < THR_min:
+                            THR_i = THR_min
+                            FUEL_i = FUEL_min
+                        elif THR_i > THR_max:
+                            THR_i = THR_max
+                            FUEL_i = FUEL_max
+                        else:
+                            CT = AC.CT(Thrust=THR_i, delta=delta)
+                            FUEL_i = AC.ff(
+                                CT=CT,
+                                delta=delta,
+                                theta=theta,
+                                M=M_i,
+                                deltaTemp=deltaTemp,
+                            )
+                    else:
+                        THR_i = AC.Thrust(
+                            rating=rating,
+                            delta=delta,
+                            theta=theta,
+                            M=M_i,
+                            deltaTemp=deltaTemp,
+                        )  # [N]
                         CT = AC.CT(Thrust=THR_i, delta=delta)
                         FUEL_i = AC.ff(
                             CT=CT,
@@ -7892,378 +8423,419 @@ def accDec(
                             M=M_i,
                             deltaTemp=deltaTemp,
                         )
-                else:
-                    THR_i = AC.Thrust(
-                        rating=rating,
-                        delta=delta,
-                        theta=theta,
-                        M=M_i,
-                        deltaTemp=deltaTemp,
-                    )  # [N]
-                    CT = AC.CT(Thrust=THR_i, delta=delta)
-                    FUEL_i = AC.ff(
-                        CT=CT,
-                        delta=delta,
-                        theta=theta,
-                        M=M_i,
-                        deltaTemp=deltaTemp,
-                    )
 
-                # compute excess power
-                Pe_i = (THR_i - Drag) * TAS_i  # [kg*m^2/s^3]
+                    # compute excess power
+                    Pe_i = (THR_i - Drag) * TAS_i  # [kg*m^2/s^3]
 
-            # BADA3
-            elif AC.BADAFamily.BADA3:
-                # aircraft aerodynamic configuration
-                if config_default is None:
-                    config_i = AC.flightEnvelope.getConfig(
-                        h=H_m,
-                        phase=phase,
-                        v=CAS_i,
-                        mass=mass_i,
-                        deltaTemp=deltaTemp,
-                    )
-                else:
-                    config_i = config_default
-
-                # ensure continuity of configuration change within the segment
-                if config:
-                    config_i = AC.flightEnvelope.checkConfigurationContinuity(
-                        phase=phase,
-                        previousConfig=config[-1],
-                        currentConfig=config_i,
-                    )
-
-                # compute lift coefficient
-                CL = AC.CL(tas=TAS_i, sigma=sigma, mass=mass_i, nz=nz)
-                # compute drag coefficient
-                CD = AC.CD(CL=CL, config=config_i, speedBrakes=speedBrakes)
-                # compute drag force
-                Drag = AC.D(tas=TAS_i, sigma=sigma, CD=CD)
-
-                # compute thrust and fuel flow
-                if rating is None:
-                    # compute thrust force required for the manoeuver
-                    if ESFc is not None:
-                        THR_i = (
-                            dh_dt_i * mass_i * const.g / (TAS_i * ESFc) + Drag
-                        )  # [N]
-                    elif control.acctarget is not None:
-                        THR_i = (
-                            dh_dt_i * mass_i * const.g / TAS_i
-                            + mass_i * control.acctarget
-                            + Drag
-                        )  # [N]
+                # BADA3
+                elif AC.BADAFamily.BADA3:
+                    # aircraft aerodynamic configuration
+                    if config_default is None:
+                        config_i = AC.flightEnvelope.getConfig(
+                            h=H_m,
+                            phase=phase,
+                            v=CAS_i,
+                            mass=mass_i,
+                            deltaTemp=deltaTemp,
+                        )
                     else:
-                        print("Error: neither ESF nor acc target provided")
+                        config_i = config_default
 
-                    # Check that required thrust fits in the available thrust envelope,
-                    # recompute ROCD if necessary and compute fuel flow accordingly
+                    # ensure continuity of configuration change within the segment
+                    if config:
+                        config_i = (
+                            AC.flightEnvelope.checkConfigurationContinuity(
+                                phase=phase,
+                                previousConfig=config[-1],
+                                currentConfig=config_i,
+                            )
+                        )
 
-                    THR_min = AC.Thrust(
-                        rating="LIDL",
-                        v=TAS_i,
-                        h=H_m,
-                        config="CR",
-                        deltaTemp=deltaTemp,
-                    )  # IDLE Thrust
-                    FUEL_min = AC.ff(
-                        flightPhase="Descent",
-                        v=TAS_i,
-                        h=H_m,
-                        T=THR_min,
-                        config="CR",
-                        adapted=False,
-                    )  # IDLE Fuel Flow
-                    THR_max = AC.Thrust(
-                        rating="MCMB",
-                        v=TAS_i,
-                        h=H_m,
-                        config="CR",
-                        deltaTemp=deltaTemp,
-                    )  # MCMB Thrust
-                    FUEL_max = AC.ff(
-                        flightPhase="Climb",
-                        v=TAS_i,
-                        h=H_m,
-                        T=THR_max,
-                        config="CR",
-                        adapted=False,
-                    )  # MCMB Fuel Flow
+                    # compute lift coefficient
+                    CL = AC.CL(tas=TAS_i, sigma=sigma, mass=mass_i, nz=nz)
+                    # compute drag coefficient
+                    CD = AC.CD(CL=CL, config=config_i, speedBrakes=speedBrakes)
+                    # compute drag force
+                    Drag = AC.D(tas=TAS_i, sigma=sigma, CD=CD)
 
-                    if THR_i < THR_min:
-                        THR_i = THR_min
-                        FUEL_i = FUEL_min
-                    elif THR_i > THR_max:
-                        THR_i = THR_max
-                        FUEL_i = FUEL_max
-                    else:
-                        FUEL_i = AC.ff(
+                    # compute thrust and fuel flow
+                    if rating is None:
+                        # compute thrust force required for the manoeuver
+                        if ESFc is not None:
+                            THR_i = (
+                                dh_dt_i * mass_i * const.g / (TAS_i * ESFc)
+                                + Drag
+                            )  # [N]
+                        elif controlTarget.acctarget is not None:
+                            THR_i = (
+                                dh_dt_i * mass_i * const.g / TAS_i
+                                + mass_i * controlTarget.acctarget
+                                + Drag
+                            )  # [N]
+                        else:
+                            print("Error: neither ESF nor acc target provided")
+
+                        # Check that required thrust fits in the available thrust envelope,
+                        # recompute ROCD if necessary and compute fuel flow accordingly
+
+                        THR_min = AC.Thrust(
+                            rating="LIDL",
                             v=TAS_i,
                             h=H_m,
-                            T=THR_i,
-                            config=config_i,
-                            adapted=True,
-                        )
-                else:
-                    THR_i = AC.Thrust(
-                        rating=rating,
-                        v=TAS_i,
-                        h=H_m,
-                        config=config_i,
-                        deltaTemp=deltaTemp,
-                    )
-                    if rating == "MCMB" or rating == "MTKF":
-                        FUEL_i = AC.ff(
-                            flightPhase="Climb",
-                            v=TAS_i,
-                            h=H_m,
-                            T=THR_i,
-                            config=config_i,
-                        )
-                    elif rating == "MCRZ":
-                        FUEL_i = AC.ff(
-                            flightPhase="Cruise",
-                            v=TAS_i,
-                            h=H_m,
-                            T=THR_i,
-                            config=config_i,
-                        )
-                    elif rating == "LIDL":
-                        FUEL_i = AC.ff(
+                            config="CR",
+                            deltaTemp=deltaTemp,
+                        )  # IDLE Thrust
+                        FUEL_min = AC.ff(
                             flightPhase="Descent",
                             v=TAS_i,
                             h=H_m,
-                            T=THR_i,
+                            T=THR_min,
+                            config="CR",
+                            adapted=False,
+                        )  # IDLE Fuel Flow
+                        THR_max = AC.Thrust(
+                            rating="MCMB",
+                            v=TAS_i,
+                            h=H_m,
+                            config="CR",
+                            deltaTemp=deltaTemp,
+                        )  # MCMB Thrust
+                        FUEL_max = AC.ff(
+                            flightPhase="Climb",
+                            v=TAS_i,
+                            h=H_m,
+                            T=THR_max,
+                            config="CR",
+                            adapted=False,
+                        )  # MCMB Fuel Flow
+
+                        if THR_i < THR_min:
+                            THR_i = THR_min
+                            FUEL_i = FUEL_min
+                        elif THR_i > THR_max:
+                            THR_i = THR_max
+                            FUEL_i = FUEL_max
+                        else:
+                            FUEL_i = AC.ff(
+                                v=TAS_i,
+                                h=H_m,
+                                T=THR_i,
+                                config=config_i,
+                                adapted=True,
+                            )
+                    else:
+                        THR_i = AC.Thrust(
+                            rating=rating,
+                            v=TAS_i,
+                            h=H_m,
                             config=config_i,
+                            deltaTemp=deltaTemp,
+                        )
+                        if rating == "MCMB" or rating == "MTKF":
+                            FUEL_i = AC.ff(
+                                flightPhase="Climb",
+                                v=TAS_i,
+                                h=H_m,
+                                T=THR_i,
+                                config=config_i,
+                            )
+                        elif rating == "MCRZ":
+                            FUEL_i = AC.ff(
+                                flightPhase="Cruise",
+                                v=TAS_i,
+                                h=H_m,
+                                T=THR_i,
+                                config=config_i,
+                            )
+                        elif rating == "LIDL":
+                            FUEL_i = AC.ff(
+                                flightPhase="Descent",
+                                v=TAS_i,
+                                h=H_m,
+                                T=THR_i,
+                                config=config_i,
+                            )
+
+                    # compute excess power
+                    Pe_i = (THR_i - Drag) * TAS_i  # [kg*m^2/s^3]
+
+                if ESFc is not None:
+                    ESF_i = ESFc
+                    # compute power dedicated to climb
+                    PC_i = Pe_i * ESF_i  # [kg*m^2/s^3]
+                    # compute ROCD
+                    dhdtisu = PC_i / (mass_i * const.g)  # [m/s]
+                    ROCDisu = dhdtisu * 1 / temp_const  # [m/s]
+                    ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
+                elif controlTarget.acctarget is not None:
+                    # compute power required for acc/dec rate
+                    Pa_i = mass_i * TAS_i * controlTarget.acctarget
+                    # check that required power fits in the available power envelope
+                    if abs(Pa_i) > abs(Pe_i):
+                        Pa_i = Pe_i
+                    # compute power dedicated to climb
+                    PC_i = Pe_i - Pa_i  # [kg*m^2/s^3]
+
+                    if Pe_i != 0:
+                        ESF_i = PC_i / Pe_i
+                    else:
+                        # ESF_i = float("Inf")
+                        ESF_i = float(0)
+
+                    # compute ROCD
+                    dhdtisu = PC_i / (mass_i * const.g)  # [m/s]
+                    ROCDisu = dhdtisu * 1 / temp_const  # [m/s]
+                    ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
+                elif (
+                    controlTarget.slopetarget is not None
+                    or controlTarget.ROCDtarget is not None
+                ):
+                    dhdtisu = dh_dt_i  # [m/s]
+                    ROCDisu = dh_dt_i * 1 / temp_const  # [m/s]
+                    ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
+                    PC_i = dh_dt_i * (mass_i * const.g)  # [kg*m^2/s^3]
+
+                    if Pe_i != 0:
+                        ESF_i = PC_i / Pe_i
+                    else:
+                        ESF_i = float("Inf")
+                else:
+                    print("Error: unexpected combination of targets")
+
+                # compute acceleration
+                if TAS_i == 0:
+                    dVdtisu_i = (Pe_i - PC_i) / (
+                        mass_i * (TAS_i + 0.5)
+                    )  # [m/s^2]
+                else:
+                    dVdtisu_i = (Pe_i - PC_i) / (mass_i * TAS_i)  # [m/s^2]
+
+                # Compute elapsed time, altitude and fuel burn over current step
+                if v_i == v_init:
+                    # no need to loop for first point: initial m/Hp already known
+                    break
+                else:
+                    # Average acceleration over step is the mean of initial and final ones
+                    step_dVdtisu = (dVdtisu[-1] + dVdtisu_i) / 2  # [m/s^2]
+                    # Step time is: TAS differential divided by average acceleration
+                    step_time = (TAS_i - conv.kt2ms(TAS[-1])) / step_dVdtisu
+                    # Average ROCD over step is the mean of initial and final ones
+                    step_ROCD = (ROCD[-1] + ROCD_i) / 2  # [ft/min]
+                    # Altitude differential is: average ROCD multiplied by step time
+                    step_Hp = step_ROCD * step_time / 60  # [ft]
+                    # Update altitude estimate at end of step
+                    Hp_i = Hp[-1] + step_Hp  # [ft]
+
+                    # BADAE
+                    if AC.BADAFamily.BADAE:
+                        # Average SOC rate over step is the mean of initial and final ones
+                        step_SOCr = (SOCr[-1] + SOCr_i) / 2  # [%/h]
+                        # SOC change is: average SOC rate multiplied by step time
+                        step_SOC = step_SOCr * step_time / 3600  # [%]
+                        # Update SOC estimate at end of step
+                        SOC_i = SOC[-1] - step_SOC  # [%]
+                        # update of aircraft mass estimate at end of step - mass is not changing for ELECTRIC engine (no fuel is consumed)
+                        mass_i = mass[-1]  # [kg]
+
+                    else:
+                        # Average fuel flow over step is the mean of initial and final ones
+                        step_FUEL = (FUEL[-1] + FUEL_i) / 2  # [kg/s]
+                        # Fuel burnt is: average fuel flow multiplied by step time
+                        step_mass = step_FUEL * step_time  # [kg]
+                        # Update aircraft mass estimate at end of step
+                        if not mass_const:
+                            mass_i = mass[-1] - step_mass  # [kg]
+                            fuelConsumed_i = step_FUEL * step_time
+                        fuelConsumed_i = (
+                            FUELCONSUMED[-1] + step_FUEL * step_time
                         )
 
-                # compute excess power
-                Pe_i = (THR_i - Drag) * TAS_i  # [kg*m^2/s^3]
+            ## PART 3: store information about end of step point
 
-            if ESFc is not None:
-                ESF_i = ESFc
-                # compute power dedicated to climb
-                PC_i = Pe_i * ESF_i  # [kg*m^2/s^3]
-                # compute ROCD
-                dhdtisu = PC_i / (mass_i * const.g)  # [m/s]
-                ROCDisu = dhdtisu * 1 / temp_const  # [m/s]
-                ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
-            elif control.acctarget is not None:
-                # compute power required for acc/dec rate
-                Pa_i = mass_i * TAS_i * control.acctarget
-                # check that required power fits in the available power envelope
-                if abs(Pa_i) > abs(Pe_i):
-                    Pa_i = Pe_i
-                # compute power dedicated to climb
-                PC_i = Pe_i - Pa_i  # [kg*m^2/s^3]
-
-                if Pe_i != 0:
-                    ESF_i = PC_i / Pe_i
-                else:
-                    # ESF_i = float("Inf")
-                    ESF_i = float(0)
-
-                # compute ROCD
-                dhdtisu = PC_i / (mass_i * const.g)  # [m/s]
-                ROCDisu = dhdtisu * 1 / temp_const  # [m/s]
-                ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
-            elif (
-                control.slopetarget is not None
-                or control.ROCDtarget is not None
-            ):
-                dhdtisu = dh_dt_i  # [m/s]
-                ROCDisu = dh_dt_i * 1 / temp_const  # [m/s]
-                ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
-                PC_i = dh_dt_i * (mass_i * const.g)  # [kg*m^2/s^3]
-
-                if Pe_i != 0:
-                    ESF_i = PC_i / Pe_i
-                else:
-                    ESF_i = float("Inf")
-            else:
-                print("Error: unexpected combination of targets")
-
-            # compute acceleration
-            if TAS_i == 0:
-                dVdtisu_i = (Pe_i - PC_i) / (mass_i * (TAS_i + 0.5))  # [m/s^2]
-            else:
-                dVdtisu_i = (Pe_i - PC_i) / (mass_i * TAS_i)  # [m/s^2]
-
-            # Compute elapsed time, altitude and fuel burn over current step
-            if v_i == v_init:
-                # no need to loop for first point: initial m/Hp already known
-                break
-            else:
-                # Average acceleration over step is the mean of initial and final ones
-                step_dVdtisu = (dVdtisu[-1] + dVdtisu_i) / 2  # [m/s^2]
-                # Step time is: TAS differential divided by average acceleration
-                step_time = (TAS_i - conv.kt2ms(TAS[-1])) / step_dVdtisu
-                # Average ROCD over step is the mean of initial and final ones
-                step_ROCD = (ROCD[-1] + ROCD_i) / 2  # [ft/min]
-                # Altitude differential is: average ROCD multiplied by step time
-                step_Hp = step_ROCD * step_time / 60  # [ft]
-                # Update altitude estimate at end of step
-                Hp_i = Hp[-1] + step_Hp  # [ft]
-
-                # BADAE
-                if AC.BADAFamily.BADAE:
-                    # Average SOC rate over step is the mean of initial and final ones
-                    step_SOCr = (SOCr[-1] + SOCr_i) / 2  # [%/h]
-                    # SOC change is: average SOC rate multiplied by step time
-                    step_SOC = step_SOCr * step_time / 3600  # [%]
-                    # Update SOC estimate at end of step
-                    SOC_i = SOC[-1] - step_SOC  # [%]
-                    # update of aircraft mass estimate at end of step - mass is not changing for ELECTRIC engine (no fuel is consumed)
-                    mass_i = mass[-1]  # [kg]
-
-                else:
-                    # Average fuel flow over step is the mean of initial and final ones
-                    step_FUEL = (FUEL[-1] + FUEL_i) / 2  # [kg/s]
-                    # Fuel burnt is: average fuel flow multiplied by step time
-                    step_mass = step_FUEL * step_time  # [kg]
-                    # Update aircraft mass estimate at end of step
-                    if not mass_const:
-                        mass_i = mass[-1] - step_mass  # [kg]
-                        fuelConsumed_i = step_FUEL * step_time
-                    fuelConsumed_i = FUELCONSUMED[-1] + step_FUEL * step_time
-
-        ## PART 3: store information about end of step point
-
-        # point data
-        TAS.append(conv.ms2kt(TAS_i))
-        CAS.append(conv.ms2kt(CAS_i))
-        M.append(M_i)
-        dVdtisu.append(dVdtisu_i)
-        ROCD.append(ROCD_i)
-        esf.append(ESF_i)
-        Comment.append(comment)
-
-        # everything except electric BADAE
-        if not AC.BADAFamily.BADAE:
-            FUEL.append(FUEL_i)
-
-        # BADAH
-        if AC.BADAFamily.BADAH:
-            Peng.append(P_i)
-            Preq.append(Preq_i)
-            Pav.append(Pav_i)
-
-        # BADAE
-        elif AC.BADAFamily.BADAE:
-            Pmec.append(P_i)
-            Pbat.append(Pbat_i)
-            SOCr.append(SOCr_i)
-            Pelc.append(Pelc_i)
-            Ibat.append(Ibat_i)
-            Vbat.append(Vbat_i)
-            Vgbat.append(Vgbat_i)
-
-        # BADA3 & BADA4
-        elif AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-            THR.append(THR_i)
-            DRAG.append(Drag)
-            config.append(config_i)
-
-        # BADA4
-        if AC.BADAFamily.BADA4:
-            HLid.append(HLid_i)
-            LG.append(LG_i)
-
-        # TEM consistency check
-        # BADAH or BADAE
-        if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
-            check.append(
-                P_i
-                - Preq_i
-                - mass_i * const.g * dhdtisu
-                - mass_i * TAS_i * dVdtisu_i
-            )
-
-        # BADA3 or BADA4
-        elif AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-            check.append(
-                (THR_i - Drag) * TAS_i
-                - mass_i * const.g * dhdtisu
-                - mass_i * TAS_i * dVdtisu_i
-            )
-
-        # calculation of the slope
-        if TAS_i == 0:
-            gamma_i = 90 * np.sign(ROCD_i)
-        else:
-            [theta, delta, sigma] = atm.atmosphereProperties(
-                h=conv.ft2m(Hp_i), deltaTemp=deltaTemp
-            )
-            temp_const = (theta * const.temp_0) / (
-                theta * const.temp_0 - deltaTemp
-            )
-            if AC.BADAFamily.BADAE:
-                gamma_i = degrees(
-                    atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
-                )
-            else:
-                # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
-                gamma_i = degrees(
-                    asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
-                )
-
-        # ground speed can be calcualted as TAS projected on the ground minus wind
-        GS_i = cos(radians(gamma_i)) * TAS_i - wS
-        GS.append(conv.ms2kt(GS_i))
-
-        Slope.append(gamma_i)
-        BankAngle.append(bankAngle)
-        ROT.append(rateOfTurn)
-
-        # integrated data
-        if v_i != v_init:  # exclude first point: initial t/d/m already known
-            if AC.BADAFamily.BADAE:
-                SOC.append(SOC_i)
+            # point data
+            TAS.append(conv.ms2kt(TAS_i))
+            CAS.append(conv.ms2kt(CAS_i))
+            M.append(M_i)
+            dVdtisu.append(dVdtisu_i)
+            ROCD.append(ROCD_i)
+            esf.append(ESF_i)
+            Comment.append(comment)
 
             # everything except electric BADAE
             if not AC.BADAFamily.BADAE:
-                FUELCONSUMED.append(fuelConsumed_i)
+                FUEL.append(FUEL_i)
 
-            # Altitude at end of step has been termined in PART 2
-            Hp.append(Hp_i)
-            # Aircraft mass at end of step has been termined in PART 2
-            mass.append(mass_i)
-            # Time at end of step is time at start of step plus step time
-            time.append(time[-1] + step_time)
+            # BADAH
+            if AC.BADAFamily.BADAH:
+                Peng.append(P_i)
+                Preq.append(Preq_i)
+                Pav.append(Pav_i)
 
-            # Average TAS over step is the mean of initial and final ones
-            step_TAS = (TAS[-2] + TAS[-1]) / 2  # [kt]
-            # Average slope over the step
-            step_gamma = radians((Slope[-2] + Slope[-1]) / 2)  # radians
-            # Average ground speed over step
-            # since this is not level flight, TAS speed should be projected on the ground, then GS can be calculated applying the wind speed
-            step_TAS_projected = cos(step_gamma) * step_TAS
-            step_GS = step_TAS_projected - wS  # [kt]
-            # Step distance is: average GS multiplied by step time
-            if turnFlight:
-                step_distance = conv.m2nm(
-                    turn.distance(
-                        rateOfTurn=rateOfTurn, TAS=TAS_i, timeOfTurn=step_time
-                    )
-                )  # arcLength during the turn [NM]
+            # BADAE
+            elif AC.BADAFamily.BADAE:
+                Pmec.append(P_i)
+                Pbat.append(Pbat_i)
+                SOCr.append(SOCr_i)
+                Pelc.append(Pelc_i)
+                Ibat.append(Ibat_i)
+                Vbat.append(Vbat_i)
+                Vgbat.append(Vgbat_i)
+
+            # BADA3 & BADA4
+            elif AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
+                THR.append(THR_i)
+                DRAG.append(Drag)
+                config.append(config_i)
+
+            # BADA4
+            if AC.BADAFamily.BADA4:
+                HLid.append(HLid_i)
+                LG.append(LG_i)
+
+            # TEM consistency check
+            # BADAH or BADAE
+            if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
+                check.append(
+                    P_i
+                    - Preq_i
+                    - mass_i * const.g * dhdtisu
+                    - mass_i * TAS_i * dVdtisu_i
+                )
+
+            # BADA3 or BADA4
+            elif AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
+                check.append(
+                    (THR_i - Drag) * TAS_i
+                    - mass_i * const.g * dhdtisu
+                    - mass_i * TAS_i * dVdtisu_i
+                )
+
+            # calculation of the slope
+            if TAS_i == 0:
+                gamma_i = 90 * np.sign(ROCD_i)
             else:
-                step_distance = step_GS * step_time / 3600  # [NM]
-            # Distance at end of step is distance at start of step plus step distance
-            dist.append(dist[-1] + step_distance)
+                [theta, delta, sigma] = atm.atmosphereProperties(
+                    h=conv.ft2m(Hp_i), deltaTemp=deltaTemp
+                )
+                temp_const = (theta * const.temp_0) / (
+                    theta * const.temp_0 - deltaTemp
+                )
+                if AC.BADAFamily.BADAE:
+                    gamma_i = degrees(
+                        atan(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
+                else:
+                    # using SIN assumes the TAS to be in the direction of the aircraft axis, not ground plane. Which means, this should be mathematically the correct equation for all the aircraft
+                    gamma_i = degrees(
+                        asin(conv.ft2m(ROCD_i) * temp_const / 60 / TAS_i)
+                    )
 
-            # add GPS calculation
-            if Lat and Lon and (magneticHeading or trueHeading):
-                if headingToFly == "TRUE":
-                    if not turnFlight:
-                        if not constantHeading:
-                            # fly ORTHODROME
-                            (Lat_i, Lon_i, HDGTrue_i) = (
-                                vincenty.destinationPoint_finalBearing(
+            # ground speed can be calcualted as TAS projected on the ground minus wind
+            GS_i = cos(radians(gamma_i)) * TAS_i - wS
+            GS.append(conv.ms2kt(GS_i))
+
+            Slope.append(gamma_i)
+            BankAngle.append(bankAngle)
+            ROT.append(rateOfTurn)
+
+            # integrated data
+            if (
+                v_i != v_init
+            ):  # exclude first point: initial t/d/m already known
+                if AC.BADAFamily.BADAE:
+                    SOC.append(SOC_i)
+
+                # everything except electric BADAE
+                if not AC.BADAFamily.BADAE:
+                    FUELCONSUMED.append(fuelConsumed_i)
+
+                # Altitude at end of step has been termined in PART 2
+                Hp.append(Hp_i)
+                # Aircraft mass at end of step has been termined in PART 2
+                mass.append(mass_i)
+                # Time at end of step is time at start of step plus step time
+                time.append(time[-1] + step_time)
+
+                # Average TAS over step is the mean of initial and final ones
+                step_TAS = (TAS[-2] + TAS[-1]) / 2  # [kt]
+                # Average slope over the step
+                step_gamma = radians((Slope[-2] + Slope[-1]) / 2)  # radians
+                # Average ground speed over step
+                # since this is not level flight, TAS speed should be projected on the ground, then GS can be calculated applying the wind speed
+                step_TAS_projected = cos(step_gamma) * step_TAS
+                step_GS = step_TAS_projected - wS  # [kt]
+                # Step distance is: average GS multiplied by step time
+                if turnFlight:
+                    step_distance = conv.m2nm(
+                        turn.distance(
+                            rateOfTurn=rateOfTurn,
+                            TAS=TAS_i,
+                            timeOfTurn=step_time,
+                        )
+                    )  # arcLength during the turn [NM]
+                else:
+                    step_distance = step_GS * step_time / 3600  # [NM]
+                # Distance at end of step is distance at start of step plus step distance
+                dist.append(dist[-1] + step_distance)
+
+                # add GPS calculation
+                if Lat and Lon and (magneticHeading or trueHeading):
+                    if headingToFly == "TRUE":
+                        if not turnFlight:
+                            if not constantHeading:
+                                # fly ORTHODROME
+                                (Lat_i, Lon_i, HDGTrue_i) = (
+                                    vincenty.destinationPoint_finalBearing(
+                                        LAT_init=LAT[-1],
+                                        LON_init=LON[-1],
+                                        distance=conv.nm2m(step_distance),
+                                        bearing=HDGTrue[-1],
+                                    )
+                                )
+
+                                if magneticDeclinationGrid is not None:
+                                    HDGMagnetic_i = (
+                                        HDGTrue_i
+                                        - magneticDeclinationGrid.getMagneticDeclination(
+                                            LAT_target=Lat_i, LON_target=Lon_i
+                                        )
+                                    )
+                                else:
+                                    magneticDeclination = 0
+                                    HDGMagnetic_i = HDGTrue_i
+
+                            elif constantHeading:
+                                # fly LOXODROME
+                                (Lat_i, Lon_i) = rhumb.destinationPoint(
                                     LAT_init=LAT[-1],
                                     LON_init=LON[-1],
-                                    distance=conv.nm2m(step_distance),
                                     bearing=HDGTrue[-1],
+                                    distance=conv.nm2m(step_distance),
+                                )
+                                HDGTrue_i = HDGTrue[-1]
+
+                                if magneticDeclinationGrid is not None:
+                                    HDGMagnetic_i = (
+                                        HDGTrue_i
+                                        - magneticDeclinationGrid.getMagneticDeclination(
+                                            LAT_target=Lat_i, LON_target=Lon_i
+                                        )
+                                    )
+                                else:
+                                    magneticDeclination = 0
+                                    HDGMagnetic_i = HDGTrue_i
+
+                        else:
+                            # calculate the turn
+                            (Lat_i, Lon_i, HDGTrue_i) = (
+                                turn.destinationPoint_finalBearing(
+                                    LAT_init=LAT[-1],
+                                    LON_init=LON[-1],
+                                    bearingInit=HDGTrue[-1],
+                                    TAS=TAS_i,
+                                    rateOfTurn=rateOfTurn,
+                                    timeOfTurn=step_time,
+                                    directionOfTurn=directionOfTurn,
                                 )
                             )
 
@@ -8278,15 +8850,41 @@ def accDec(
                                 magneticDeclination = 0
                                 HDGMagnetic_i = HDGTrue_i
 
-                        elif constantHeading:
-                            # fly LOXODROME
-                            (Lat_i, Lon_i) = rhumb.destinationPoint(
-                                LAT_init=LAT[-1],
-                                LON_init=LON[-1],
-                                bearing=HDGTrue[-1],
-                                distance=conv.nm2m(step_distance),
+                    elif headingToFly == "MAGNETIC":
+                        if not turnFlight:
+                            if constantHeading:
+                                (Lat_i, Lon_i) = rhumb.destinationPoint(
+                                    LAT_init=LAT[-1],
+                                    LON_init=LON[-1],
+                                    bearing=HDGTrue[-1],
+                                    distance=conv.nm2m(step_distance),
+                                )
+                                HDGMagnetic_i = HDGMagnetic[-1]
+
+                                if magneticDeclinationGrid is not None:
+                                    HDGTrue_i = (
+                                        HDGMagnetic_i
+                                        + magneticDeclinationGrid.getMagneticDeclination(
+                                            LAT_target=Lat_i, LON_target=Lon_i
+                                        )
+                                    )
+                                else:
+                                    magneticDeclination = 0
+                                    HDGTrue_i = HDGMagnetic_i
+
+                        else:
+                            # calculate the turn
+                            (Lat_i, Lon_i, HDGTrue_i) = (
+                                turn.destinationPoint_finalBearing(
+                                    LAT_init=LAT[-1],
+                                    LON_init=LON[-1],
+                                    bearingInit=HDGTrue[-1],
+                                    TAS=TAS_i,
+                                    rateOfTurn=rateOfTurn,
+                                    timeOfTurn=step_time,
+                                    directionOfTurn=directionOfTurn,
+                                )
                             )
-                            HDGTrue_i = HDGTrue[-1]
 
                             if magneticDeclinationGrid is not None:
                                 HDGMagnetic_i = (
@@ -8299,144 +8897,72 @@ def accDec(
                                 magneticDeclination = 0
                                 HDGMagnetic_i = HDGTrue_i
 
-                    else:
-                        # calculate the turn
-                        (Lat_i, Lon_i, HDGTrue_i) = (
-                            turn.destinationPoint_finalBearing(
-                                LAT_init=LAT[-1],
-                                LON_init=LON[-1],
-                                bearingInit=HDGTrue[-1],
-                                TAS=TAS_i,
-                                rateOfTurn=rateOfTurn,
-                                timeOfTurn=step_time,
-                                directionOfTurn=directionOfTurn,
-                            )
-                        )
+                    LAT.append(Lat_i)
+                    LON.append(Lon_i)
+                    HDGMagnetic.append(HDGMagnetic_i)
+                    HDGTrue.append(HDGTrue_i)
 
-                        if magneticDeclinationGrid is not None:
-                            HDGMagnetic_i = (
-                                HDGTrue_i
-                                - magneticDeclinationGrid.getMagneticDeclination(
-                                    LAT_target=Lat_i, LON_target=Lon_i
-                                )
-                            )
-                        else:
-                            magneticDeclination = 0
-                            HDGMagnetic_i = HDGTrue_i
+            # Determine end speed of next step
+            v_next = v_i + speed_step
 
-                elif headingToFly == "MAGNETIC":
-                    if not turnFlight:
-                        if constantHeading:
-                            (Lat_i, Lon_i) = rhumb.destinationPoint(
-                                LAT_init=LAT[-1],
-                                LON_init=LON[-1],
-                                bearing=HDGTrue[-1],
-                                distance=conv.nm2m(step_distance),
-                            )
-                            HDGMagnetic_i = HDGMagnetic[-1]
-
-                            if magneticDeclinationGrid is not None:
-                                HDGTrue_i = (
-                                    HDGMagnetic_i
-                                    + magneticDeclinationGrid.getMagneticDeclination(
-                                        LAT_target=Lat_i, LON_target=Lon_i
-                                    )
-                                )
-                            else:
-                                magneticDeclination = 0
-                                HDGTrue_i = HDGMagnetic_i
-
-                    else:
-                        # calculate the turn
-                        (Lat_i, Lon_i, HDGTrue_i) = (
-                            turn.destinationPoint_finalBearing(
-                                LAT_init=LAT[-1],
-                                LON_init=LON[-1],
-                                bearingInit=HDGTrue[-1],
-                                TAS=TAS_i,
-                                rateOfTurn=rateOfTurn,
-                                timeOfTurn=step_time,
-                                directionOfTurn=directionOfTurn,
-                            )
-                        )
-
-                        if magneticDeclinationGrid is not None:
-                            HDGMagnetic_i = (
-                                HDGTrue_i
-                                - magneticDeclinationGrid.getMagneticDeclination(
-                                    LAT_target=Lat_i, LON_target=Lon_i
-                                )
-                            )
-                        else:
-                            magneticDeclination = 0
-                            HDGMagnetic_i = HDGTrue_i
-
-                LAT.append(Lat_i)
-                LON.append(Lon_i)
-                HDGMagnetic.append(HDGMagnetic_i)
-                HDGTrue.append(HDGTrue_i)
-
-        # Determine end speed of next step
-        v_next = v_i + speed_step
-
-        if speedEvol == "acc":
-            if v_next < v_final:
-                v_i = v_next
-            elif v_i < v_final:
-                v_i = v_final
+            if speedEvol == "acc":
+                if v_next < v_final:
+                    v_i = v_next
+                elif v_i < v_final:
+                    v_i = v_final
+                else:
+                    go_on = False
             else:
-                go_on = False
-        else:
-            if v_next > v_final:
-                v_i = v_next
-            elif v_i > v_final:
-                v_i = v_final
-            else:
-                go_on = False
+                if v_next > v_final:
+                    v_i = v_next
+                elif v_i > v_final:
+                    v_i = v_final
+                else:
+                    go_on = False
 
-    flightData = {
-        "Hp": Hp,
-        "TAS": TAS,
-        "CAS": CAS,
-        "GS": GS,
-        "M": M,
-        "acc": dVdtisu,
-        "ROCD": ROCD,
-        "ESF": esf,
-        "FUEL": FUEL,
-        "Pmec": Pmec,
-        "Pelc": Pelc,
-        "Pbat": Pbat,
-        "SOCr": SOCr,
-        "SOC": SOC,
-        "Ibat": Ibat,
-        "Vbat": Vbat,
-        "Vgbat": Vgbat,
-        "FUELCONSUMED": FUELCONSUMED,
-        "Preq": Preq,
-        "Peng": Peng,
-        "Pav": Pav,
-        "THR": THR,
-        "DRAG": DRAG,
-        "time": time,
-        "dist": dist,
-        "slope": Slope,
-        "mass": mass,
-        "config": config,
-        "HLid": HLid,
-        "LG": LG,
-        "LAT": LAT,
-        "LON": LON,
-        "HDGTrue": HDGTrue,
-        "HDGMagnetic": HDGMagnetic,
-        "BankAngle": BankAngle,
-        "ROT": ROT,
-        "comment": Comment,
-    }
+        flightData = {
+            "Hp": Hp,
+            "TAS": TAS,
+            "CAS": CAS,
+            "GS": GS,
+            "M": M,
+            "acc": dVdtisu,
+            "ROCD": ROCD,
+            "ESF": esf,
+            "FUEL": FUEL,
+            "Pmec": Pmec,
+            "Pelc": Pelc,
+            "Pbat": Pbat,
+            "SOCr": SOCr,
+            "SOC": SOC,
+            "Ibat": Ibat,
+            "Vbat": Vbat,
+            "Vgbat": Vgbat,
+            "FUELCONSUMED": FUELCONSUMED,
+            "Preq": Preq,
+            "Peng": Peng,
+            "Pav": Pav,
+            "THR": THR,
+            "DRAG": DRAG,
+            "time": time,
+            "dist": dist,
+            "slope": Slope,
+            "mass": mass,
+            "config": config,
+            "HLid": HLid,
+            "LG": LG,
+            "LAT": LAT,
+            "LON": LON,
+            "HDGTrue": HDGTrue,
+            "HDGMagnetic": HDGMagnetic,
+            "BankAngle": BankAngle,
+            "ROT": ROT,
+            "comment": Comment,
+        }
 
-    flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
+        flightTrajectory = FT.createFlightTrajectoryDataframe(flightData)
 
-    return flightTrajectory
+        return flightTrajectory
 
 
 def accDec_time(
@@ -8451,7 +8977,7 @@ def accDec_time(
     deltaTemp,
     wS=0.0,
     turnMetrics={"rateOfTurn": 0.0, "bankAngle": 0.0, "directionOfTurn": None},
-    control=None,
+    controlTarget=None,
     Lat=None,
     Lon=None,
     initialHeading={"magnetic": None, "true": None, "constantHeading": None},
@@ -8465,10 +8991,10 @@ def accDec_time(
     cruise, or descent phases of flight.
 
     The flight parameters are calculated using different models for the BADA (Base of Aircraft Data) families (BADA3, BADA4, BADAH, BADAE).
-    The function can also accommodate different control laws, vertical evolution phases, wind conditions, and complex flight dynamics like turns.
+    The function can also accommodate different controlTarget laws, vertical evolution phases, wind conditions, and complex flight dynamics like turns.
 
     .. note::
-        The control law used during the segment depends on the targets provided in the input parameter 'control':
+        The controlTarget law used during the segment depends on the targets provided in the input parameter 'controlTarget':
 
         - ROCD/slope+ESF:  Law based on ROCD/slope + ESF
         - ROCD/slope+acc:  Law based on ROCD/slope + acceleration
@@ -8483,7 +9009,7 @@ def accDec_time(
     :param v_init: Initial speed [kt] (CAS/TAS) or [-] MACH.
     :param speedEvol: Evolution of speed {acc, dec} (acceleration or deceleration).
     :param phase: Vertical evolution phase {Climb, Descent, Cruise}.
-    :param control: A dictionary containing the following targets:
+    :param controlTarget: A dictionary containing the following targets:
 
         - ROCDtarget: Rate of climb/descent to be followed [ft/min].
         - slopetarget: Slope (flight path angle) to be followed [deg].
@@ -8630,82 +9156,100 @@ def accDec_time(
             "m_iter", 10
         )  # number of iterations for integration loop[-]
 
-    if control is None:
-        # create empty control target
-        control = target()
+    if controlTarget is None:
+        # create empty controlTarget target
+        controlTarget = target()
 
     # check the consistency of SLOPE/ROCD and climb/descent phase of flight
     # if incosistent, change the sign on slope/ROCD target value
     if phase == "Climb":
-        if control.slopetarget is not None and control.slopetarget < 0:
-            control.slopetarget = abs(control.slopetarget)
+        if (
+            controlTarget.slopetarget is not None
+            and controlTarget.slopetarget < 0
+        ):
+            controlTarget.slopetarget = abs(controlTarget.slopetarget)
             print("Slopetarget for Climb should be positive")
-        if control.ROCDtarget is not None and control.ROCDtarget < 0:
-            control.ROCDtarget = abs(control.ROCDtarget)
+        if (
+            controlTarget.ROCDtarget is not None
+            and controlTarget.ROCDtarget < 0
+        ):
+            controlTarget.ROCDtarget = abs(controlTarget.ROCDtarget)
             print("ROCDtarget for Climb should be positive")
     elif phase == "Descent":
-        if control.slopetarget is not None and control.slopetarget > 0:
-            control.slopetarget = control.slopetarget * (-1)
+        if (
+            controlTarget.slopetarget is not None
+            and controlTarget.slopetarget > 0
+        ):
+            controlTarget.slopetarget = controlTarget.slopetarget * (-1)
             print("Slopetarget for Descent should be negative")
-        if control.ROCDtarget is not None and control.ROCDtarget > 0:
-            control.ROCDtarget = control.ROCDtarget * (-1)
+        if (
+            controlTarget.ROCDtarget is not None
+            and controlTarget.ROCDtarget > 0
+        ):
+            controlTarget.ROCDtarget = controlTarget.ROCDtarget * (-1)
             print("ROCDtarget for Descent should be negative")
 
     # check the consistency of acc/dec and ESF
     if phase == "Cruise":
-        if control.ESFtarget is not None and control.ESFtarget != 0:
-            control.ESFtarget = 0
+        if (
+            controlTarget.ESFtarget is not None
+            and controlTarget.ESFtarget != 0
+        ):
+            controlTarget.ESFtarget = 0
     elif phase == "Climb":
         if (
-            control.ESFtarget is not None
+            controlTarget.ESFtarget is not None
             and speedEvol == "acc"
-            and control.ESFtarget > 1
+            and controlTarget.ESFtarget > 1
         ):
             print("ESFtarget for acceleration in Climb should be < 1")
         if (
-            control.ESFtarget is not None
+            controlTarget.ESFtarget is not None
             and speedEvol == "dec"
-            and control.ESFtarget < 1
+            and controlTarget.ESFtarget < 1
         ):
             print("ESFtarget for deceleration in Climb should be > 1")
     elif phase == "Descent":
         if (
-            control.ESFtarget is not None
+            controlTarget.ESFtarget is not None
             and speedEvol == "acc"
-            and control.ESFtarget < 1
+            and controlTarget.ESFtarget < 1
         ):
             print("ESFtarget for acceleration in Descent should be > 1")
         if (
-            control.ESFtarget is not None
+            controlTarget.ESFtarget is not None
             and speedEvol == "dec"
-            and control.ESFtarget > 1
+            and controlTarget.ESFtarget > 1
         ):
             print("ESFtarget for deceleration in Descent should be < 1")
 
     # check the consistency of acctarget and acc/dec
     if speedEvol == "acc":
-        if control.acctarget is not None and control.acctarget < 0:
-            control.acctarget = abs(control.acctarget)
+        if controlTarget.acctarget is not None and controlTarget.acctarget < 0:
+            controlTarget.acctarget = abs(controlTarget.acctarget)
             print("Acctarget in acceleration should be > 1")
     elif speedEvol == "dec":
-        if control.acctarget is not None and control.acctarget > 0:
-            control.acctarget = control.acctarget * (-1)
+        if controlTarget.acctarget is not None and controlTarget.acctarget > 0:
+            controlTarget.acctarget = controlTarget.acctarget * (-1)
             print("Acctarget in deceleration should be < 1")
 
-    if control.ROCDtarget is not None and control.slopetarget is not None:
+    if (
+        controlTarget.ROCDtarget is not None
+        and controlTarget.slopetarget is not None
+    ):
         print("Both ROCD and SLOPE target provided, priority given to SLOPE")
 
     # comment line describing type of trajectory calculation
-    controlComment = ""
-    if control is not None:
-        if control.ROCDtarget is not None:
-            controlComment += "_" + "ROCDtarget"
-        if control.slopetarget is not None:
-            controlComment += "_" + "slopetarget"
-        if control.acctarget is not None:
-            controlComment += "_" + "acctarget"
-        if control.ESFtarget is not None:
-            controlComment += "_" + "ESFtarget"
+    controlTargetComment = ""
+    if controlTarget is not None:
+        if controlTarget.ROCDtarget is not None:
+            controlTargetComment += "_" + "ROCDtarget"
+        if controlTarget.slopetarget is not None:
+            controlTargetComment += "_" + "slopetarget"
+        if controlTarget.acctarget is not None:
+            controlTargetComment += "_" + "acctarget"
+        if controlTarget.ESFtarget is not None:
+            controlTargetComment += "_" + "ESFtarget"
 
     if turnFlight:
         turnComment = "_turn"
@@ -8725,7 +9269,7 @@ def accDec_time(
         + speedEvol
         + "_"
         + speedType
-        + controlComment
+        + controlTargetComment
         + "_"
         + constHeadingStr
     )
@@ -8734,18 +9278,21 @@ def accDec_time(
         comment = comment + "_" + headingToFly + "_Heading"
 
     # compute Energy Share Factor
-    if control.ESFtarget is not None:
-        ESFc = control.ESFtarget
-    elif control.ROCDtarget is not None or control.slopetarget is not None:
+    if controlTarget.ESFtarget is not None:
+        ESFc = controlTarget.ESFtarget
+    elif (
+        controlTarget.ROCDtarget is not None
+        or controlTarget.slopetarget is not None
+    ):
         ESFc = None
-    elif control.acctarget is not None:
+    elif controlTarget.acctarget is not None:
         ESFc = None
 
         # update ROCD target if phase is set to "Cruise"
         if phase == "Cruise":
-            control.ROCDtarget = 0
+            controlTarget.ROCDtarget = 0
     else:
-        # Neither ROCD/slope nor ESF/acc provided means control is rating+default ESF
+        # Neither ROCD/slope nor ESF/acc provided means controlTarget is rating+default ESF
         if (phase == "Climb" and speedEvol == "acc") or (
             phase == "Descent" and speedEvol == "dec"
         ):
@@ -8758,10 +9305,10 @@ def accDec_time(
             ESFc = 0
 
     # convert target values to ISU units
-    if control.ROCDtarget is not None:
-        ROCDtargetisu = conv.ft2m(control.ROCDtarget) / 60  # [m/s]
-    if control.slopetarget is not None:
-        slopetargetisu = conv.deg2rad(control.slopetarget)
+    if controlTarget.ROCDtarget is not None:
+        ROCDtargetisu = conv.ft2m(controlTarget.ROCDtarget) / 60  # [m/s]
+    if controlTarget.slopetarget is not None:
+        slopetargetisu = conv.deg2rad(controlTarget.slopetarget)
 
     # Determine max engine rating if not provided
     if "maxRating" not in kwargs:
@@ -8774,8 +9321,12 @@ def accDec_time(
 
     # Determine engine rating
     if (
-        control.ROCDtarget is not None or control.slopetarget is not None
-    ) and (control.ESFtarget is not None or control.acctarget is not None):
+        controlTarget.ROCDtarget is not None
+        or controlTarget.slopetarget is not None
+    ) and (
+        controlTarget.ESFtarget is not None
+        or controlTarget.acctarget is not None
+    ):
         rating = None
     else:
         if phase == "Climb" or (phase == "Cruise" and speedEvol == "acc"):
@@ -8923,7 +9474,7 @@ def accDec_time(
             nz = 1 / cos(radians(bankAngle))
 
             # compute ROCD target (if any) on this step
-            if control.slopetarget is not None:
+            if controlTarget.slopetarget is not None:
                 # compute target ROCD corresponding to target slope
                 if AC.BADAFamily.BADAE:
                     # special case for BADAE, in future it may apply also for BADAH
@@ -8932,7 +9483,7 @@ def accDec_time(
                     dh_dt_i = TAS_i * sin(slopetargetisu)
 
                 ROCDtargetisu_i = dh_dt_i * (1 / temp_const)
-            elif control.ROCDtarget is not None:
+            elif controlTarget.ROCDtarget is not None:
                 ROCDtargetisu_i = ROCDtargetisu
                 dh_dt_i = ROCDtargetisu_i * temp_const
 
@@ -8948,10 +9499,10 @@ def accDec_time(
                     # compiute power required for the manoeuver
                     if ESFc is not None:
                         P_i = dh_dt_i * mass_i * const.g / ESFc + Preq_i  # [W]
-                    elif control.acctarget is not None:
+                    elif controlTarget.acctarget is not None:
                         P_i = (
                             dh_dt_i * mass_i * const.g
-                            + mass_i * TAS_i * control.acctarget
+                            + mass_i * TAS_i * controlTarget.acctarget
                             + Preq_i
                         )  # [W]
                     else:
@@ -8990,12 +9541,14 @@ def accDec_time(
                                 )
                                 * 60
                             )
-                        elif control.acctarget is not None:
+                        elif controlTarget.acctarget is not None:
                             ROCD_i = (
                                 conv.m2ft(
                                     (
                                         P_i
-                                        - mass_i * TAS_i * control.acctarget
+                                        - mass_i
+                                        * TAS_i
+                                        * controlTarget.acctarget
                                         - Preq_i
                                     )
                                     / (mass_i * const.g * temp_const)
@@ -9019,12 +9572,14 @@ def accDec_time(
                                 )
                                 * 60
                             )
-                        elif control.acctarget is not None:
+                        elif controlTarget.acctarget is not None:
                             ROCD_i = (
                                 conv.m2ft(
                                     (
                                         P_i
-                                        - mass_i * TAS_i * control.acctarget
+                                        - mass_i
+                                        * TAS_i
+                                        * controlTarget.acctarget
                                         - Preq_i
                                     )
                                     / (mass_i * const.g * temp_const)
@@ -9032,7 +9587,7 @@ def accDec_time(
                                 * 60
                             )
                     else:
-                        ROCD_i = control.ROCDtarget
+                        ROCD_i = controlTarget.ROCDtarget
 
                 else:
                     # Compute available power
@@ -9119,10 +9674,10 @@ def accDec_time(
                         THR_i = (
                             dh_dt_i * mass_i * const.g / (TAS_i * ESFc) + Drag
                         )  # [N]
-                    elif control.acctarget is not None:
+                    elif controlTarget.acctarget is not None:
                         THR_i = (
                             dh_dt_i * mass_i * const.g / TAS_i
-                            + mass_i * control.acctarget
+                            + mass_i * controlTarget.acctarget
                             + Drag
                         )  # [N]
                     else:
@@ -9230,10 +9785,10 @@ def accDec_time(
                         THR_i = (
                             dh_dt_i * mass_i * const.g / (TAS_i * ESFc) + Drag
                         )  # [N]
-                    elif control.acctarget is not None:
+                    elif controlTarget.acctarget is not None:
                         THR_i = (
                             dh_dt_i * mass_i * const.g / TAS_i
-                            + mass_i * control.acctarget
+                            + mass_i * controlTarget.acctarget
                             + Drag
                         )  # [N]
                     else:
@@ -9331,9 +9886,9 @@ def accDec_time(
                 dhdtisu = PC_i / (mass_i * const.g)  # [m/s]
                 ROCDisu = dhdtisu * 1 / temp_const  # [m/s]
                 ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
-            elif control.acctarget is not None:
+            elif controlTarget.acctarget is not None:
                 # compute power required for acc/dec rate
-                Pa_i = mass_i * TAS_i * control.acctarget
+                Pa_i = mass_i * TAS_i * controlTarget.acctarget
                 # check that required power fits in the available power envelope
                 if abs(Pa_i) > abs(Pe_i):
                     Pa_i = Pe_i
@@ -9349,8 +9904,8 @@ def accDec_time(
                 ROCDisu = dhdtisu * 1 / temp_const  # [m/s]
                 ROCD_i = conv.m2ft(ROCDisu) * 60  # [ft/min]
             elif (
-                control.slopetarget is not None
-                or control.ROCDtarget is not None
+                controlTarget.slopetarget is not None
+                or controlTarget.ROCDtarget is not None
             ):
                 dhdtisu = dh_dt_i  # [m/s]
                 ROCDisu = dh_dt_i * 1 / temp_const  # [m/s]

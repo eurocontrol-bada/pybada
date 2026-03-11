@@ -793,6 +793,23 @@ class BADA4(Airplane, Bada):
 
         return CLpoly
 
+    def CLder(self, M):
+        """Computes the derivative of lift coefficient polynomial for the given Mach number (CLPoly),
+        used to compute the slope of the extrapolation.
+
+        :param M: Mach number [-].
+        :type M: float
+        :return: Lift coefficient derivative [-].
+        :rtype: float
+        """
+
+        return (
+            self.AC.bf[1]
+            + 2 * self.AC.bf[2] * M
+            + 3 * self.AC.bf[3] * pow(M, 2)
+            + 4 * self.AC.bf[4] * pow(M, 3)
+        )
+
     def CLmax(self, M, HLid, LG):
         """Computes the maximum lift coefficient (CLmax) for the given Mach
         number (M), high-lift device (HLid) position, and landing gear (LG)
@@ -826,20 +843,9 @@ class BADA4(Airplane, Bada):
                         self.AC.CLPoly(self.AC.Mmin) - self.AC.CL_Mach0
                     )
                 elif M > self.AC.Mmax:
-                    CLder = (
-                        self.AC.bf[1]
-                        + 2 * self.AC.bf[2] * self.AC.Mmax
-                        + 3 * self.AC.bf[3] * self.AC.Mmax * self.AC.Mmax
-                        + 4
-                        * self.AC.bf[4]
-                        * self.AC.Mmax
-                        * self.AC.Mmax
-                        * self.AC.Mmax
-                    )
-                    CLmax = (
-                        self.CLPoly(self.AC.Mmax)
-                        + self.CLPoly(M - self.AC.Mmax) * CLder
-                    )
+                    CLmax = self.CLPoly(self.AC.Mmax) + (
+                        M - self.AC.Mmax
+                    ) * self.CLder(self.AC.Mmax)
                 else:
                     CLmax = self.CLPoly(M)
             else:
@@ -2107,8 +2113,6 @@ class FlightEnvelope(BADA4):
                     sigma=sigma,
                 )
 
-                # if M_buffet == float('-inf'):
-                # VMax = float('-inf')
             else:
                 VMax = self.maxCAS(HLid=HLid, LG=LG)
         else:
@@ -2698,6 +2702,7 @@ class ARPM(BADA4):
         h,
         hRWY=0.0,
         speedSchedule_default=None,
+        applyLimits=True,
         procedure="BADA",
         config=None,
         NADP1_ALT=3000,
@@ -2713,6 +2718,7 @@ class ARPM(BADA4):
         :param h: Altitude in meters [m].
         :param hRWY: Runway elevation AMSL in meters [m].
         :param speedSchedule_default: Optional, a default speed schedule that overrides the BADA schedule. It should be in the form [Vcl1, Vcl2, Mcl].
+        :param applyLimits: Boolean flag indicating whether to apply the minimum and maximum speed limits based on the flight envelope.
         :param procedure: Climb procedure to be followed, e.g., 'BADA', 'NADP1', 'NADP2'. Default is 'BADA'.
         :param config: Optional, current aircraft aerodynamic configuration (TO/IC/CR/AP/LD).
         :param NADP1_ALT: Altitude in feet for NADP1 procedure. Default is 3000 feet.
@@ -2724,6 +2730,7 @@ class ARPM(BADA4):
         :type h: float
         :type hRWY: float, optional
         :type speedSchedule_default: list[float], optional
+        :type applyLimits: bool
         :type procedure: str
         :type config: str, optional
         :type NADP1_ALT: float, optional
@@ -2978,43 +2985,50 @@ class ARPM(BADA4):
                         Mach=Mcl, theta=theta, delta=delta, sigma=sigma
                     )
 
-        # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
-        if config is None:
-            config = self.flightEnvelope.getConfig(
-                h=h,
-                phase=phase,
-                v=cas,
-                mass=mass,
-                deltaTemp=deltaTemp,
-                hRWY=hRWY,
+        if applyLimits:
+            # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
+            if config is None:
+                config = self.flightEnvelope.getConfig(
+                    h=h,
+                    phase=phase,
+                    v=cas,
+                    mass=mass,
+                    deltaTemp=deltaTemp,
+                    hRWY=hRWY,
+                )
+            minSpeed = self.flightEnvelope.VMin(
+                config=config, mass=mass, theta=theta, delta=delta
             )
-        minSpeed = self.flightEnvelope.VMin(
-            config=config, mass=mass, theta=theta, delta=delta
-        )
-        [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
-        maxSpeed = self.flightEnvelope.VMax(
-            h=h, HLid=HLid, LG=LG, theta=theta, delta=delta, mass=mass, nz=1.2
-        )
+            [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
+            maxSpeed = self.flightEnvelope.VMax(
+                h=h,
+                HLid=HLid,
+                LG=LG,
+                theta=theta,
+                delta=delta,
+                mass=mass,
+                nz=1.2,
+            )
 
-        eps = 1e-6  # float calculation precision
-        # empty envelope - keep the original calculated CAS speed
+            eps = 1e-6  # float calculation precision
+            # empty envelope - keep the original calculated CAS speed
 
-        if minSpeed is None or maxSpeed is None:
-            return [cas, "vV"]
-
-        if maxSpeed < minSpeed:
-            if (cas - eps) > maxSpeed and (cas - eps) > minSpeed:
-                return [cas, "V"]
-            elif (cas + eps) < minSpeed and (cas + eps) < maxSpeed:
-                return [cas, "v"]
-            else:
+            if minSpeed is None or maxSpeed is None:
                 return [cas, "vV"]
 
-        if minSpeed > (cas + eps):
-            return [minSpeed, "C"]
+            if maxSpeed < minSpeed:
+                if (cas - eps) > maxSpeed and (cas - eps) > minSpeed:
+                    return [cas, "V"]
+                elif (cas + eps) < minSpeed and (cas + eps) < maxSpeed:
+                    return [cas, "v"]
+                else:
+                    return [cas, "vV"]
 
-        if maxSpeed < (cas - eps):
-            return [maxSpeed, "C"]
+            if minSpeed > (cas + eps):
+                return [minSpeed, "C"]
+
+            if maxSpeed < (cas - eps):
+                return [maxSpeed, "C"]
 
         return [cas, ""]
 
@@ -3026,6 +3040,7 @@ class ARPM(BADA4):
         h,
         hRWY=0.0,
         speedSchedule_default=None,
+        applyLimits=True,
         config=None,
         deltaTemp=0.0,
     ):
@@ -3040,6 +3055,7 @@ class ARPM(BADA4):
         :param speedSchedule_default: Optional, a default speed schedule
             that overrides the BADA schedule. It should be in the form
             [Vcr1, Vcr2, Mcr].
+        :param applyLimits: Boolean flag indicating whether to apply the minimum and maximum speed limits based on the flight envelope.
         :param config: Optional, current aircraft aerodynamic
             configuration (TO/IC/CR/AP/LD).
         :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
@@ -3049,6 +3065,7 @@ class ARPM(BADA4):
         :type h: float
         :type hRWY: float, optional
         :type speedSchedule_default: list[float], optional
+        :type applyLimits: bool
         :type config: str, optional
         :type deltaTemp: float, optional
         :returns: A tuple containing the cruise calibrated airspeed
@@ -3110,44 +3127,51 @@ class ARPM(BADA4):
                     Mach=Mcr, theta=theta, delta=delta, sigma=sigma
                 )
 
-        # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
-        if config is None:
-            config = self.flightEnvelope.getConfig(
+        if applyLimits:
+            # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
+            if config is None:
+                config = self.flightEnvelope.getConfig(
+                    h=h,
+                    phase=phase,
+                    v=cas,
+                    mass=mass,
+                    deltaTemp=deltaTemp,
+                    hRWY=hRWY,
+                )
+
+            minSpeed = self.flightEnvelope.VMin(
+                config=config, mass=mass, theta=theta, delta=delta
+            )
+            [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
+            maxSpeed = self.flightEnvelope.VMax(
                 h=h,
-                phase=phase,
-                v=cas,
+                HLid=HLid,
+                LG=LG,
+                theta=theta,
+                delta=delta,
                 mass=mass,
-                deltaTemp=deltaTemp,
-                hRWY=hRWY,
+                nz=1.2,
             )
 
-        minSpeed = self.flightEnvelope.VMin(
-            config=config, mass=mass, theta=theta, delta=delta
-        )
-        [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
-        maxSpeed = self.flightEnvelope.VMax(
-            h=h, HLid=HLid, LG=LG, theta=theta, delta=delta, mass=mass, nz=1.2
-        )
+            eps = 1e-6  # float calculation precision
+            # empty envelope - keep the original calculated CAS speed
 
-        eps = 1e-6  # float calculation precision
-        # empty envelope - keep the original calculated CAS speed
-
-        if minSpeed is None or maxSpeed is None:
-            return [cas, "vV"]
-
-        if maxSpeed < minSpeed:
-            if (cas - eps) > maxSpeed and (cas - eps) > minSpeed:
-                return [cas, "V"]
-            elif (cas + eps) < minSpeed and (cas + eps) < maxSpeed:
-                return [cas, "v"]
-            else:
+            if minSpeed is None or maxSpeed is None:
                 return [cas, "vV"]
 
-        if minSpeed > (cas + eps):
-            return [minSpeed, "C"]
+            if maxSpeed < minSpeed:
+                if (cas - eps) > maxSpeed and (cas - eps) > minSpeed:
+                    return [cas, "V"]
+                elif (cas + eps) < minSpeed and (cas + eps) < maxSpeed:
+                    return [cas, "v"]
+                else:
+                    return [cas, "vV"]
 
-        if maxSpeed < (cas - eps):
-            return [maxSpeed, "C"]
+            if minSpeed > (cas + eps):
+                return [minSpeed, "C"]
+
+            if maxSpeed < (cas - eps):
+                return [maxSpeed, "C"]
 
         return [cas, ""]
 
@@ -3159,6 +3183,7 @@ class ARPM(BADA4):
         h,
         hRWY=0.0,
         speedSchedule_default=None,
+        applyLimits=True,
         config=None,
         deltaTemp=0.0,
     ):
@@ -3173,6 +3198,7 @@ class ARPM(BADA4):
         :param speedSchedule_default: Optional, a default speed schedule
             that overrides the BADA schedule. It should be in the form
             [Vdes1, Vdes2, Mdes].
+        :param applyLimits: Boolean flag indicating whether to apply the minimum and maximum speed limits based on the flight envelope.
         :param config: Optional, current aircraft aerodynamic
             configuration (TO/IC/CR/AP/LD).
         :param deltaTemp: Deviation from ISA temperature in Kelvin [K].
@@ -3182,6 +3208,7 @@ class ARPM(BADA4):
         :type h: float
         :type hRWY: float, optional
         :type speedSchedule_default: list[float], optional
+        :type applyLimits: bool
         :type config: str, optional
         :type deltaTemp: float, optional
         :returns: A tuple containing the descent calibrated airspeed
@@ -3299,44 +3326,51 @@ class ARPM(BADA4):
                     Mach=Mdes, theta=theta, delta=delta, sigma=sigma
                 )
 
-        # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
-        if config is None:
-            config = self.flightEnvelope.getConfig(
+        if applyLimits:
+            # check if the speed is within the limits of minimum and maximum speed from the flight envelope, if not, overwrite calculated speed with flight envelope min/max speed
+            if config is None:
+                config = self.flightEnvelope.getConfig(
+                    h=h,
+                    phase=phase,
+                    v=cas,
+                    mass=mass,
+                    deltaTemp=deltaTemp,
+                    hRWY=hRWY,
+                )
+
+            minSpeed = self.flightEnvelope.VMin(
+                config=config, mass=mass, theta=theta, delta=delta
+            )
+            [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
+            maxSpeed = self.flightEnvelope.VMax(
                 h=h,
-                phase=phase,
-                v=cas,
+                HLid=HLid,
+                LG=LG,
+                theta=theta,
+                delta=delta,
                 mass=mass,
-                deltaTemp=deltaTemp,
-                hRWY=hRWY,
+                nz=1.2,
             )
 
-        minSpeed = self.flightEnvelope.VMin(
-            config=config, mass=mass, theta=theta, delta=delta
-        )
-        [HLid, LG] = self.flightEnvelope.getAeroConfig(config=config)
-        maxSpeed = self.flightEnvelope.VMax(
-            h=h, HLid=HLid, LG=LG, theta=theta, delta=delta, mass=mass, nz=1.2
-        )
+            eps = 1e-6  # float calculation precision
+            # empty envelope - keep the original calculated CAS speed
 
-        eps = 1e-6  # float calculation precision
-        # empty envelope - keep the original calculated CAS speed
-
-        if minSpeed is None or maxSpeed is None:
-            return [cas, "vV"]
-
-        if maxSpeed < minSpeed:
-            if (cas - eps) > maxSpeed and (cas - eps) > minSpeed:
-                return [cas, "V"]
-            elif (cas + eps) < minSpeed and (cas + eps) < maxSpeed:
-                return [cas, "v"]
-            else:
+            if minSpeed is None or maxSpeed is None:
                 return [cas, "vV"]
 
-        if minSpeed > (cas + eps):
-            return [minSpeed, "C"]
+            if maxSpeed < minSpeed:
+                if (cas - eps) > maxSpeed and (cas - eps) > minSpeed:
+                    return [cas, "V"]
+                elif (cas + eps) < minSpeed and (cas + eps) < maxSpeed:
+                    return [cas, "v"]
+                else:
+                    return [cas, "vV"]
 
-        if maxSpeed < (cas - eps):
-            return [maxSpeed, "C"]
+            if minSpeed > (cas + eps):
+                return [minSpeed, "C"]
+
+            if maxSpeed < (cas - eps):
+                return [maxSpeed, "C"]
 
         return [cas, ""]
 

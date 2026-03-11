@@ -494,8 +494,6 @@ def apcClimbCasMach(
             acctarget=None,
         )
 
-    # set ESFTarget for AcceleationKind.AT to 0.0
-
     # determine the BADA speed schedule [m/s and Mach]
     CASbelowFL100 = casMachSpeedSchedule.CASbelowFL100
     CASaboveFL100 = casMachSpeedSchedule.CASaboveFL100
@@ -615,6 +613,7 @@ def apcClimbCasMach(
                             delta=delta,
                             deltaTemp=meteo.deltaTemp,
                             speedSchedule_default=speedSchedule,
+                            applyLimits=True,
                         )[0]
                     )
                 case TakeOffProcedureNADP1(NADP1Threshold=threshold):
@@ -627,6 +626,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -639,6 +639,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                                 NADP1_ALT=threshold,
                             )[0]
@@ -655,6 +656,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -667,6 +669,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                                 NADP2_ALT=[threshold1, threshold2],
                             )[0]
@@ -697,6 +700,7 @@ def apcClimbCasMach(
                             delta=delta,
                             deltaTemp=meteo.deltaTemp,
                             speedSchedule_default=speedSchedule,
+                            applyLimits=True,
                         )[0]
                     )
                 case TakeOffProcedureNADP1(NADP1Threshold=threshold):
@@ -709,6 +713,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -721,6 +726,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                                 NADP1_ALT=threshold,
                             )[0]
@@ -737,6 +743,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -749,19 +756,17 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                                 NADP2_ALT=[threshold1, threshold2],
                             )[0]
                         )
-
         if Hp_next < crossoverAltitude:
             Hp_final = Hp_next
 
             # check if the next calculated speed is smaller then my current speed, to avoid deceleration during climb
             # if CAS_final < CAS_current:
             # CAS_final = CAS_current
-
-            # how much altitude do I need to Accelerate to next threshold altitude speed?
 
             if speed.accelerationLevelKind == AccelerationLevelKind.AT:
                 # climb to set altitude and accelerate then to reach the next threshold
@@ -784,13 +789,11 @@ def apcClimbCasMach(
                         AC, ["CAS", "Hp", "mass", "config"]
                     )
                 )
-
                 if (
                     calculationType == CalculationType.POINT
                     and Hp_current != pressureAltitude.finalPressureAltitude
                 ):
                     trajectory.removeLines(AC, numberOfLines=1)
-
                 if (
                     abs(CAS_current - CAS_final) > 0.3
                 ):  # preventing speed jumps due to small accuracy issues
@@ -841,6 +844,7 @@ def apcClimbCasMach(
                         wS=meteo.wS,
                         deltaTemp=meteo.deltaTemp,
                         calculationType=calculationType,
+                        suppressWarnings=True,
                     )
                     traj.append(AC, flightTrajectory)
                     CAS, Hp_end = traj.getFinalValue(AC, ["CAS", "Hp"])
@@ -973,7 +977,7 @@ def apcClimbCasMach(
             flightTrajectory = trajectorySegments.constantSpeedRating(
                 AC=AC,
                 speedType=SpeedType.CAS,
-                v=CAS_final,
+                v=CAS_current,
                 Hp_init=Hp_current,
                 Hp_final=Hp_next,
                 Hp_step=stepPressureAltitude,
@@ -1166,6 +1170,7 @@ def apcDescentCasMach(
             theta=theta,
             delta=delta,
             deltaTemp=meteo.deltaTemp,
+            applyLimits=False,
             speedSchedule_default=speedSchedule,
         )[0]
     )
@@ -1190,6 +1195,7 @@ def apcDescentCasMach(
                 theta=theta,
                 delta=delta,
                 deltaTemp=meteo.deltaTemp,
+                applyLimits=False,
                 speedSchedule_default=speedSchedule,
             )[0]
         )
@@ -1511,8 +1517,6 @@ def hpcClimbARPM(
     TAS_current = conv.ms2kt(tas)
     ROCD_current = conv.m2ft(ROCD) * 60
 
-    Hp_speed = Hp_current  # Altitude to calculate the speed for the whole climb segment, which will not change at this point
-
     for Hp_next in altitudeClimbThresholdList:
         if Hp_next == 5:
             flightTrajectory = trajectorySegments.constantSpeedROCD(
@@ -1576,8 +1580,8 @@ def hpcClimbARPM(
                 )
                 trajectory.append(AC, flightTrajectory)
 
-        CAS_current, TAS_current, Hp_current, mass_current = (
-            trajectory.getFinalValue(AC, ["CAS", "TAS", "Hp", "mass"])
+        TAS_current, Hp_current, mass_current = trajectory.getFinalValue(
+            AC, ["TAS", "Hp", "mass"]
         )
 
         if (
@@ -1585,6 +1589,46 @@ def hpcClimbARPM(
             and Hp_current != pressureAltitude.finalPressureAltitude
         ):
             trajectory.removeLines(AC, numberOfLines=1)
+
+        if Hp_current == 5:
+            Hp_speed = Hp_current + 0.1
+        else:
+            Hp_speed = Hp_current
+
+        # calculate the final TAS_current
+        [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = AC.ARPM.ARPMProcedure(
+            phase="Climb",
+            h=conv.ft2m(Hp_speed),
+            deltaTemp=meteo.deltaTemp,
+            mass=mass_current,
+            rating=rating,
+        )
+        TAS_final = conv.ms2kt(tas)
+
+        if abs(TAS_current - TAS_final) > 3:
+            flightTrajectory = trajectorySegments.accDec(
+                AC=AC,
+                speedType=SpeedType.TAS,
+                v_init=TAS_current,
+                v_final=TAS_final,
+                speed_step=abs(TAS_final - TAS_current),
+                Hp_init=Hp_current,
+                control=controlTarget,
+                phase="Cruise",
+                m_init=mass_current,
+                wS=meteo.wS,
+                deltaTemp=meteo.deltaTemp,
+                calculationType=calculationType,
+            )
+            trajectory.append(AC, flightTrajectory)
+            TAS_current, Hp_current, mass_current, config_current = (
+                trajectory.getFinalValue(AC, ["TAS", "Hp", "mass", "config"])
+            )
+            if (
+                calculationType == CalculationType.POINT
+                and Hp_current != pressureAltitude.finalPressureAltitude
+            ):
+                trajectory.removeLines(AC, numberOfLines=1)
 
     return trajectory
 
@@ -1743,6 +1787,46 @@ def hpcDescentARPM(
             and Hp_current != pressureAltitude.finalPressureAltitude
         ):
             trajectory.removeLines(AC, numberOfLines=1)
+
+        if Hp_current == 5:
+            Hp_speed = Hp_current + 0.1
+        else:
+            Hp_speed = Hp_current
+
+        # calculate the final TAS_current
+        [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = AC.ARPM.ARPMProcedure(
+            phase="Descent",
+            h=conv.ft2m(Hp_speed),
+            deltaTemp=meteo.deltaTemp,
+            mass=mass_current,
+            rating="ARPM",
+        )
+        TAS_final = conv.ms2kt(tas)
+
+        if abs(TAS_current - TAS_final) > 3:
+            flightTrajectory = trajectorySegments.accDec(
+                AC=AC,
+                speedType=SpeedType.TAS,
+                v_init=TAS_current,
+                v_final=TAS_final,
+                speed_step=abs(TAS_final - TAS_current),
+                Hp_init=Hp_current,
+                control=controlTarget,
+                phase="Cruise",
+                m_init=mass_current,
+                wS=meteo.wS,
+                deltaTemp=meteo.deltaTemp,
+                calculationType=calculationType,
+            )
+            trajectory.append(AC, flightTrajectory)
+            TAS_current, Hp_current, mass_current, config_current = (
+                trajectory.getFinalValue(AC, ["TAS", "Hp", "mass", "config"])
+            )
+            if (
+                calculationType == CalculationType.POINT
+                and Hp_current != pressureAltitude.finalPressureAltitude
+            ):
+                trajectory.removeLines(AC, numberOfLines=1)
 
     return trajectory
 
@@ -2678,14 +2762,12 @@ def apcFlightEnvelope(
             AC.flightEnvelope.maxAltitude(mass=mass, deltaTemp=meteo.deltaTemp)
         )  # [ft]
 
-        # Collect special altitudes that need to be included if they are less than AC.hmo.
         special_altitudes = [
             alt
             for alt in [crossoverAltitude, tropopauseAltitude, maxAltitude]
             if alt < AC.hmo
         ]
 
-        # Merge the arrays, remove duplicates, and sort.
         altitudeRange = np.sort(
             np.unique(np.concatenate((altitudeRange, special_altitudes)))
         )
@@ -2846,14 +2928,12 @@ def apcFlightEnvelope(
                 )
 
     elif AC.BADAFamilyName == "BADA4":
-        # Collect special altitudes that need to be included if they are less than AC.hmo
         special_altitudes = [
             alt
             for alt in [crossoverAltitude, tropopauseAltitude]
             if alt < AC.hmo
         ]
 
-        # Merge the arrays, remove duplicates, and sort.
         altitudeRange = np.sort(
             np.unique(np.concatenate((altitudeRange, special_altitudes)))
         )
@@ -2869,15 +2949,19 @@ def apcFlightEnvelope(
                     config="CR", theta=theta, delta=delta, mass=mass
                 )
             )
-            Vmax = AC.flightEnvelope.VMax(
-                h=alt_m,
-                HLid=0,
-                LG="LGUP",
-                delta=delta,
-                theta=theta,
-                mass=mass,
-                nz=1.0,
+
+            Vmax = conv.ms2kt(
+                AC.flightEnvelope.VMax(
+                    h=alt_m,
+                    HLid=0,
+                    LG="LGUP",
+                    delta=delta,
+                    theta=theta,
+                    mass=mass,
+                    nz=1.0,
+                )
             )
+
             VminCertified = conv.ms2kt(
                 AC.flightEnvelope.VStall(
                     theta=theta,
@@ -2888,6 +2972,7 @@ def apcFlightEnvelope(
                     nz=1.0,
                 )
             )
+
             Vmax_thrustLimited = conv.ms2kt(
                 AC.flightEnvelope.Vmax_thrustLimited(
                     h=alt_m,
@@ -2932,10 +3017,15 @@ def apcFlightEnvelope(
             if VminCertified_CAS > VmaxCertified_CAS:
                 break
 
+            if Hp < crossoverAltitude:
+                VMAX = Vmax_thrustLimited
+            else:
+                VMAX = Vmax
+
             if (
-                Vmax_thrustLimited is None
+                VMAX is None
                 or Vmin_operational is None
-                or (Vmin_operational > Vmax_thrustLimited)
+                or (Vmin_operational > VMAX)
             ):
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = [None, None, None]
                 [Vmin_M, Vmin_CAS, Vmin_TAS] = [None, None, None]
@@ -2972,7 +3062,7 @@ def apcFlightEnvelope(
                     sigma=sigma,
                 )
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = atm.convertSpeed(
-                    v=Vmax_thrustLimited,
+                    v=VMAX,
                     speedType="CAS",
                     theta=theta,
                     delta=delta,
@@ -3054,12 +3144,10 @@ def hpcFlightEnvelope(
     altitudeRange = np.append(altitudeRange, AC.hmo)
 
     if AC.BADAFamilyName == "BADAH":
-        maxAltitude = conv.m2ft(AC.flightEnvelope.maxAltitude())  # [ft]
-
         # Collect special altitudes that need to be included if they are less than AC.hmo.
         special_altitudes = [
             alt
-            for alt in [crossoverAltitude, tropopauseAltitude, maxAltitude]
+            for alt in [crossoverAltitude, tropopauseAltitude]
             if alt < AC.hmo
         ]
 
@@ -3119,7 +3207,7 @@ def hpcFlightEnvelope(
 
             if (
                 Vmax_powerLimited is None
-                or Hp > maxAltitude
+                or Hp > AC.hmo
                 or Vmin_operational is None
                 or (Vmin_operational > Vmax_powerLimited)
             ):
@@ -3189,12 +3277,10 @@ def hpcFlightEnvelope(
                 )
 
     elif AC.BADAFamilyName == "BADAE":
-        maxAltitude = conv.m2ft(AC.flightEnvelope.maxAltitude())  # [ft]
-
         # Collect special altitudes that need to be included if they are less than AC.hmo.
         special_altitudes = [
             alt
-            for alt in [crossoverAltitude, tropopauseAltitude, maxAltitude]
+            for alt in [crossoverAltitude, tropopauseAltitude]
             if alt < AC.hmo
         ]
 
@@ -3244,7 +3330,7 @@ def hpcFlightEnvelope(
                 )
             )
 
-            if Vmax_powerLimited is None or Hp > maxAltitude:
+            if Vmax_powerLimited is None or Hp > AC.hmo:
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = [None, None, None]
                 [Vmin_M, Vmin_CAS, Vmin_TAS] = [None, None, None]
 
