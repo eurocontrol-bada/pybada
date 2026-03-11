@@ -1520,13 +1520,15 @@ def constantSpeedROCD(
             minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
-        if CAS_i < minSpeed:
-            v = conv.ms2kt(minSpeed)
-        elif CAS_i > maxSpeed:
-            v = conv.ms2kt(maxSpeed)
+        # stop when out of speed flight envelope
+        if minSpeed is None or maxSpeed is None:
+            warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+            break
 
-        [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=v, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
-
+        if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+            if CAS_i < minSpeed or CAS_i > maxSpeed:
+                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                break
 
         # compute Energy Share Factor (ESF)
         ESF_i = AC.esf(
@@ -2576,12 +2578,15 @@ def constantSpeedROCD_time(
                 minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
-            if CAS_i < minSpeed:
-                v = conv.ms2kt(minSpeed)
-            elif CAS_i > maxSpeed:
-                v = conv.ms2kt(maxSpeed)
+            # stop when out of speed flight envelope
+            if minSpeed is None or maxSpeed is None:
+                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+                break
 
-            [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=v, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+            if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+                if CAS_i < minSpeed or CAS_i > maxSpeed:
+                    warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                    break
 
             # compute Energy Share Factor (ESF)
             ESF_i = AC.esf(
@@ -3624,12 +3629,16 @@ def constantSpeedSlope(
             minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
-        if CAS_i < minSpeed:
-            v = conv.ms2kt(minSpeed)
-        elif CAS_i > maxSpeed:
-            v = conv.ms2kt(maxSpeed)
+        # stop when out of speed flight envelope
+        if minSpeed is None or maxSpeed is None:
+            warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+            break
 
-        [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=v, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+        if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+            if CAS_i < minSpeed or CAS_i > maxSpeed:
+                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                break
+
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -4678,12 +4687,15 @@ def constantSpeedSlope_time(
                 minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
-            if CAS_i < minSpeed:
-                v = conv.ms2kt(minSpeed)
-            elif CAS_i > maxSpeed:
-                v = conv.ms2kt(maxSpeed)
+            # stop when out of speed flight envelope
+            if minSpeed is None or maxSpeed is None:
+                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+                break
 
-            [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=v, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+            if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+                if CAS_i < minSpeed or CAS_i > maxSpeed:
+                    warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                    break
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
@@ -5718,6 +5730,8 @@ def constantSpeedRating(
             theta * const.temp_0 - deltaTemp
         )
 
+        mass_i = mass[-1]
+
         # aircraft speed
         if calculationType == "POINT" and AC.BADAFamily.BADAH:
             [
@@ -5732,7 +5746,7 @@ def constantSpeedRating(
                 phase=phase,
                 h=H_m,
                 deltaTemp=deltaTemp,
-                mass=mass[-1],
+                mass=mass_i,
                 rating=rating,
             )
             v = conv.ms2kt(tas_POINT)
@@ -5741,6 +5755,47 @@ def constantSpeedRating(
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
+
+        # check for speed flight envelope
+        if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+            if config_default is None:
+                config_i = AC.flightEnvelope.getConfig(
+                    h=H_m,
+                    phase=phase,
+                    v=CAS_i,
+                    mass=mass_i,
+                    deltaTemp=deltaTemp,
+                )
+            else:
+                config_i = config_default
+
+        if AC.BADAFamily.BADA4:
+            minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+            [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+
+        if AC.BADAFamily.BADA3:
+            minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+            maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        # stop when out of speed flight envelope
+        if minSpeed is None or maxSpeed is None:
+            warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+            break
+
+        if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+            if CAS_i < minSpeed or CAS_i > maxSpeed:
+                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                break
+
+        # if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+            # if CAS_i < minSpeed:
+                # correctedSpeed = conv.ms2kt(minSpeed)
+                # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+            # elif CAS_i > maxSpeed:
+                # correctedSpeed = conv.ms2kt(maxSpeed)
+                # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -5764,8 +5819,6 @@ def constantSpeedRating(
             deltaTemp=deltaTemp,
             flightEvolution=("const" + speedType),
         )
-
-        mass_i = mass[-1]
 
         # BADAH
         if AC.BADAFamily.BADAH:
@@ -6695,6 +6748,46 @@ def constantSpeedRating_time(
             [M_i, CAS_i, TAS_i] = atm.convertSpeed(
                 v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
             )
+
+            # check for speed flight envelope
+            if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
+                if config_default is None:
+                    config_i = AC.flightEnvelope.getConfig(
+                        h=H_m,
+                        phase=phase,
+                        v=CAS_i,
+                        mass=mass_i,
+                        deltaTemp=deltaTemp,
+                    )
+                else:
+                    config_i = config_default
+
+            if AC.BADAFamily.BADA4:
+                minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
+
+            if AC.BADAFamily.BADA3:
+                minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
+                maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            # stop when out of speed flight envelope
+            if minSpeed is None or maxSpeed is None:
+                warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
+                break
+
+            if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+                if CAS_i < minSpeed or CAS_i > maxSpeed:
+                    warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
+                    break
+
+            # if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
+                # if CAS_i < minSpeed:
+                    # correctedSpeed = conv.ms2kt(minSpeed)
+                    # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+                # elif CAS_i > maxSpeed:
+                    # correctedSpeed = conv.ms2kt(maxSpeed)
+                    # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:

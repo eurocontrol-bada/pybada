@@ -613,7 +613,7 @@ def apcClimbCasMach(
                             delta=delta,
                             deltaTemp=meteo.deltaTemp,
                             speedSchedule_default=speedSchedule,
-                            applyLimits=False,
+                            applyLimits=True,
                         )[0]
                     )
                 case TakeOffProcedureNADP1(NADP1Threshold=threshold):
@@ -626,7 +626,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
-                                applyLimits=False,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -639,7 +639,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
-                                applyLimits=False,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                                 NADP1_ALT=threshold,
                             )[0]
@@ -656,7 +656,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
-                                applyLimits=False,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -669,7 +669,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
-                                applyLimits=False,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                                 NADP2_ALT=[threshold1, threshold2],
                             )[0]
@@ -700,7 +700,7 @@ def apcClimbCasMach(
                             delta=delta,
                             deltaTemp=meteo.deltaTemp,
                             speedSchedule_default=speedSchedule,
-                            applyLimits=False,
+                            applyLimits=True,
                         )[0]
                     )
                 case TakeOffProcedureNADP1(NADP1Threshold=threshold):
@@ -713,7 +713,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
-                                applyLimits=False,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -726,7 +726,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
-                                applyLimits=False,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                                 NADP1_ALT=threshold,
                             )[0]
@@ -743,7 +743,7 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
-                                applyLimits=False,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                             )[0]
                         )
@@ -756,12 +756,12 @@ def apcClimbCasMach(
                                 delta=delta,
                                 deltaTemp=meteo.deltaTemp,
                                 speedSchedule_default=speedSchedule,
-                                applyLimits=False,
+                                applyLimits=True,
                                 procedure=takeOffProcedure.type,
                                 NADP2_ALT=[threshold1, threshold2],
                             )[0]
                         )
-
+        # print("CAS_final", Hp_next, CAS_final)
         if Hp_next < crossoverAltitude:
             Hp_final = Hp_next
 
@@ -771,6 +771,7 @@ def apcClimbCasMach(
 
             if speed.accelerationLevelKind == AccelerationLevelKind.AT:
                 # climb to set altitude and accelerate then to reach the next threshold
+                # print("climbed from ", Hp_current, "to", Hp_final, "CAS_current:", CAS_current, "CAS_final", CAS_final)
                 flightTrajectory = trajectorySegments.constantSpeedRating(
                     AC=AC,
                     speedType=SpeedType.CAS,
@@ -790,16 +791,16 @@ def apcClimbCasMach(
                         AC, ["CAS", "Hp", "mass", "config"]
                     )
                 )
-
                 if (
                     calculationType == CalculationType.POINT
                     and Hp_current != pressureAltitude.finalPressureAltitude
                 ):
                     trajectory.removeLines(AC, numberOfLines=1)
-                print(Hp_next, CAS_current, CAS_final)
+                # print("before acceleration:", CAS_current, CAS_final)
                 if (
                     abs(CAS_current - CAS_final) > 0.3
                 ):  # preventing speed jumps due to small accuracy issues
+                    # print("accelerated at", Hp_current)
                     flightTrajectory = trajectorySegments.accDec(
                         AC=AC,
                         speedType=SpeedType.CAS,
@@ -980,7 +981,7 @@ def apcClimbCasMach(
             flightTrajectory = trajectorySegments.constantSpeedRating(
                 AC=AC,
                 speedType=SpeedType.CAS,
-                v=CAS_final,
+                v=CAS_current,
                 Hp_init=Hp_current,
                 Hp_final=Hp_next,
                 Hp_step=stepPressureAltitude,
@@ -994,7 +995,7 @@ def apcClimbCasMach(
             trajectory.append(AC, flightTrajectory)
             CAS_current, Hp_current, massCurrent, M_current, config_current = (
                 trajectory.getFinalValue(
-                    AC, ["CAS", "Hp", "mass", "M", "config"]
+                    AC, ["CAS", "Hp", "mass","M", "config"]
                 )
             )
             if (
@@ -1007,7 +1008,6 @@ def apcClimbCasMach(
             if Hp_current < Hp_next:
                 break
         else:
-            print("M", M_current)
             flightTrajectory = trajectorySegments.constantSpeedRating(
                 AC=AC,
                 speedType=SpeedType.M,
