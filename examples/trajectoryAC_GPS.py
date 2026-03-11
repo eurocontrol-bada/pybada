@@ -5,8 +5,6 @@ Aircraft Trajectory Calculation on Earth
 Example of BADA3 and BADA4 trajectory including geodesic calculations using TCL
 """
 
-from dataclasses import dataclass
-
 import matplotlib.pyplot as plt
 
 from pyBADA import atmosphere as atm
@@ -16,15 +14,7 @@ from pyBADA.bada4 import Bada4Aircraft
 from pyBADA.bada4 import Parser as Bada4Parser
 from pyBADA.flightTrajectory import FlightTrajectory as FT
 from pyBADA.magnetic import Grid
-
-
-@dataclass
-class target:
-    ROCDtarget: float = None
-    slopetarget: float = None
-    acctarget: float = None
-    ESFtarget: float = None
-
+from pyBADA.myTypes import ControlTarget
 
 badaVersion = "DUMMY"
 
@@ -127,7 +117,6 @@ flightTrajectory = trajectorySegments.accDec(
     v_init=CAS_final,
     v_final=conv.ms2kt(cas_cl2),
     Hp_init=Hp,
-    control=None,
     phase="Climb",
     m_init=m_final,
     wS=wS,
@@ -197,7 +186,6 @@ flightTrajectory = trajectorySegments.accDec(
     v_init=CAS_final,
     v_final=conv.ms2kt(cas_cl3),
     Hp_init=Hp,
-    control=None,
     phase="Climb",
     m_init=m_final,
     wS=wS,
@@ -267,7 +255,6 @@ flightTrajectory = trajectorySegments.accDec(
     v_init=CAS_final,
     v_final=conv.ms2kt(cas_cl4),
     Hp_init=Hp,
-    control=None,
     phase="Climb",
     m_init=m_final,
     wS=wS,
@@ -337,7 +324,6 @@ flightTrajectory = trajectorySegments.accDec(
     v_init=CAS_final,
     v_final=conv.ms2kt(cas_cl5),
     Hp_init=Hp,
-    control=None,
     phase="Climb",
     m_init=m_final,
     wS=wS,
@@ -407,7 +393,6 @@ flightTrajectory = trajectorySegments.accDec(
     v_init=CAS_final,
     v_final=conv.ms2kt(cas_cl6),
     Hp_init=Hp,
-    control=None,
     phase="Climb",
     m_init=m_final,
     wS=wS,
@@ -466,7 +451,6 @@ flightTrajectory = trajectorySegments.accDec(
     v_init=CAS_final,
     v_final=conv.ms2kt(Vcl2),
     Hp_init=Hp,
-    control=None,
     phase="Climb",
     m_init=m_final,
     wS=wS,
@@ -551,14 +535,13 @@ Hp, m_final, M_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
 )
 
 if M_final < Mcr:
-    control = target(acctarget=0.5)
     flightTrajectory = trajectorySegments.accDec(
         AC=AC,
         speedType="M",
         v_init=M_final,
         v_final=Mcr,
         Hp_init=Hp,
-        control=control,
+        controlTarget=ControlTarget(acctarget=0.5),
         phase="Cruise",
         m_init=m_final,
         wS=wS,
@@ -933,14 +916,13 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     deltaTemp=deltaTemp,
 )
 
-control = target(slopetarget=-3.0)
 flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
     v_final=conv.ms2kt(cas),
     Hp_init=Hp,
-    control=control,
+    controlTarget=ControlTarget(slopetarget=-3.0),
     phase="Descent",
     config="AP",
     speedBrakes={"deployed": True, "value": 0.03},
@@ -1011,14 +993,13 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     deltaTemp=deltaTemp,
 )
 
-control = target(slopetarget=-3.0)
 flightTrajectory = trajectorySegments.accDec(
     AC=AC,
     speedType="CAS",
     v_init=CAS_final,
     v_final=conv.ms2kt(cas),
     Hp_init=Hp,
-    control=control,
+    controlTarget=ControlTarget(slopetarget=-3.0),
     phase="Descent",
     config="LD",
     speedBrakes={"deployed": True, "value": 0.03},
@@ -1089,7 +1070,6 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     deltaTemp=deltaTemp,
 )
 
-control = target(slopetarget=-3.0)
 if AC.BADAFamily.BADA3:
     flightTrajectory = trajectorySegments.accDec(
         AC=AC,
@@ -1097,7 +1077,7 @@ if AC.BADAFamily.BADA3:
         v_init=CAS_final,
         v_final=conv.ms2kt(cas),
         Hp_init=Hp,
-        control=control,
+        controlTarget=ControlTarget(slopetarget=-3.0),
         phase="Descent",
         config="LD",
         speedBrakes={"deployed": True, "value": 0.03},
@@ -1121,7 +1101,7 @@ elif AC.BADAFamily.BADA4:
         v_init=CAS_final,
         v_final=conv.ms2kt(cas),
         Hp_init=Hp,
-        control=control,
+        controlTarget=ControlTarget(slopetarget=-3.0),
         phase="Descent",
         config="LD",
         m_init=m_final,
@@ -1190,7 +1170,6 @@ Hp, m_final, CAS_final, LAT_final, LON_final, HDGTrue = ft.getFinalValue(
     deltaTemp=deltaTemp,
 )
 
-control = target(slopetarget=-3.0)
 if AC.BADAFamily.BADA3:
     flightTrajectory = trajectorySegments.accDec(
         AC=AC,
@@ -1198,7 +1177,7 @@ if AC.BADAFamily.BADA3:
         v_init=CAS_final,
         v_final=conv.ms2kt(cas),
         Hp_init=Hp,
-        control=control,
+        controlTarget=ControlTarget(slopetarget=-3.0),
         phase="Descent",
         config=None,
         speedBrakes={"deployed": True, "value": 0.03},
@@ -1222,7 +1201,7 @@ elif AC.BADAFamily.BADA4:
         v_init=CAS_final,
         v_final=conv.ms2kt(cas),
         Hp_init=Hp,
-        control=control,
+        controlTarget=ControlTarget(slopetarget=-3.0),
         phase="Descent",
         config=None,
         m_init=m_final,

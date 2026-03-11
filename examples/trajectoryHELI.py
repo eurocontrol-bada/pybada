@@ -5,7 +5,6 @@ Helicopter Trajectory Calculation
 Example of BADAH trajectory using TCL
 """
 
-from dataclasses import dataclass
 from math import pi, tan
 
 import matplotlib.pyplot as plt
@@ -15,15 +14,7 @@ from pyBADA import trajectorySegments
 from pyBADA.badaH import BadaHAircraft
 from pyBADA.badaH import Parser as BadaHParser
 from pyBADA.flightTrajectory import FlightTrajectory as FT
-
-
-@dataclass
-class target:
-    ROCDtarget: float = None
-    slopetarget: float = None
-    acctarget: float = None
-    ESFtarget: float = None
-
+from pyBADA.myTypes import ControlTarget
 
 # initialization of BADAH
 badaVersion = "DUMMY"
@@ -72,7 +63,7 @@ flightTrajectory = trajectorySegments.constantSpeedROCD(
 ft.append(AC, flightTrajectory)
 
 Hp, m_final = ft.getFinalValue(AC, ["Hp", "mass"])
-control = target(ROCDtarget=500, acctarget=AVT)
+controlTarget = ControlTarget(ROCDtarget=500, acctarget=AVT)
 
 # acc in climb
 flightTrajectory = trajectorySegments.accDec(
@@ -82,7 +73,7 @@ flightTrajectory = trajectorySegments.accDec(
     v_final=MEC,
     Hp_init=Hp,
     phase="Climb",
-    control=control,
+    controlTarget=controlTarget,
     maxRating="MTKF",
     m_init=m_final,
     wS=wS,
@@ -168,7 +159,7 @@ flightTrajectory = trajectorySegments.constantSpeedROCD(
 ft.append(AC, flightTrajectory)
 
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
-control = target(ROCDtarget=-300, ESFtarget=0.3)
+controlTarget = ControlTarget(ROCDtarget=-300, ESFtarget=0.3)
 
 # dec in descent const ROCD
 flightTrajectory = trajectorySegments.accDec(
@@ -178,7 +169,7 @@ flightTrajectory = trajectorySegments.accDec(
     v_final=MEC,
     Hp_init=Hp,
     phase="Descent",
-    control=control,
+    controlTarget=controlTarget,
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
@@ -205,7 +196,7 @@ flightTrajectory = trajectorySegments.constantSpeedROCD(
 ft.append(AC, flightTrajectory)
 
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
-control = target(ROCDtarget=-200, ESFtarget=0.3)
+controlTarget = ControlTarget(ROCDtarget=-200, ESFtarget=0.3)
 
 # dec in descent const ROCD
 flightTrajectory = trajectorySegments.accDec(
@@ -215,7 +206,7 @@ flightTrajectory = trajectorySegments.accDec(
     v_final=30,
     Hp_init=Hp,
     phase="Descent",
-    control=control,
+    controlTarget=controlTarget,
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
@@ -242,7 +233,7 @@ flightTrajectory = trajectorySegments.constantSpeedROCD(
 ft.append(AC, flightTrajectory)
 
 Hp, m_final, v = ft.getFinalValue(AC, ["Hp", "mass", "TAS"])
-control = target(acctarget=DVT)
+controlTarget = ControlTarget(acctarget=DVT)
 
 # dec in descent const ROCD
 flightTrajectory = trajectorySegments.accDec(
@@ -252,7 +243,7 @@ flightTrajectory = trajectorySegments.accDec(
     v_final=0,
     Hp_init=Hp,
     phase="Cruise",
-    control=control,
+    controlTarget=controlTarget,
     m_init=m_final,
     wS=wS,
     bankAngle=bankAngle,
@@ -304,4 +295,4 @@ plt.show()
 # save the output to a CSV/XLSX file
 # ------------------------------------------------
 # ft.save2csv(os.path.join(grandParentDir,"flightTrajectory_export"), separator=',')
-# ft.save2xlsx(os.path.join(grandParentDir,"flightTrajectory_export"))
+# ft.save2xlsx(os.path.join("flightTrajectory_export"))

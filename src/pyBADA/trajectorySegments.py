@@ -371,11 +371,16 @@ def constantSpeedLevel(
                 nz=1.2,
             )
 
-        if AC.BADAFamily.BADA3:
+        elif AC.BADAFamily.BADA3:
             minSpeed = AC.flightEnvelope.VMin(
                 h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
             )
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        elif AC.BADAFamily.BADAH:
+            minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
+                h=H_m, mass=mass_i, deltaTemp=deltaTemp
+            )
 
         # stop when out of speed flight envelope
         if minSpeed is None or maxSpeed is None:
@@ -1573,11 +1578,16 @@ def constantSpeedROCD(
                 nz=1.2,
             )
 
-        if AC.BADAFamily.BADA3:
+        elif AC.BADAFamily.BADA3:
             minSpeed = AC.flightEnvelope.VMin(
                 h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
             )
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        elif AC.BADAFamily.BADAH:
+            minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
+                h=H_m, mass=mass_i, deltaTemp=deltaTemp
+            )
 
         # stop when out of speed flight envelope
         if minSpeed is None or maxSpeed is None:
@@ -2651,11 +2661,18 @@ def constantSpeedROCD_time(
                     nz=1.2,
                 )
 
-            if AC.BADAFamily.BADA3:
+            elif AC.BADAFamily.BADA3:
                 minSpeed = AC.flightEnvelope.VMin(
                     h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
                 )
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            elif AC.BADAFamily.BADAH:
+                minSpeed, maxSpeed = (
+                    AC.flightEnvelope.speedEnvelope_powerLimited(
+                        h=H_m, mass=mass_i, deltaTemp=deltaTemp
+                    )
+                )
 
             # stop when out of speed flight envelope
             if minSpeed is None or maxSpeed is None:
@@ -3720,11 +3737,16 @@ def constantSpeedSlope(
                 nz=1.2,
             )
 
-        if AC.BADAFamily.BADA3:
+        elif AC.BADAFamily.BADA3:
             minSpeed = AC.flightEnvelope.VMin(
                 h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
             )
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        elif AC.BADAFamily.BADAH:
+            minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
+                h=H_m, mass=mass_i, deltaTemp=deltaTemp
+            )
 
         # stop when out of speed flight envelope
         if minSpeed is None or maxSpeed is None:
@@ -4797,11 +4819,18 @@ def constantSpeedSlope_time(
                     nz=1.2,
                 )
 
-            if AC.BADAFamily.BADA3:
+            elif AC.BADAFamily.BADA3:
                 minSpeed = AC.flightEnvelope.VMin(
                     h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
                 )
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            elif AC.BADAFamily.BADAH:
+                minSpeed, maxSpeed = (
+                    AC.flightEnvelope.speedEnvelope_powerLimited(
+                        h=H_m, mass=mass_i, deltaTemp=deltaTemp
+                    )
+                )
 
             # stop when out of speed flight envelope
             if minSpeed is None or maxSpeed is None:
@@ -5906,11 +5935,16 @@ def constantSpeedRating(
                 nz=1.2,
             )
 
-        if AC.BADAFamily.BADA3:
+        elif AC.BADAFamily.BADA3:
             minSpeed = AC.flightEnvelope.VMin(
                 h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
             )
             maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+        elif AC.BADAFamily.BADAH:
+            minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
+                h=H_m, mass=mass_i, deltaTemp=deltaTemp
+            )
 
         # stop when out of speed flight envelope
         if minSpeed is None or maxSpeed is None:
@@ -6918,11 +6952,18 @@ def constantSpeedRating_time(
                     nz=1.2,
                 )
 
-            if AC.BADAFamily.BADA3:
+            elif AC.BADAFamily.BADA3:
                 minSpeed = AC.flightEnvelope.VMin(
                     h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp
                 )
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
+
+            elif AC.BADAFamily.BADAH:
+                minSpeed, maxSpeed = (
+                    AC.flightEnvelope.speedEnvelope_powerLimited(
+                        h=H_m, mass=mass_i, deltaTemp=deltaTemp
+                    )
+                )
 
             # stop when out of speed flight envelope
             if minSpeed is None or maxSpeed is None:
