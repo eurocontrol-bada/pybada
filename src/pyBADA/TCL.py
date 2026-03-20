@@ -1826,26 +1826,15 @@ def hpcDescentARPM(
             mass=mass_current,
             rating="ARPM",
         )
-<<<<<<< HEAD
 
-        print(Hp_current, "TAS_current", TAS_current, "TAS_final", conv.ms2kt(tas))
         if abs(TAS_current - conv.ms2kt(tas)) > 3:
-=======
-        TAS_final = conv.ms2kt(tas)
-
-        if abs(TAS_current - TAS_final) > 3:
->>>>>>> fa8195f68a5d7cc92e954d671fe09607c8313de1
             flightTrajectory = trajectorySegments.accDec(
                 AC=AC,
                 speedType=SpeedType.TAS,
                 v_init=TAS_current,
-<<<<<<< HEAD
                 v_final=conv.ms2kt(tas),
                 speed_step=abs(conv.ms2kt(tas) - TAS_current),
-=======
-                v_final=TAS_final,
-                speed_step=abs(TAS_final - TAS_current),
->>>>>>> fa8195f68a5d7cc92e954d671fe09607c8313de1
+
                 Hp_init=Hp_current,
                 control=controlTarget,
                 phase="Cruise",
