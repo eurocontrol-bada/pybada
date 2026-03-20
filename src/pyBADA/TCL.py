@@ -420,6 +420,7 @@ def hpcDescentEmergency(
         deltaTemp=meteo.deltaTemp,
         wS=meteo.wS,
         calculationType=calculationType,
+        applyFlightEnvelope=False
     )
     trajectory.append(AC, flightTrajectory)
 
@@ -1724,7 +1725,6 @@ def hpcDescentARPM(
             trajectory.append(AC, flightTrajectory)
 
         elif Hp_next == 150 or Hp_next == 5:
-            Hp_speed = Hp_current + 0.1
             [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
                 AC.ARPM.ARPMProcedure(
                     phase="Descent",
@@ -1734,13 +1734,12 @@ def hpcDescentARPM(
                     rating="ARPM",
                 )
             )
-            ROCD_current = conv.m2ft(ROCD) * 60
 
             flightTrajectory = trajectorySegments.constantSpeedROCD(
                 AC=AC,
                 speedType=SpeedType.TAS,
                 v=TAS_current,
-                ROCDtarget=ROCD_current,
+                ROCDtarget=conv.m2ft(ROCD) * 60,
                 Hp_init=Hp_current,
                 Hp_final=Hp_next,
                 Hp_step=pressureAltitude.stepPressureAltitude,
@@ -1751,24 +1750,50 @@ def hpcDescentARPM(
             )
             trajectory.append(AC, flightTrajectory)
 
-        else:  # vertical landing
+        elif Hp_next == 0:  # vertical landing
             [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
                 AC.ARPM.ARPMProcedure(
                     phase="Descent",
-                    h=conv.ft2m(0),
+                    h=Hp_next,
                     deltaTemp=meteo.deltaTemp,
                     mass=mass_current,
                     rating="ARPM",
                 )
             )
-            TAS_current = conv.ms2kt(tas)
-            ROCD_current = conv.m2ft(ROCD) * 60
+
+            flightTrajectory = trajectorySegments.accDec(
+                AC=AC,
+                speedType=SpeedType.TAS,
+                v_init=TAS_current,
+                v_final=0,
+                speed_step=abs(0 - TAS_current),
+                Hp_init=Hp_current,
+                control=controlTarget,
+                phase="Cruise",
+                m_init=mass_current,
+                wS=meteo.wS,
+                deltaTemp=meteo.deltaTemp,
+                calculationType=calculationType,
+            )
+            trajectory.append(AC, flightTrajectory)
+
+            TAS_current, Hp_current, mass_current = (
+                trajectory.getFinalValue(AC, ["TAS", "Hp", "mass"])
+            )
+
+            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = AC.ARPM.ARPMProcedure(
+                phase="Descent",
+                h=0,
+                deltaTemp=meteo.deltaTemp,
+                mass=mass_current,
+                rating="ARPM",
+            )
 
             flightTrajectory = trajectorySegments.constantSpeedROCD(
                 AC=AC,
                 speedType=SpeedType.TAS,
-                v=TAS_current,
-                ROCDtarget=ROCD_current,
+                v=0,
+                ROCDtarget=conv.m2ft(ROCD) * 60,
                 Hp_init=Hp_current,
                 Hp_final=Hp_next,
                 Hp_step=pressureAltitude.stepPressureAltitude,
@@ -1779,8 +1804,8 @@ def hpcDescentARPM(
             )
             trajectory.append(AC, flightTrajectory)
 
-        CAS_current, TAS_current, Hp_current, mass_current = (
-            trajectory.getFinalValue(AC, ["CAS", "TAS", "Hp", "mass"])
+        TAS_current, Hp_current, mass_current = (
+            trajectory.getFinalValue(AC, ["TAS", "Hp", "mass"])
         )
         if (
             calculationType == CalculationType.POINT
@@ -1801,15 +1826,26 @@ def hpcDescentARPM(
             mass=mass_current,
             rating="ARPM",
         )
+<<<<<<< HEAD
+
+        print(Hp_current, "TAS_current", TAS_current, "TAS_final", conv.ms2kt(tas))
+        if abs(TAS_current - conv.ms2kt(tas)) > 3:
+=======
         TAS_final = conv.ms2kt(tas)
 
         if abs(TAS_current - TAS_final) > 3:
+>>>>>>> fa8195f68a5d7cc92e954d671fe09607c8313de1
             flightTrajectory = trajectorySegments.accDec(
                 AC=AC,
                 speedType=SpeedType.TAS,
                 v_init=TAS_current,
+<<<<<<< HEAD
+                v_final=conv.ms2kt(tas),
+                speed_step=abs(conv.ms2kt(tas) - TAS_current),
+=======
                 v_final=TAS_final,
                 speed_step=abs(TAS_final - TAS_current),
+>>>>>>> fa8195f68a5d7cc92e954d671fe09607c8313de1
                 Hp_init=Hp_current,
                 control=controlTarget,
                 phase="Cruise",
