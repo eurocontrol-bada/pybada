@@ -2969,14 +2969,11 @@ def apcFlightEnvelope(
                 h=alt_m, deltaTemp=meteo.deltaTemp
             )
 
-            Vmin_operational = conv.ms2kt(
-                AC.flightEnvelope.VMin(
+            Vmin_operational = AC.flightEnvelope.VMin(
                     config="CR", theta=theta, delta=delta, mass=mass
                 )
-            )
 
-            Vmax = conv.ms2kt(
-                AC.flightEnvelope.VMax(
+            VmaxCertified = AC.flightEnvelope.VMax(
                     h=alt_m,
                     HLid=0,
                     LG="LGUP",
@@ -2985,10 +2982,8 @@ def apcFlightEnvelope(
                     mass=mass,
                     nz=1.0,
                 )
-            )
 
-            VminCertified = conv.ms2kt(
-                AC.flightEnvelope.VStall(
+            VminCertified = AC.flightEnvelope.VStall(
                     theta=theta,
                     delta=delta,
                     mass=mass,
@@ -2996,32 +2991,22 @@ def apcFlightEnvelope(
                     LG="LGUP",
                     nz=1.0,
                 )
-            )
 
-            Vmax_thrustLimited = conv.ms2kt(
-                AC.flightEnvelope.Vmax_thrustLimited(
+            Vmax_thrustLimited = AC.flightEnvelope.Vmax_thrustLimited(
                     h=alt_m,
                     mass=mass,
                     deltaTemp=meteo.deltaTemp,
                     rating="MCRZ",
                     config="CR",
                 )
-            )
 
-            if Hp < crossoverAltitude:
-                VmaxCertified = AC.VMO
-                speedType = "CAS"
-            else:
-                VmaxCertified = AC.MMO
-                speedType = "M"
-
-            if VminCertified is None or VmaxCertified is None:
+            if VminCertified is None or VmaxCertified is None or (VminCertified > VmaxCertified):
                 break
 
             # aircraft speed
             [VminCertified_M, VminCertified_CAS, VminCertified_TAS] = (
                 atm.convertSpeed(
-                    v=VminCertified,
+                    v=conv.ms2kt(VminCertified),
                     speedType="CAS",
                     theta=theta,
                     delta=delta,
@@ -3030,27 +3015,18 @@ def apcFlightEnvelope(
             )
             [VmaxCertified_M, VmaxCertified_CAS, VmaxCertified_TAS] = (
                 atm.convertSpeed(
-                    v=VmaxCertified,
-                    speedType=speedType,
+                    v=conv.ms2kt(VmaxCertified),
+                    speedType="CAS",
                     theta=theta,
                     delta=delta,
                     sigma=sigma,
                 )
             )
 
-            # limit the calcuation to where the max certified speed is lower than min certified speed
-            if VminCertified_CAS > VmaxCertified_CAS:
-                break
-
-            if Hp < crossoverAltitude:
-                VMAX = Vmax_thrustLimited
-            else:
-                VMAX = Vmax
-
             if (
-                VMAX is None
+                Vmax_thrustLimited is None
                 or Vmin_operational is None
-                or (Vmin_operational > VMAX)
+                or (Vmin_operational > Vmax_thrustLimited)
             ):
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = [None, None, None]
                 [Vmin_M, Vmin_CAS, Vmin_TAS] = [None, None, None]
@@ -3080,14 +3056,14 @@ def apcFlightEnvelope(
 
             else:
                 [Vmin_M, Vmin_CAS, Vmin_TAS] = atm.convertSpeed(
-                    v=Vmin_operational,
+                    v=conv.ms2kt(Vmin_operational),
                     speedType="CAS",
                     theta=theta,
                     delta=delta,
                     sigma=sigma,
                 )
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = atm.convertSpeed(
-                    v=VMAX,
+                    v=conv.ms2kt(Vmax_thrustLimited),
                     speedType="CAS",
                     theta=theta,
                     delta=delta,
