@@ -1608,7 +1608,9 @@ def constantSpeedROCD(
         ):
             if AC.BADAFamily.BADAH:
                 epsilon = 3
-                if (CAS_i < (minSpeed-epsilon)) or CAS_i > (maxSpeed+epsilon):
+                if (CAS_i < (minSpeed - epsilon)) or CAS_i > (
+                    maxSpeed + epsilon
+                ):
                     warnings.warn(
                         f"Aircraft out of speed flight envelope at {Hp_i} ft"
                     )
@@ -1619,7 +1621,6 @@ def constantSpeedROCD(
                         f"Aircraft out of speed flight envelope at {Hp_i} ft"
                     )
                     break
-
 
         # compute Energy Share Factor (ESF)
         ESF_i = AC.esf(
@@ -5965,7 +5966,9 @@ def constantSpeedRating(
                 minSpeed = AC.flightEnvelope.VMin(
                     config=config_i, mass=mass_i, theta=theta, delta=delta
                 )
-                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
+                [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(
+                    config=config_i
+                )
                 maxSpeed = AC.flightEnvelope.VMax(
                     h=H_m,
                     HLid=HLid_i,
@@ -5983,8 +5986,10 @@ def constantSpeedRating(
                 maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
 
             elif AC.BADAFamily.BADAH:
-                minSpeed, maxSpeed = AC.flightEnvelope.speedEnvelope_powerLimited(
-                    h=H_m, mass=mass_i, deltaTemp=deltaTemp
+                minSpeed, maxSpeed = (
+                    AC.flightEnvelope.speedEnvelope_powerLimited(
+                        h=H_m, mass=mass_i, deltaTemp=deltaTemp
+                    )
                 )
 
             # stop when out of speed flight envelope

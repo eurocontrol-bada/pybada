@@ -420,7 +420,7 @@ def hpcDescentEmergency(
         deltaTemp=meteo.deltaTemp,
         wS=meteo.wS,
         calculationType=calculationType,
-        applyFlightEnvelope=False
+        applyFlightEnvelope=False,
     )
     trajectory.append(AC, flightTrajectory)
 
@@ -1777,16 +1777,18 @@ def hpcDescentARPM(
             )
             trajectory.append(AC, flightTrajectory)
 
-            TAS_current, Hp_current, mass_current = (
-                trajectory.getFinalValue(AC, ["TAS", "Hp", "mass"])
+            TAS_current, Hp_current, mass_current = trajectory.getFinalValue(
+                AC, ["TAS", "Hp", "mass"]
             )
 
-            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = AC.ARPM.ARPMProcedure(
-                phase="Descent",
-                h=0,
-                deltaTemp=meteo.deltaTemp,
-                mass=mass_current,
-                rating="ARPM",
+            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
+                AC.ARPM.ARPMProcedure(
+                    phase="Descent",
+                    h=0,
+                    deltaTemp=meteo.deltaTemp,
+                    mass=mass_current,
+                    rating="ARPM",
+                )
             )
 
             flightTrajectory = trajectorySegments.constantSpeedROCD(
@@ -1804,8 +1806,8 @@ def hpcDescentARPM(
             )
             trajectory.append(AC, flightTrajectory)
 
-        TAS_current, Hp_current, mass_current = (
-            trajectory.getFinalValue(AC, ["TAS", "Hp", "mass"])
+        TAS_current, Hp_current, mass_current = trajectory.getFinalValue(
+            AC, ["TAS", "Hp", "mass"]
         )
         if (
             calculationType == CalculationType.POINT
@@ -1834,7 +1836,6 @@ def hpcDescentARPM(
                 v_init=TAS_current,
                 v_final=conv.ms2kt(tas),
                 speed_step=abs(conv.ms2kt(tas) - TAS_current),
-
                 Hp_init=Hp_current,
                 control=controlTarget,
                 phase="Cruise",
@@ -2970,37 +2971,41 @@ def apcFlightEnvelope(
             )
 
             Vmin_operational = AC.flightEnvelope.VMin(
-                    config="CR", theta=theta, delta=delta, mass=mass
-                )
+                config="CR", theta=theta, delta=delta, mass=mass
+            )
 
             VmaxCertified = AC.flightEnvelope.VMax(
-                    h=alt_m,
-                    HLid=0,
-                    LG="LGUP",
-                    delta=delta,
-                    theta=theta,
-                    mass=mass,
-                    nz=1.0,
-                )
+                h=alt_m,
+                HLid=0,
+                LG="LGUP",
+                delta=delta,
+                theta=theta,
+                mass=mass,
+                nz=1.0,
+            )
 
             VminCertified = AC.flightEnvelope.VStall(
-                    theta=theta,
-                    delta=delta,
-                    mass=mass,
-                    HLid=0,
-                    LG="LGUP",
-                    nz=1.0,
-                )
+                theta=theta,
+                delta=delta,
+                mass=mass,
+                HLid=0,
+                LG="LGUP",
+                nz=1.0,
+            )
 
             Vmax_thrustLimited = AC.flightEnvelope.Vmax_thrustLimited(
-                    h=alt_m,
-                    mass=mass,
-                    deltaTemp=meteo.deltaTemp,
-                    rating="MCRZ",
-                    config="CR",
-                )
+                h=alt_m,
+                mass=mass,
+                deltaTemp=meteo.deltaTemp,
+                rating="MCRZ",
+                config="CR",
+            )
 
-            if VminCertified is None or VmaxCertified is None or (VminCertified > VmaxCertified):
+            if (
+                VminCertified is None
+                or VmaxCertified is None
+                or (VminCertified > VmaxCertified)
+            ):
                 break
 
             # aircraft speed
