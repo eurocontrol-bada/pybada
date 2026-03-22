@@ -420,6 +420,7 @@ def hpcDescentEmergency(
         deltaTemp=meteo.deltaTemp,
         wS=meteo.wS,
         calculationType=calculationType,
+        applyFlightEnvelope=False,
     )
     trajectory.append(AC, flightTrajectory)
 
@@ -1724,7 +1725,6 @@ def hpcDescentARPM(
             trajectory.append(AC, flightTrajectory)
 
         elif Hp_next == 150 or Hp_next == 5:
-            Hp_speed = Hp_current + 0.1
             [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
                 AC.ARPM.ARPMProcedure(
                     phase="Descent",
@@ -1734,13 +1734,12 @@ def hpcDescentARPM(
                     rating="ARPM",
                 )
             )
-            ROCD_current = conv.m2ft(ROCD) * 60
 
             flightTrajectory = trajectorySegments.constantSpeedROCD(
                 AC=AC,
                 speedType=SpeedType.TAS,
                 v=TAS_current,
-                ROCDtarget=ROCD_current,
+                ROCDtarget=conv.m2ft(ROCD) * 60,
                 Hp_init=Hp_current,
                 Hp_final=Hp_next,
                 Hp_step=pressureAltitude.stepPressureAltitude,
@@ -1751,24 +1750,52 @@ def hpcDescentARPM(
             )
             trajectory.append(AC, flightTrajectory)
 
-        else:  # vertical landing
+        elif Hp_next == 0:  # vertical landing
             [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
                 AC.ARPM.ARPMProcedure(
                     phase="Descent",
-                    h=conv.ft2m(0),
+                    h=Hp_next,
                     deltaTemp=meteo.deltaTemp,
                     mass=mass_current,
                     rating="ARPM",
                 )
             )
-            TAS_current = conv.ms2kt(tas)
-            ROCD_current = conv.m2ft(ROCD) * 60
+
+            flightTrajectory = trajectorySegments.accDec(
+                AC=AC,
+                speedType=SpeedType.TAS,
+                v_init=TAS_current,
+                v_final=0,
+                speed_step=abs(0 - TAS_current),
+                Hp_init=Hp_current,
+                control=controlTarget,
+                phase="Cruise",
+                m_init=mass_current,
+                wS=meteo.wS,
+                deltaTemp=meteo.deltaTemp,
+                calculationType=calculationType,
+            )
+            trajectory.append(AC, flightTrajectory)
+
+            TAS_current, Hp_current, mass_current = trajectory.getFinalValue(
+                AC, ["TAS", "Hp", "mass"]
+            )
+
+            [Pav, Peng, Preq, tas, ROCD, ESF, limitation] = (
+                AC.ARPM.ARPMProcedure(
+                    phase="Descent",
+                    h=0,
+                    deltaTemp=meteo.deltaTemp,
+                    mass=mass_current,
+                    rating="ARPM",
+                )
+            )
 
             flightTrajectory = trajectorySegments.constantSpeedROCD(
                 AC=AC,
                 speedType=SpeedType.TAS,
-                v=TAS_current,
-                ROCDtarget=ROCD_current,
+                v=0,
+                ROCDtarget=conv.m2ft(ROCD) * 60,
                 Hp_init=Hp_current,
                 Hp_final=Hp_next,
                 Hp_step=pressureAltitude.stepPressureAltitude,
@@ -1779,8 +1806,8 @@ def hpcDescentARPM(
             )
             trajectory.append(AC, flightTrajectory)
 
-        CAS_current, TAS_current, Hp_current, mass_current = (
-            trajectory.getFinalValue(AC, ["CAS", "TAS", "Hp", "mass"])
+        TAS_current, Hp_current, mass_current = trajectory.getFinalValue(
+            AC, ["TAS", "Hp", "mass"]
         )
         if (
             calculationType == CalculationType.POINT
@@ -1801,15 +1828,14 @@ def hpcDescentARPM(
             mass=mass_current,
             rating="ARPM",
         )
-        TAS_final = conv.ms2kt(tas)
 
-        if abs(TAS_current - TAS_final) > 3:
+        if abs(TAS_current - conv.ms2kt(tas)) > 3:
             flightTrajectory = trajectorySegments.accDec(
                 AC=AC,
                 speedType=SpeedType.TAS,
                 v_init=TAS_current,
-                v_final=TAS_final,
-                speed_step=abs(TAS_final - TAS_current),
+                v_final=conv.ms2kt(tas),
+                speed_step=abs(conv.ms2kt(tas) - TAS_current),
                 Hp_init=Hp_current,
                 control=controlTarget,
                 phase="Cruise",
@@ -2944,59 +2970,48 @@ def apcFlightEnvelope(
                 h=alt_m, deltaTemp=meteo.deltaTemp
             )
 
-            Vmin_operational = conv.ms2kt(
-                AC.flightEnvelope.VMin(
-                    config="CR", theta=theta, delta=delta, mass=mass
-                )
+            Vmin_operational = AC.flightEnvelope.VMin(
+                config="CR", theta=theta, delta=delta, mass=mass
             )
 
-            Vmax = conv.ms2kt(
-                AC.flightEnvelope.VMax(
-                    h=alt_m,
-                    HLid=0,
-                    LG="LGUP",
-                    delta=delta,
-                    theta=theta,
-                    mass=mass,
-                    nz=1.0,
-                )
+            VmaxCertified = AC.flightEnvelope.VMax(
+                h=alt_m,
+                HLid=0,
+                LG="LGUP",
+                delta=delta,
+                theta=theta,
+                mass=mass,
+                nz=1.0,
             )
 
-            VminCertified = conv.ms2kt(
-                AC.flightEnvelope.VStall(
-                    theta=theta,
-                    delta=delta,
-                    mass=mass,
-                    HLid=0,
-                    LG="LGUP",
-                    nz=1.0,
-                )
+            VminCertified = AC.flightEnvelope.VStall(
+                theta=theta,
+                delta=delta,
+                mass=mass,
+                HLid=0,
+                LG="LGUP",
+                nz=1.0,
             )
 
-            Vmax_thrustLimited = conv.ms2kt(
-                AC.flightEnvelope.Vmax_thrustLimited(
-                    h=alt_m,
-                    mass=mass,
-                    deltaTemp=meteo.deltaTemp,
-                    rating="MCRZ",
-                    config="CR",
-                )
+            Vmax_thrustLimited = AC.flightEnvelope.Vmax_thrustLimited(
+                h=alt_m,
+                mass=mass,
+                deltaTemp=meteo.deltaTemp,
+                rating="MCRZ",
+                config="CR",
             )
 
-            if Hp < crossoverAltitude:
-                VmaxCertified = AC.VMO
-                speedType = "CAS"
-            else:
-                VmaxCertified = AC.MMO
-                speedType = "M"
-
-            if VminCertified is None or VmaxCertified is None:
+            if (
+                VminCertified is None
+                or VmaxCertified is None
+                or (VminCertified > VmaxCertified)
+            ):
                 break
 
             # aircraft speed
             [VminCertified_M, VminCertified_CAS, VminCertified_TAS] = (
                 atm.convertSpeed(
-                    v=VminCertified,
+                    v=conv.ms2kt(VminCertified),
                     speedType="CAS",
                     theta=theta,
                     delta=delta,
@@ -3005,27 +3020,18 @@ def apcFlightEnvelope(
             )
             [VmaxCertified_M, VmaxCertified_CAS, VmaxCertified_TAS] = (
                 atm.convertSpeed(
-                    v=VmaxCertified,
-                    speedType=speedType,
+                    v=conv.ms2kt(VmaxCertified),
+                    speedType="CAS",
                     theta=theta,
                     delta=delta,
                     sigma=sigma,
                 )
             )
 
-            # limit the calcuation to where the max certified speed is lower than min certified speed
-            if VminCertified_CAS > VmaxCertified_CAS:
-                break
-
-            if Hp < crossoverAltitude:
-                VMAX = Vmax_thrustLimited
-            else:
-                VMAX = Vmax
-
             if (
-                VMAX is None
+                Vmax_thrustLimited is None
                 or Vmin_operational is None
-                or (Vmin_operational > VMAX)
+                or (Vmin_operational > Vmax_thrustLimited)
             ):
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = [None, None, None]
                 [Vmin_M, Vmin_CAS, Vmin_TAS] = [None, None, None]
@@ -3055,14 +3061,14 @@ def apcFlightEnvelope(
 
             else:
                 [Vmin_M, Vmin_CAS, Vmin_TAS] = atm.convertSpeed(
-                    v=Vmin_operational,
+                    v=conv.ms2kt(Vmin_operational),
                     speedType="CAS",
                     theta=theta,
                     delta=delta,
                     sigma=sigma,
                 )
                 [Vmax_M, Vmax_CAS, Vmax_TAS] = atm.convertSpeed(
-                    v=VMAX,
+                    v=conv.ms2kt(Vmax_thrustLimited),
                     speedType="CAS",
                     theta=theta,
                     delta=delta,
