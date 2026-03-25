@@ -18,6 +18,10 @@ class FlightTrajectory:
     def __init__(self):
         self.flightData = {}
 
+    def __bool__(self):
+        """Defines the 'truthiness' of the object."""
+        return bool(self.flightData)
+
     def createFT(self):
         """Creates and returns an empty DataFrame for storing aircraft flight
         trajectory data. This DataFrame includes various flight parameters

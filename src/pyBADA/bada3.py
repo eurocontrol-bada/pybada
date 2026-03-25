@@ -2509,7 +2509,7 @@ class FlightEnvelope(BADA3):
 
         if phase == "Climb" and h_AGL <= HmaxTO_AGL:
             config = "TO"
-        elif phase == "Climb" and (h_AGL > HmaxTO_AGL and h_AGL <= HmaxIC_AGL):
+        elif phase == "Climb" and (h_AGL > HmaxTO_AGL and h_AGL < HmaxIC_AGL):
             config = "IC"
         else:
             vMinCR = self.VMin(
@@ -2540,7 +2540,7 @@ class FlightEnvelope(BADA3):
             ):
                 config = "AP"
             elif (
-                (phase == "Climb" and h_AGL > HmaxIC_AGL)
+                (phase == "Climb" and h_AGL >= HmaxIC_AGL)
                 or phase == "Cruise"
                 or (phase == "Descent" and h_AGL >= HmaxAPP_AGL)
                 or (

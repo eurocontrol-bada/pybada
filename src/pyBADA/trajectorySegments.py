@@ -389,18 +389,17 @@ def constantSpeedLevel(
             )
             break
 
-        if AC.BADAFamily.BADAH:
-            if (CAS_i < minSpeed and H_m > 0) or CAS_i > maxSpeed:
-                warnings.warn(
-                    f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                )
-                break
-        else:
-            if (CAS_i < minSpeed) or CAS_i > maxSpeed:
-                warnings.warn(
-                    f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                )
-                break
+        epsilon = 3
+        if CAS_i < (minSpeed - epsilon):
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+            )
+            break
+        elif CAS_i > (maxSpeed + epsilon):
+            warnings.warn(
+                f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+            )
+            break
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -1606,21 +1605,17 @@ def constantSpeedROCD(
         if (phase == "Climb" and Hp_i < Hp_final) or (
             phase == "Descent" and Hp_i > Hp_final
         ):
-            if AC.BADAFamily.BADAH:
-                epsilon = 3
-                if (CAS_i < (minSpeed - epsilon)) or CAS_i > (
-                    maxSpeed + epsilon
-                ):
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                    )
-                    break
-            else:
-                if (CAS_i < minSpeed) or CAS_i > maxSpeed:
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                    )
-                    break
+            epsilon = 3
+            if CAS_i < (minSpeed - epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                )
+                break
+            elif CAS_i > (maxSpeed + epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                )
+                break
 
         # compute Energy Share Factor (ESF)
         ESF_i = AC.esf(
@@ -2701,18 +2696,17 @@ def constantSpeedROCD_time(
             if (phase == "Climb" and Hp_i < Hp_final) or (
                 phase == "Descent" and Hp_i > Hp_final
             ):
-                if AC.BADAFamily.BADAH:
-                    if (CAS_i < minSpeed and H_m > 0) or CAS_i > maxSpeed:
-                        warnings.warn(
-                            f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                        )
-                        break
-                else:
-                    if (CAS_i < minSpeed) or CAS_i > maxSpeed:
-                        warnings.warn(
-                            f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                        )
-                        break
+                epsilon = 3
+                if CAS_i < (minSpeed - epsilon):
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                    )
+                    break
+                elif CAS_i > (maxSpeed + epsilon):
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                    )
+                    break
 
             # compute Energy Share Factor (ESF)
             ESF_i = AC.esf(
@@ -3782,18 +3776,17 @@ def constantSpeedSlope(
         if (phase == "Climb" and Hp_i < Hp_final) or (
             phase == "Descent" and Hp_i > Hp_final
         ):
-            if AC.BADAFamily.BADAH:
-                if (CAS_i < minSpeed and H_m > 0) or CAS_i > maxSpeed:
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                    )
-                    break
-            else:
-                if (CAS_i < minSpeed) or CAS_i > maxSpeed:
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                    )
-                    break
+            epsilon = 3
+            if CAS_i < (minSpeed - epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                )
+                break
+            elif CAS_i > (maxSpeed + epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                )
+                break
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -4873,18 +4866,17 @@ def constantSpeedSlope_time(
             if (phase == "Climb" and Hp_i < Hp_final) or (
                 phase == "Descent" and Hp_i > Hp_final
             ):
-                if AC.BADAFamily.BADAH:
-                    if (CAS_i < minSpeed and H_m > 0) or CAS_i > maxSpeed:
-                        warnings.warn(
-                            f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                        )
-                        break
-                else:
-                    if (CAS_i < minSpeed) or CAS_i > maxSpeed:
-                        warnings.warn(
-                            f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                        )
-                        break
+                epsilon = 3
+                if CAS_i < (minSpeed - epsilon):
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                    )
+                    break
+                elif CAS_i > (maxSpeed + epsilon):
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                    )
+                    break
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
@@ -5947,7 +5939,6 @@ def constantSpeedRating(
         [M_i, CAS_i, TAS_i] = atm.convertSpeed(
             v=v, speedType=speedType, theta=theta, delta=delta, sigma=sigma
         )
-
         # check for speed flight envelope
         if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
             if config_default is None:
@@ -6002,26 +5993,17 @@ def constantSpeedRating(
             if (phase == "Climb" and Hp_i < Hp_final) or (
                 phase == "Descent" and Hp_i > Hp_final
             ):
-                if AC.BADAFamily.BADAH:
-                    if CAS_i < minSpeed or CAS_i > maxSpeed:
-                        warnings.warn(
-                            f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                        )
-                        break
-                else:
-                    if (CAS_i < minSpeed) or CAS_i > maxSpeed:
-                        warnings.warn(
-                            f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                        )
-                        break
-
-        # if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
-        # if CAS_i < minSpeed:
-        # correctedSpeed = conv.ms2kt(minSpeed)
-        # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
-        # elif CAS_i > maxSpeed:
-        # correctedSpeed = conv.ms2kt(maxSpeed)
-        # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+                epsilon = 3
+                if CAS_i < (minSpeed - epsilon):
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                    )
+                    break
+                elif CAS_i > (maxSpeed + epsilon):
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                    )
+                    break
 
         if turnFlight:
             if turnMetrics["bankAngle"] != 0.0:
@@ -7028,26 +7010,17 @@ def constantSpeedRating_time(
             if (phase == "Climb" and Hp_i < Hp_final) or (
                 phase == "Descent" and Hp_i > Hp_final
             ):
-                if AC.BADAFamily.BADAH:
-                    if (CAS_i < minSpeed and H_m > 0) or CAS_i > maxSpeed:
-                        warnings.warn(
-                            f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                        )
-                        break
-                else:
-                    if (CAS_i < minSpeed) or CAS_i > maxSpeed:
-                        warnings.warn(
-                            f"Aircraft out of speed flight envelope at {Hp_i} ft"
-                        )
-                        break
-
-            # if (phase == "Climb" and Hp_i < Hp_final) or (phase == "Descent" and Hp_i > Hp_final):
-            # if CAS_i < minSpeed:
-            # correctedSpeed = conv.ms2kt(minSpeed)
-            # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
-            # elif CAS_i > maxSpeed:
-            # correctedSpeed = conv.ms2kt(maxSpeed)
-            # [M_i, CAS_i, TAS_i] = atm.convertSpeed(v=correctedSpeed, speedType="CAS", theta=theta, delta=delta, sigma=sigma)
+                epsilon = 3
+                if CAS_i < (minSpeed - epsilon):
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                    )
+                    break
+                elif CAS_i > (maxSpeed + epsilon):
+                    warnings.warn(
+                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                    )
+                    break
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
@@ -8151,37 +8124,6 @@ def accDec(
                     delta=delta,
                     sigma=sigma,
                 )
-
-                # check for speed flight envelope
-                # if AC.BADAFamily.BADA4 or AC.BADAFamily.BADA3:
-                # if config_default is None:
-                # config_i = AC.flightEnvelope.getConfig(
-                # h=H_m,
-                # phase="Cruise",
-                # v=CAS_i,
-                # mass=mass_i,
-                # deltaTemp=deltaTemp,
-                # )
-                # else:
-                # config_i = config_default
-
-                # if AC.BADAFamily.BADA4:
-                # minSpeed = AC.flightEnvelope.VMin(config=config_i, mass=mass_i, theta=theta, delta=delta)
-                # [HLid_i, LG_i] = AC.flightEnvelope.getAeroConfig(config=config_i)
-                # maxSpeed = AC.flightEnvelope.VMax(h=H_m, HLid=HLid_i, LG=LG_i, theta=theta, delta=delta, mass=mass_i, nz=1.2)
-
-                # if AC.BADAFamily.BADA3:
-                # minSpeed = AC.flightEnvelope.VMin(h=H_m, mass=mass_i, config=config_i, deltaTemp=deltaTemp)
-                # maxSpeed = AC.flightEnvelope.VMax(h=H_m, deltaTemp=deltaTemp)
-
-                # stop when out of speed flight envelope
-                # if minSpeed is None or maxSpeed is None:
-                # warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft - unable to calculate min/max speed")
-                # break
-
-                # if CAS_i < minSpeed or CAS_i > maxSpeed:
-                # warnings.warn(f"Aircraft out of speed flight envelope at {Hp_i} ft")
-                # break
 
                 if turnFlight:
                     if turnMetrics["bankAngle"] != 0.0:
