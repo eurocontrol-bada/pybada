@@ -65,19 +65,6 @@ def climbDescentRate(
 
     trajectory = FT()
 
-    if speedBrakes is None:
-        speedBrakes = myTypes.SpeedBrakes(deployed=0, value=0)
-    else:
-        if speedBrakes.value is None:
-            speedBrakesValue = 0.0
-        else:
-            speedBrakesValue = abs(min(speedBrakes.value, 100) * (0.03 / 100))
-
-        speedBrakes = {
-            "deployed": speedBrakes.deployed,
-            "value": speedBrakesValue,
-        }
-
     flightTrajectory = trajectorySegments.constantSpeedROCD(
         AC=AC,
         speedType=speed.speedType,
@@ -132,19 +119,6 @@ def climbDescentSlope(
     """
 
     trajectory = FT()
-
-    if speedBrakes is None:
-        speedBrakes = myTypes.SpeedBrakes(deployed=0, value=0)
-    else:
-        if speedBrakes.value is None:
-            speedBrakesValue = 0.0
-        else:
-            speedBrakesValue = abs(min(speedBrakes.value, 100) * (0.03 / 100))
-
-        speedBrakes = {
-            "deployed": speedBrakes.deployed,
-            "value": speedBrakesValue,
-        }
 
     flightTrajectory = trajectorySegments.constantSpeedSlope(
         AC=AC,
@@ -203,19 +177,6 @@ def climbDescentAccelerationDeceleration(
     """
 
     trajectory = FT()
-
-    if speedBrakes is None:
-        speedBrakes = myTypes.SpeedBrakes(deployed=0, value=0)
-    else:
-        if speedBrakes.value is None:
-            speedBrakesValue = 0.0
-        else:
-            speedBrakesValue = abs(min(speedBrakes.value, 100) * (0.03 / 100))
-
-        speedBrakes = {
-            "deployed": speedBrakes.deployed,
-            "value": speedBrakesValue,
-        }
 
     if calculationType == calculationType.POINT:
         stepSpeed = abs(speed.finalSpeed - speed.initSpeed)
@@ -2502,19 +2463,6 @@ def apcLevelAccelerationDeceleration(
     """
 
     trajectory = FT()
-
-    if speedBrakes is None:
-        speedBrakes = myTypes.SpeedBrakes(deployed=0, value=0)
-    else:
-        if speedBrakes.value is None:
-            speedBrakesValue = 0.0
-        else:
-            speedBrakesValue = abs(min(speedBrakes.value, 100) * (0.03 / 100))
-
-        speedBrakes = {
-            "deployed": speedBrakes.deployed,
-            "value": speedBrakesValue,
-        }
 
     flightTrajectory = trajectorySegments.accDec(
         AC=AC,

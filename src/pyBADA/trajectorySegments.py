@@ -11,6 +11,7 @@ from pyBADA import atmosphere as atm
 from pyBADA import constants as const
 from pyBADA import conversions as conv
 from pyBADA import utils
+from pyBADA import myTypes
 from pyBADA.flightTrajectory import FlightTrajectory as FT
 from pyBADA.geodesic import RhumbLine as rhumb
 from pyBADA.geodesic import Turn as turn
@@ -43,6 +44,7 @@ def constantSpeedLevel(
     initialHeading={"magnetic": None, "true": None, "constantHeading": None},
     flightPhase="Cruise",
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     **kwargs,
 ):
     """Calculates the time, fuel consumption, and other parameters for a level
@@ -78,10 +80,10 @@ def constantSpeedLevel(
         - constantHeading: Whether to fly along a constant heading (loxodrome). Default is None.
     :param flightPhase: Defines the phase of flight, e.g., "Cruise", "Climb", "Descent". Default is "Cruise".
     :param magneticDeclinationGrid: Optional magnetic declination grid to correct headings. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param kwargs: Additional optional parameters:
 
         - SOC_init: Initial battery state of charge for electric aircraft [%]. Default is 100 for BADAE.
-        - speedBrakes: Dictionary defining whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum rate of climb/descent threshold to identify service ceiling [ft/min]. Default varies by aircraft type.
         - config: Default aerodynamic configuration. Values: TO, IC, CR, AP, LD.
         - HpStep: Altitude step for step climb [ft]. Default is 2000 ft.
@@ -185,12 +187,6 @@ def constantSpeedLevel(
         SOC_init = kwargs.get("SOC_init", 100)
     else:
         SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
 
     # optional parameter - iteration step length based on the type of aircraft
     if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -1232,6 +1228,7 @@ def constantSpeedROCD(
     reducedPower=None,
     directionOfTurn=None,
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     **kwargs,
 ):
     """Computes the time, fuel consumption, and other parameters required for
@@ -1268,11 +1265,11 @@ def constantSpeedROCD(
     :param reducedPower: Boolean specifying whether to apply reduced power during the climb. Default is None.
     :param directionOfTurn: Direction of the turn {LEFT, RIGHT}. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declinations used to correct headings. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param kwargs: Additional optional parameters:
 
         - Hp_step: Altitude step size [ft]. Default is 1000 for BADA3/4, 500 for BADAH/BADAE.
         - SOC_init: Initial state of charge for electric aircraft [%]. Default is 100 for BADAE.
-        - speedBrakes: Dictionary specifying whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum ROCD to identify the service ceiling [ft/min]. Default varies by aircraft type.
         - config: Default aerodynamic configuration. Values: TO, IC, CR, AP, LD. Default is None.
         - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
@@ -1376,12 +1373,6 @@ def constantSpeedROCD(
         SOC_init = kwargs.get("SOC_init", 100)
     else:
         SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
 
     # optional parameter - iteration step for altitude loop
     if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -2333,6 +2324,7 @@ def constantSpeedROCD_time(
     reducedPower=None,
     directionOfTurn=None,
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     **kwargs,
 ):
     """Computes the time, fuel consumption, and performance parameters
@@ -2368,11 +2360,11 @@ def constantSpeedROCD_time(
     :param reducedPower: Boolean specifying whether to apply reduced power during the climb. Default is None.
     :param directionOfTurn: Direction of the turn {LEFT, RIGHT}. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declinations used to correct headings. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param kwargs: Additional optional parameters:
 
         - step_length: Step size in seconds for time iteration. Default is 1 second.
         - SOC_init: Initial state of charge for electric aircraft [%]. Default is 100 for BADAE.
-        - speedBrakes: Dictionary specifying whether speed brakes are deployed and their drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum ROCD to identify the service ceiling [ft/min]. Default varies by aircraft type.
         - config: Default aerodynamic configuration. Values: TO, IC, CR, AP, LD. Default is None.
         - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
@@ -2471,12 +2463,6 @@ def constantSpeedROCD_time(
         SOC_init = kwargs.get("SOC_init", 100)
     else:
         SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
 
     # step size in [s]
     step_length = kwargs.get("step_length", 1)
@@ -3415,6 +3401,7 @@ def constantSpeedSlope(
     reducedPower=None,
     directionOfTurn=None,
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     **kwargs,
 ):
     """Calculates time, fuel consumption, and other parameters required for an
@@ -3450,11 +3437,11 @@ def constantSpeedSlope(
     :param reducedPower: Boolean specifying if reduced power is applied during the climb. Default is None.
     :param directionOfTurn: Direction of the turn {LEFT, RIGHT}. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param kwargs: Additional optional parameters:
 
         - Hp_step: Step size in altitude for the iterative calculation [ft]. Default is 1000 ft for BADA3/BADA4, 500 ft for BADAH/BADAE.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
-        - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum rate of climb/descent used to determine service ceiling [ft/min]. Default varies based on aircraft type.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
         - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
@@ -3553,12 +3540,6 @@ def constantSpeedSlope(
         SOC_init = kwargs.get("SOC_init", 100)
     else:
         SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
 
     # optional parameter - iteration step for altitude loop
     if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -4509,6 +4490,7 @@ def constantSpeedSlope_time(
     reducedPower=None,
     directionOfTurn=None,
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     **kwargs,
 ):
     """Computes the time, fuel, and trajectory parameters required by an
@@ -4541,13 +4523,13 @@ def constantSpeedSlope_time(
     :param reducedPower: Boolean specifying if reduced power is applied during climb/descent. Default is None.
     :param directionOfTurn: Direction of turn {LEFT, RIGHT}. Default is None.
     :param magneticDeclinationGrid: Optional magnetic declination grid for correcting magnetic heading. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param kwargs: Additional optional parameters:
 
         - step_length: Step length for trajectory calculation [s]. Default is 1 second.
         - Hp_step: Altitude step size for calculations [ft]. Default is 1000 ft for BADA3/BADA4, 500 ft for BADAH/BADAE.
         - SOC_init: Initial battery state of charge (for electric aircraft) [%]. Default is 100.
         - config: Default aerodynamic configuration {TO, IC, CR, AP, LD}. If not provided, configuration is calculated automatically.
-        - speedBrakes: Dictionary specifying if speed brakes are deployed and additional drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum Rate of Climb/Descent to determine service ceiling [ft/min]. Defaults depend on aircraft type and engine.
         - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
         - m_iter: Number of iterations for mass integration. Default is 5.
@@ -4645,12 +4627,6 @@ def constantSpeedSlope_time(
         SOC_init = kwargs.get("SOC_init", 100)
     else:
         SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
 
     # step size in [s]
     step_length = kwargs.get("step_length", 1)
@@ -5597,6 +5573,7 @@ def constantSpeedRating(
     directionOfTurn=None,
     expedite=False,
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     initRating=None,
     applyFlightEnvelope=True,
     **kwargs,
@@ -5634,13 +5611,13 @@ def constantSpeedRating(
     :param directionOfTurn: Direction of the turn {LEFT, RIGHT}. Default is None.
     :param expedite: Boolean flag to expedite climb/descent. Default is False.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param initRating: Defines the engine rating used for the calculation
     :param applyFlightEnvelope: Boolean flag to define if operational flight envelope is applied or not. Default is True.
     :param kwargs: Additional optional parameters:
 
         - Hp_step: Step size in altitude for the iterative calculation [ft]. Default is 1000 ft for BADA3/BADA4, 500 ft for BADAH/BADAE.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
-        - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum rate of climb/descent used to determine service ceiling [ft/min]. Default varies based on aircraft type.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
         - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
@@ -5739,12 +5716,6 @@ def constantSpeedRating(
         SOC_init = kwargs.get("SOC_init", 100)
     else:
         SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
 
     # optional parameter - iteration step for altitude loop
     if AC.BADAFamily.BADAH or AC.BADAFamily.BADAE:
@@ -6615,6 +6586,7 @@ def constantSpeedRating_time(
     directionOfTurn=None,
     expedite=False,
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     initRating=None,
     **kwargs,
 ):
@@ -6651,12 +6623,12 @@ def constantSpeedRating_time(
     :param directionOfTurn: Direction of the turn {LEFT, RIGHT}. Default is None.
     :param expedite: Boolean flag to expedite the climb/descent. Default is False.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param initRating: Initial engine rating settings. Default is None.
     :param kwargs: Additional optional parameters:
 
         - step_length: Step size in time for the iterative calculation [s]. Default is 1 s.
         - SOC_init: Initial battery state of charge for electric aircraft (BADAE) [%]. Default is 100.
-        - speedBrakes: A dictionary specifying whether speed brakes are deployed and the additional drag coefficient {deployed: False, value: 0.03}.
         - ROCD_min: Minimum rate of climb/descent to determine service ceiling [ft/min]. Default varies by aircraft type.
         - config: Default aerodynamic configuration (TO, IC, CR, AP, LD). Default is None.
         - calculationType: String indicating whether calculation is performed as INTEGRATED or POINT. Default is INTEGRATED.
@@ -6755,12 +6727,6 @@ def constantSpeedRating_time(
         SOC_init = kwargs.get("SOC_init", 100)
     else:
         SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
 
     # step size in [s]
     step_length = kwargs.get("step_length", 1)
@@ -7620,6 +7586,7 @@ def accDec(
     initialHeading={"magnetic": None, "true": None, "constantHeading": None},
     reducedPower=None,
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     suppressWarnings=False,
     **kwargs,
 ):
@@ -7670,6 +7637,7 @@ def accDec(
         - constantHeading: Whether to maintain a constant heading. Default is None.
     :param reducedPower: Boolean specifying if reduced power is applied during the climb. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param suppressWarnings: Boolean to enable suppressing the warning messages
     :param kwargs: Additional optional parameters:
 
@@ -7781,12 +7749,6 @@ def accDec(
             SOC_init = kwargs.get("SOC_init", 100)
         else:
             SOC_init = None
-
-        # speed brakes application
-        if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-            speedBrakes = kwargs.get(
-                "speedBrakes", {"deployed": False, "value": 0.03}
-            )
 
         # iteratin step of speed loop
         if speedType == "M":
@@ -8985,6 +8947,7 @@ def accDec_time(
     initialHeading={"magnetic": None, "true": None, "constantHeading": None},
     reducedPower=None,
     magneticDeclinationGrid=None,
+    speedBrakes: myTypes.SpeedBrakes | None = None,
     **kwargs,
 ):
     """Calculates the time, fuel consumption, and other key flight parameters
@@ -9035,6 +8998,7 @@ def accDec_time(
         - constantHeading: Whether to maintain a constant heading. Default is None.
     :param reducedPower: Boolean specifying if reduced power is applied during the climb. Default is None.
     :param magneticDeclinationGrid: Optional grid of magnetic declination used to correct magnetic heading. Default is None.
+    :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
     :param kwargs: Additional optional parameters:
 
         - step_length: Length of each time step in the calculation [s]. Default is 1 second.
@@ -9136,12 +9100,6 @@ def accDec_time(
         SOC_init = kwargs.get("SOC_init", 100)
     else:
         SOC_init = None
-
-    # speed brakes application
-    if AC.BADAFamily.BADA3 or AC.BADAFamily.BADA4:
-        speedBrakes = kwargs.get(
-            "speedBrakes", {"deployed": False, "value": 0.03}
-        )
 
     # step size in [s]
     step_length = kwargs.get("step_length", 1)
