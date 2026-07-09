@@ -12,8 +12,7 @@ from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const
 from pyBADA import conversions as conv
-from pyBADA import utils
-from pyBADA import myTypes
+from pyBADA import myTypes, utils
 from pyBADA.aircraft import Airplane, Bada, BadaFamily
 
 

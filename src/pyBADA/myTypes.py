@@ -51,7 +51,7 @@ class SpeedBrakes:
     percent: float | None = None
 
     # Define the conversion factor for drag increment to be used later
-    MAX_DRAG_INCREMENT: float = 0.03 
+    MAX_DRAG_INCREMENT: float = 0.03
 
     @property
     def coefficient(self) -> float:
