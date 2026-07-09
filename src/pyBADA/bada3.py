@@ -12,7 +12,7 @@ from pyBADA import atmosphere as atm
 from pyBADA import configuration as configuration
 from pyBADA import constants as const
 from pyBADA import conversions as conv
-from pyBADA import utils
+from pyBADA import myTypes, utils
 from pyBADA.aircraft import Airplane, Bada, BadaFamily
 
 
@@ -1577,7 +1577,7 @@ class BADA3(Airplane, Bada):
         CL,
         config,
         expedite=False,
-        speedBrakes={"deployed": False, "value": 0.03},
+        speedBrakes: myTypes.SpeedBrakes | None = None,
     ):
         """Computes the drag coefficient based on the lift coefficient and
         aircraft configuration.
@@ -1587,12 +1587,11 @@ class BADA3(Airplane, Bada):
             'TO', 'AP', 'LD').
         :param expedite: Flag indicating if expedite descent is used (default
             is False).
-        :param speedBrakes: Dictionary indicating if speed brakes are deployed
-            and their effect.
+        :param speedBrakes: SpeedBrakes object containing the deployment percentage. Default is None.
         :type CL: float
         :type config: str
         :type expedite: bool
-        :type speedBrakes: dict
+        :type speedBrakes: myTypes.SpeedBrakes.
         :returns: Drag coefficient [-].
         :rtype: float
         :raises: ValueError if an invalid configuration is provided.
@@ -1660,11 +1659,8 @@ class BADA3(Airplane, Bada):
                     return float("Nan")
 
         # implementation of a simple speed brakes model
-        if speedBrakes["deployed"]:
-            if speedBrakes["value"] is not None:
-                CD = CD + speedBrakes["value"]
-            else:
-                CD = CD + 0.03
+        if speedBrakes is not None and speedBrakes.coefficient > 0.0:
+            CD = CD + speedBrakes.coefficient
             return CD
 
         # expedite descent

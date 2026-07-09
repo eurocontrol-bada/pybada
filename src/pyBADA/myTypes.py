@@ -48,8 +48,20 @@ class Speed:
 
 @dataclass
 class SpeedBrakes:
-    deployed: float | None = None
-    value: float | None = None
+    percent: float | None = None
+
+    # Define the conversion factor for drag increment to be used later
+    MAX_DRAG_INCREMENT: float = 0.03
+
+    @property
+    def coefficient(self) -> float:
+        """Calculates the final scaled value (0.0 to MAX_DRAG_INCREMENT) based on the percentage."""
+        if self.percent is None or self.percent <= 0:
+            return 0.0
+
+        # Cap at 100% and calculate the scaled value
+        capped_percent = min(self.percent, 100.0)
+        return (capped_percent / 100.0) * self.MAX_DRAG_INCREMENT
 
 
 @dataclass

@@ -65,19 +65,6 @@ def climbDescentRate(
 
     trajectory = FT()
 
-    if speedBrakes is None:
-        speedBrakes = myTypes.SpeedBrakes(deployed=0, value=0)
-    else:
-        if speedBrakes.value is None:
-            speedBrakesValue = 0.0
-        else:
-            speedBrakesValue = abs(min(speedBrakes.value, 100) * (0.03 / 100))
-
-        speedBrakes = {
-            "deployed": speedBrakes.deployed,
-            "value": speedBrakesValue,
-        }
-
     flightTrajectory = trajectorySegments.constantSpeedROCD(
         AC=AC,
         speedType=speed.speedType,
@@ -132,19 +119,6 @@ def climbDescentSlope(
     """
 
     trajectory = FT()
-
-    if speedBrakes is None:
-        speedBrakes = myTypes.SpeedBrakes(deployed=0, value=0)
-    else:
-        if speedBrakes.value is None:
-            speedBrakesValue = 0.0
-        else:
-            speedBrakesValue = abs(min(speedBrakes.value, 100) * (0.03 / 100))
-
-        speedBrakes = {
-            "deployed": speedBrakes.deployed,
-            "value": speedBrakesValue,
-        }
 
     flightTrajectory = trajectorySegments.constantSpeedSlope(
         AC=AC,
@@ -204,19 +178,6 @@ def climbDescentAccelerationDeceleration(
 
     trajectory = FT()
 
-    if speedBrakes is None:
-        speedBrakes = myTypes.SpeedBrakes(deployed=0, value=0)
-    else:
-        if speedBrakes.value is None:
-            speedBrakesValue = 0.0
-        else:
-            speedBrakesValue = abs(min(speedBrakes.value, 100) * (0.03 / 100))
-
-        speedBrakes = {
-            "deployed": speedBrakes.deployed,
-            "value": speedBrakesValue,
-        }
-
     if calculationType == calculationType.POINT:
         stepSpeed = abs(speed.finalSpeed - speed.initSpeed)
     else:
@@ -238,7 +199,7 @@ def climbDescentAccelerationDeceleration(
         m_init=mass,
         deltaTemp=meteo.deltaTemp,
         wS=meteo.wS,
-        control=controlTarget,
+        controlTarget=controlTarget,
         speedBrakes=speedBrakes,
         calculationType=calculationType,
     )
@@ -805,7 +766,7 @@ def apcClimbCasMach(
                         v_final=CAS_final,
                         speed_step=speed.stepSpeed,
                         Hp_init=Hp_current,
-                        control=controlTarget,
+                        controlTarget=controlTarget,
                         phase="Cruise",
                         config=config_current,
                         m_init=massCurrent,
@@ -838,7 +799,7 @@ def apcClimbCasMach(
                         v_final=CAS_final,
                         speed_step=speed.stepSpeed,
                         Hp_init=Hp_final,
-                        control=controlTarget,
+                        controlTarget=controlTarget,
                         phase="Climb",
                         config=config_current,
                         m_init=massCurrent,
@@ -888,7 +849,7 @@ def apcClimbCasMach(
                         v_final=CAS_final,
                         speed_step=speed.stepSpeed,
                         Hp_init=Hp_current,
-                        control=controlTarget,
+                        controlTarget=controlTarget,
                         phase="Climb",
                         config=config_current,
                         m_init=massCurrent,
@@ -949,7 +910,7 @@ def apcClimbCasMach(
                         v_final=CAS_final,
                         speed_step=speed.stepSpeed,
                         Hp_init=Hp_current,
-                        control=controlTarget,
+                        controlTarget=controlTarget,
                         phase="Climb",
                         config=config_current,
                         m_init=massCurrent,
@@ -1272,7 +1233,7 @@ def apcDescentCasMach(
                         v_final=CAS_final,
                         speed_step=speed.stepSpeed,
                         Hp_init=Hp_current,
-                        control=controlTarget,
+                        controlTarget=controlTarget,
                         phase="Cruise",
                         m_init=mass_current,
                         wS=meteo.wS,
@@ -1333,7 +1294,7 @@ def apcDescentCasMach(
                         v_final=CAS_final,
                         speed_step=speed.stepSpeed,
                         Hp_init=Hp_current,
-                        control=controlTarget,
+                        controlTarget=controlTarget,
                         phase="Descent",
                         m_init=mass_current,
                         wS=meteo.wS,
@@ -1375,7 +1336,7 @@ def apcDescentCasMach(
                             v_final=CAS_final,
                             speed_step=speed.stepSpeed,
                             Hp_init=Hp_final,
-                            control=controlTarget,
+                            controlTarget=controlTarget,
                             phase="Descent",
                             config=config_current,
                             m_init=mass_current,
@@ -1428,7 +1389,7 @@ def apcDescentCasMach(
                         v_final=CAS_final,
                         speed_step=speed.stepSpeed,
                         Hp_init=Hp_current,
-                        control=controlTarget,
+                        controlTarget=controlTarget,
                         phase="Descent",
                         m_init=mass_current,
                         wS=meteo.wS,
@@ -1614,7 +1575,7 @@ def hpcClimbARPM(
                 v_final=TAS_final,
                 speed_step=abs(TAS_final - TAS_current),
                 Hp_init=Hp_current,
-                control=controlTarget,
+                controlTarget=controlTarget,
                 phase="Cruise",
                 m_init=mass_current,
                 wS=meteo.wS,
@@ -1768,7 +1729,7 @@ def hpcDescentARPM(
                 v_final=0,
                 speed_step=abs(0 - TAS_current),
                 Hp_init=Hp_current,
-                control=controlTarget,
+                controlTarget=controlTarget,
                 phase="Cruise",
                 m_init=mass_current,
                 wS=meteo.wS,
@@ -1841,7 +1802,7 @@ def hpcDescentARPM(
                     v_final=conv.ms2kt(tas),
                     speed_step=abs(conv.ms2kt(tas) - TAS_current),
                     Hp_init=Hp_current,
-                    control=controlTarget,
+                    controlTarget=controlTarget,
                     phase="Cruise",
                     m_init=mass_current,
                     wS=meteo.wS,
@@ -2502,19 +2463,6 @@ def apcLevelAccelerationDeceleration(
     """
 
     trajectory = FT()
-
-    if speedBrakes is None:
-        speedBrakes = myTypes.SpeedBrakes(deployed=0, value=0)
-    else:
-        if speedBrakes.value is None:
-            speedBrakesValue = 0.0
-        else:
-            speedBrakesValue = abs(min(speedBrakes.value, 100) * (0.03 / 100))
-
-        speedBrakes = {
-            "deployed": speedBrakes.deployed,
-            "value": speedBrakesValue,
-        }
 
     flightTrajectory = trajectorySegments.accDec(
         AC=AC,

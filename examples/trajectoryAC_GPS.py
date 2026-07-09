@@ -14,7 +14,7 @@ from pyBADA.bada4 import Bada4Aircraft
 from pyBADA.bada4 import Parser as Bada4Parser
 from pyBADA.flightTrajectory import FlightTrajectory as FT
 from pyBADA.magnetic import Grid
-from pyBADA.myTypes import ControlTarget
+from pyBADA.myTypes import ControlTarget, SpeedBrakes
 
 badaVersion = "DUMMY"
 
@@ -925,7 +925,7 @@ flightTrajectory = trajectorySegments.accDec(
     controlTarget=ControlTarget(slopetarget=-3.0),
     phase="Descent",
     config="AP",
-    speedBrakes={"deployed": True, "value": 0.03},
+    speedBrakes=SpeedBrakes(percent=100),
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
@@ -1002,7 +1002,7 @@ flightTrajectory = trajectorySegments.accDec(
     controlTarget=ControlTarget(slopetarget=-3.0),
     phase="Descent",
     config="LD",
-    speedBrakes={"deployed": True, "value": 0.03},
+    speedBrakes=SpeedBrakes(percent=100),
     m_init=m_final,
     wS=wS,
     bankAngle=ba,
@@ -1080,7 +1080,7 @@ if AC.BADAFamily.BADA3:
         controlTarget=ControlTarget(slopetarget=-3.0),
         phase="Descent",
         config="LD",
-        speedBrakes={"deployed": True, "value": 0.03},
+        speedBrakes=SpeedBrakes(percent=100),
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
@@ -1180,7 +1180,7 @@ if AC.BADAFamily.BADA3:
         controlTarget=ControlTarget(slopetarget=-3.0),
         phase="Descent",
         config=None,
-        speedBrakes={"deployed": True, "value": 0.03},
+        speedBrakes=SpeedBrakes(percent=100),
         m_init=m_final,
         wS=wS,
         bankAngle=ba,
