@@ -36,7 +36,7 @@ dev = [
   "sphinx-gallery==0.21.0",
   "matplotlib==3.11.0",
   "folium==0.20.0",
-  "pytest==9.0.2",
+  "pytest==9.1.1",
   "build==1.5.1",
   "twine==6.2.0",
   "readthedocs-sphinx-search>=0.3.2",
