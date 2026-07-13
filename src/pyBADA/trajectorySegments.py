@@ -2678,20 +2678,17 @@ def constantSpeedROCD_time(
                 )
                 break
 
-            if (phase == "Climb" and Hp_i < Hp_final) or (
-                phase == "Descent" and Hp_i > Hp_final
-            ):
-                epsilon = 3
-                if CAS_i < (minSpeed - epsilon):
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
-                    )
-                    break
-                elif CAS_i > (maxSpeed + epsilon):
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
-                    )
-                    break
+            epsilon = 3
+            if CAS_i < (minSpeed - epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                )
+                break
+            elif CAS_i > (maxSpeed + epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                )
+                break
 
             # compute Energy Share Factor (ESF)
             ESF_i = AC.esf(
@@ -4838,20 +4835,17 @@ def constantSpeedSlope_time(
                 )
                 break
 
-            if (phase == "Climb" and Hp_i < Hp_final) or (
-                phase == "Descent" and Hp_i > Hp_final
-            ):
-                epsilon = 3
-                if CAS_i < (minSpeed - epsilon):
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
-                    )
-                    break
-                elif CAS_i > (maxSpeed + epsilon):
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
-                    )
-                    break
+            epsilon = 3
+            if CAS_i < (minSpeed - epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                )
+                break
+            elif CAS_i > (maxSpeed + epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                )
+                break
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
@@ -6972,20 +6966,17 @@ def constantSpeedRating_time(
                 )
                 break
 
-            if (phase == "Climb" and Hp_i < Hp_final) or (
-                phase == "Descent" and Hp_i > Hp_final
-            ):
-                epsilon = 3
-                if CAS_i < (minSpeed - epsilon):
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
-                    )
-                    break
-                elif CAS_i > (maxSpeed + epsilon):
-                    warnings.warn(
-                        f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
-                    )
-                    break
+            epsilon = 3
+            if CAS_i < (minSpeed - epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_min = {conv.ms2kt(minSpeed)} kt"
+                )
+                break
+            elif CAS_i > (maxSpeed + epsilon):
+                warnings.warn(
+                    f"Aircraft out of speed flight envelope at {Hp_i} ft; CAS_max = {conv.ms2kt(maxSpeed)} kt"
+                )
+                break
 
             if turnFlight:
                 if turnMetrics["bankAngle"] != 0.0:
