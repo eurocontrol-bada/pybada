@@ -34,7 +34,7 @@ dev = [
   "Sphinx==9.1.0",
   "pre-commit==4.5.1",
   "sphinx-gallery==0.20.0",
-  "matplotlib==3.10.8",
+  "matplotlib==3.11.0",
   "folium==0.20.0",
   "pytest==9.0.2",
   "build==1.4.0",
