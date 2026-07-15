@@ -44,6 +44,12 @@ dev = [
   "ruff==0.15.21",
   ]
 
+[tool.uv]
+environments = [
+  "python_version == '3.11'",
+  "python_version == '3.12'",
+]
+
 [project.urls]
 "Homepage" = "https://github.com/eurocontrol-bada/pybada"
 
