@@ -4,3 +4,15 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "sphinx*"
+      - dependency-name: "sphinx-rtd-theme"
+      - dependency-name: "sphinx-gallery"
+      - dependency-name: "readthedocs-sphinx-search"
+      - dependency-name: "pre-commit"
+      - dependency-name: "pytest"
+      - dependency-name: "build"
+      - dependency-name: "twine"
+      - dependency-name: "ruff"
+      - dependency-name: "matplotlib"
+      - dependency-name: "folium"
